@@ -1,7 +1,7 @@
-1. Backend Architecture & Libraries
-The application is built around an offline-first, agentic architecture using a cross-platform React Native (Expo) frontend. The backend services prioritize local processing and persistence with seamless cloud sync.
+1. Backend Architecture \& Libraries
+   The application is built around an offline-first, mobile-first architecture using a cross-platform React Native (Expo) frontend. The backend services prioritize local processing and persistence with seamless cloud sync.
 
-Local Data & State Management
+Local Data \& State Management
 
 TinyBase (tinybase): Acts as the offline-first reactive key-value and tabular data store. It stores data locally (via SQLite on native devices) and provides fine-grained reactivity for UI components.
 
@@ -9,7 +9,7 @@ Expo SQLite (expo-sqlite): The underlying SQL database engine powering the local
 
 Zustand (zustand): Used for managing ephemeral, non-persisted session-level state across the UI.
 
-Cloud Backend & Data Sync
+Cloud Backend \& Data Sync
 
 Nhost JS SDK (@nhost/nhost-js): Serves as the primary Backend-as-a-Service (BaaS). It provides PostgreSQL for the cloud database, Hasura for GraphQL APIs, built-in Authentication, and Storage.
 
@@ -17,8 +17,22 @@ GraphQL Client (graphql-client): Used to securely communicate with the Nhost Has
 
 Nhost Serverless Functions: Hosts custom backend logic, such as the AI Proxy (/functions/ai-proxy) which handles billing and forwards requests to OpenRouter.
 
-2. Testing Strategy & Libraries
-The testing strategy has moved towards a structured setup orchestrated by a custom MCP (Model Context Protocol) server (test-orchestrator), dividing tests into Unit and End-to-End (E2E) layers.
+Client-Side Technologies
+
+Components: 
+
+Gluestack UI (@gluestack-ui/core, @gluestack-ui/nativewind) - The core component library providing accessible, customizable, and cross-platform UI components.
+
+Tailwind CSS: A utility-first CSS framework for creating custom, responsive designs efficiently.
+
+GrapesJS: Templating drag and drop editor for character sheets and other components.
+
+Rendering: The Three.js rendering engine is a component within the client application. It receives its state (map image, token positions, etc.) from the React application and is responsible for drawing the main tabletop view.
+
+Voice/Video Chat: WebRTC connections are established peer-to-peer between clients. The Nhost backend acts as a secure signaling server to facilitate the initial handshake.
+
+2. Testing Strategy \& Libraries
+   The testing strategy has moved towards a structured setup orchestrated by a custom MCP (Model Context Protocol) server (test-orchestrator), dividing tests into Unit and End-to-End (E2E) layers.
 
 Unit Testing Strategy
 
@@ -32,3 +46,4 @@ Playwright (@playwright/test): Replaced Maestro/Detox (indicated by some legacy 
 est Orchestration
 
 MCP Test Orchestrator (mcp/test-orchestrator/dist/cli.js): A custom system designed for AI agents to precisely run tests, type-checks, and coverage reports. It replaces the traditional manual npm test scripts to provide structured, machine-readable output for continuous validation during development.
+
