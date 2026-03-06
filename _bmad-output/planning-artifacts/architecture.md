@@ -1,5 +1,5 @@
 ---
-stepsCompleted: [1, 2, 3, 4, 5, 6, 7]
+stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
 inputs:
   - c:\Development\DungeonsWithFriends\_bmad-output\planning-artifacts\prd.md
   - c:\Development\DungeonsWithFriends\_bmad-output\planning-artifacts\architecture.md
@@ -9,6 +9,9 @@ workflowType: 'architecture'
 project_name: 'DungeonsWithFriends'
 user_name: 'Derek'
 date: '2026-03-06T08:14:35-08:00'
+lastStep: 8
+status: 'complete'
+completedAt: '2026-03-06T10:02:56-08:00'
 ---
 # Architecture Decision Document
 
