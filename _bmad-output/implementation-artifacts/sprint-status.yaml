@@ -1,0 +1,109 @@
+# generated: 2026-03-06 15:15:00
+# project: DungeonsWithFriends
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: c:\Development\DungeonsWithFriends\_bmad-output\implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: "2026-03-06 15:15:00"
+project: DungeonsWithFriends
+project_key: NOKEY
+tracking_system: file-system
+story_location: "c:\\Development\\DungeonsWithFriends\\_bmad-output\\implementation-artifacts"
+
+development_status:
+  epic-1: backlog
+  1-1-project-initialization-core-framework-scaffolding: backlog
+  1-2-user-authentication-offline-only-mode: backlog
+  1-3-custom-component-definition-for-creators-desktop: backlog
+  1-4-load-pre-created-optimal-character-templates: backlog
+  1-5-interactive-character-sheet-manual-overrides: backlog
+  1-6-import-export-json-layouts-local-data-backup: backlog
+  1-7-native-dice-parser-and-roller: backlog
+  1-8-data-privacy-partitioning-with-defaults: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-cloud-backend-syncfacade-initialization: backlog
+  2-2-player-profile-friends-list-management: backlog
+  2-3-campaign-instance-creation-configuration: backlog
+  2-4-campaign-joining-character-binding: backlog
+  2-5-player-campaign-library: backlog
+  2-6-the-campaign-dashboard-player-visibility: backlog
+  2-7-campaign-chat-threaded-conversations: backlog
+  2-8-publishing-house-rules: backlog
+  2-9-campaign-audio-integration: backlog
+  2-10-dynamic-campaign-theming: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-2d-battlemap-scene-imagery-uploads: backlog
+  3-2-encounter-builder-compendium: backlog
+  3-3-token-placement-free-roam-movement: backlog
+  3-4-dynamic-initiative-tracking-turn-based-movement: backlog
+  3-5-character-sheet-battlemap-integration-hud: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-offline-mechanical-action-submission: backlog
+  4-2-asynchronous-auto-sync-resolution: backlog
+  4-3-contextual-narrative-push-notifications: backlog
+  4-4-auto-rollback-for-state-conflicts: backlog
+  epic-4-retrospective: optional
+
+  epic-5: backlog
+  5-1-webhook-integration-for-third-party-vtts: backlog
+  5-2-gm-forced-roll-triggers-timeouts: backlog
+  5-3-headless-encounter-simulation: backlog
+  5-4-basic-ai-action-interception: backlog
+  epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-full-rules-engine-map-integration: backlog
+  6-2-local-autonomous-battle-simulation-rl-training-pipeline: backlog
+  6-3-standalone-workstation-simulation-tool: backlog
+  6-4-auto-balancing-encounters-local: backlog
+  6-5-searchable-campaign-help-system: backlog
+  6-6-rules-engine-mcp-server-integration: backlog
+  6-7-natural-language-rules-translation-llm: backlog
+  6-7-natural-language-catch-up-summaries-llm: backlog
+  6-8-deep-rules-gm-approval-gate: backlog
+  epic-6-retrospective: optional
+
+  epic-7: backlog
+  7-1-cloud-syncing-premium-subscription-tier: backlog
+  7-2-ugc-template-publishing-marketplace: backlog
+  7-3-official-system-curation-api: backlog
+  7-4-premium-template-purchasing-token-economy: backlog
+  7-5-automated-ugc-moderation: backlog
+  7-6-immutable-action-ledger-for-moderation: backlog
+  7-7-automated-bot-detection-restriction: backlog
+  epic-7-retrospective: optional
