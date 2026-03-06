@@ -156,7 +156,8 @@ The architecture successfully supports true offline-first capability and real-ti
 - **FR16:** Users can create and play these interactive character sheets entirely offline.
 
 **Edge Cases & Administrative (Secondary Creator Tooling)**
-- **FR17:** Creators can use a drag-and-drop WYSIWYG editor to design custom character sheet layouts and map visual controls strictly to underlying JSON data structures.
+- **FR17: Custom Game Components**
+Platform Admins or authorized creators can define new component definitions (attributes, derived stats) and underlying structured data representations to support non-standard game systems.
 - **FR18:** Creators can export their custom character sheet JSON configurations to local device storage, and import valid JSON layouts.
 
 ### 3. Campaign Setup & Social Hub
@@ -178,7 +179,7 @@ The architecture successfully supports true offline-first capability and real-ti
 - **FR30:** Users can receive contextual mobile push notifications framed narratively (e.g., "The Goblin lunges at you, what do you do?") when an action dictates their mandatory input.
 - **FR31:** Users can execute an "Initiative Roll" to inject their character into a formal turn order when the GM starts tactical combat mode.
 - **FR32:** Players can view the active 2D battlemap, including the real-time or async coordinates of their character token and visible adversaries.
-- **FR33:** Players can submit dice rolls to the campaign log directly passing values from a third-party VTT or tracking tool via external webhook integration (e.g., rolling on D&D Beyond).
+- **FR33:** Players can send dice roll results from third-party VTT trackers (e.g., Beyond20) directly to the Dungeons with Friends campaign log via webhook ingest or native extension.
 - **FR34:** The system can parse user-inputted dice notation natively (e.g., 2d6+4) and mathematically resolve the outcome.
 - **FR35:** GMs can manually build encounters by searching a Compendium database and adding pre-configured monsters to the game state.
 - **FR36:** The system can conduct headless background simulations of GM-built encounters to predict the probability of player victory and surface balance metrics.
