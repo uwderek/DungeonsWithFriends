@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeons with Friends - Design Directions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        .font-sans { font-family: 'Inter', sans-serif; }
+        .font-serif { font-family: 'Merriweather', serif; }
+        
+        /* Thematic CSS Variables (Simulating the FR27b Customization Strategy) */
+        :root {
+            /* Default Dark Mode */
+            --bg-base: #000000;
+            --bg-surface: #1A1A1A;
+            --bg-elevated: #2C2C2E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #8E8E93;
+            --accent-primary: #5E5CE6;
+            --accent-success: #30D158;
+            --accent-danger: #FF453A;
+            --border-radius: 12px;
+        }
+
+        .theme-shadowdark {
+            --bg-base: #0A0A0A;
+            --bg-surface: #141414;
+            --bg-elevated: #262626;
+            --text-primary: #E5E5E5;
+            --text-secondary: #737373;
+            --accent-primary: #D4D4D4; /* Muted silver/white */
+            --accent-success: #A3A3A3;
+            --accent-danger: #7F1D1D; /* Dark blood red */
+            --border-radius: 0px; /* Gritty, sharp edges */
+            font-family: 'Courier New', Courier, monospace; /* Gritty retro feel */
+        }
+        
+        body { background-color: #111; color: white; }
+        
+        .mockup-container {
+            width: 375px; /* Standard iPhone width */
+            height: 812px;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            border-radius: 40px;
+            border: 8px solid #333;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background-color: #333;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="p-8 font-sans">
+
+    <header class="mb-12 text-center">
+        <h1 class="text-4xl font-bold mb-4 font-serif">Design Directions Showcase</h1>
+        <p class="text-gray-400 max-w-2xl mx-auto">Explore three distinct approaches to the "Play" interface. Click the buttons below to toggle themes and see how the UI structure responds.</p>
+    </header>
+
+    <div class="flex flex-wrap justify-center gap-12">
+
+        <!-- Direction 1: The "Pure Feed" (Discord Heavy) -->
+        <div class="flex flex-col items-center">
+            <h2 class="text-2xl font-bold mb-2">1. The "Pure Feed"</h2>
+            <p class="text-sm text-gray-400 mb-6 text-center max-w-xs">Maximizes the Chat/Narrative history. Action buttons are minimal pills until expanded.</p>
+            
+            <div class="mockup-container" id="mockup1">
+                <div class="phone-notch"></div>
+                
+                <!-- Top Nav -->
+                <div class="pt-12 pb-4 px-4 flex justify-between items-center bg-[var(--bg-surface)] border-b border-[var(--bg-elevated)]">
+                    <div class="font-serif font-bold">Curse of Strahd</div>
+                    <div class="text-[var(--accent-primary)] font-bold">HP: 34/45</div>
+                </div>
+
+                <!-- Scrollable Feed -->
+                <div class="p-4 h-[550px] overflow-y-auto flex flex-col justify-end space-y-4">
+                    
+                    <!-- GM Post -->
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-purple-600 flex-shrink-0"></div>
+                        <div>
+                            <div class="flex items-baseline gap-2">
+                                <span class="font-bold text-sm">Game Master</span>
+                                <span class="text-xs text-[var(--text-secondary)]">2:14 PM</span>
+                            </div>
+                            <p class="text-sm mt-1">The door splinters inward. Two dire wolves bare their teeth, eyes glowing in the dark. Initiative!</p>
+                        </div>
+                    </div>
+
+                    <!-- Player Rich Embed Roll -->
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 flex-shrink-0"></div>
+                        <div class="w-full">
+                            <div class="flex items-baseline gap-2">
+                                <span class="font-bold text-sm">Garamond (You)</span>
+                                <span class="text-xs text-[var(--text-secondary)]">2:16 PM</span>
+                            </div>
+                            
+                            <div class="mt-2 bg-[var(--bg-surface)] border border-[var(--bg-elevated)] p-3 rounded-[var(--border-radius)]">
+                                <div class="text-xs text-[var(--text-secondary)] font-bold uppercase mb-1">Initiative Roll</div>
+                                <div class="flex justify-between items-center">
+                                    <div class="text-sm">1d20 + 3</div>
+                                    <div class="text-xl font-bold text-[var(--accent-primary)]">18</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Story Card Digest -->
+                    <div class="bg-[var(--bg-surface)] border-l-4 border-[var(--accent-primary)] p-4 rounded-r-[var(--border-radius)] my-4">
+                        <h3 class="font-serif font-bold text-sm mb-2 text-[var(--accent-primary)]">Previously On...</h3>
+                        <ul class="text-sm space-y-1 text-[var(--text-secondary)]">
+                            <li>• Elara cast Light on the rogue's dagger.</li>
+                            <li>• The Rogue disarmed the heavy portcullis trap.</li>
+                            <li>• You are now at the crypt entrance.</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- Static Bottom Action Bar -->
+                <div class="absolute bottom-0 w-full bg-[var(--bg-surface)] p-4 pb-8 border-t border-[var(--bg-elevated)]">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="bg-[var(--accent-primary)] text-white py-3 rounded-[var(--border-radius)] font-bold shadow-lg">Attack (1d20+5)</button>
+                        <button class="bg-[var(--bg-elevated)] text-[var(--text-primary)] py-3 rounded-[var(--border-radius)] font-bold">Cast Spell</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 2: The "Floating HUD" (Marvel Snap Heavy) -->
+        <div class="flex flex-col items-center">
+            <h2 class="text-2xl font-bold mb-2">2. The "Floating HUD"</h2>
+            <p class="text-sm text-gray-400 mb-6 text-center max-w-xs">The Background is the Battlemap. UI elements float over it, maximizing spatial awareness.</p>
+            
+            <div class="mockup-container bg-gray-800 relative" id="mockup2" style="background-image: url('https://www.transparenttextures.com/patterns/black-scales.png');">
+                <div class="phone-notch"></div>
+                
+                <!-- Fake Map Grid Background -->
+                <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+                <!-- Floating Top Vitals -->
+                <div class="pt-12 px-4 flex justify-between items-start pointer-events-none">
+                    <!-- Enemy Card -->
+                    <div class="bg-[var(--bg-surface)]/90 backdrop-blur border border-[var(--bg-elevated)] p-3 rounded-[var(--border-radius)] w-1/2 pointer-events-auto">
+                        <div class="text-xs font-bold text-[var(--accent-danger)] uppercase">Target</div>
+                        <div class="font-serif font-bold">Dire Wolf A</div>
+                        <div class="text-xs text-[var(--text-secondary)] mt-1">Status: Engaged</div>
+                    </div>
+                </div>
+
+                <!-- Floating Turn Indicator -->
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none text-center w-full">
+                    <div class="inline-block bg-[var(--bg-base)]/80 backdrop-blur px-6 py-2 rounded-full border border-[var(--accent-primary)]/50 text-[var(--accent-primary)] font-bold animate-pulse">
+                        YOUR TURN
+                    </div>
+                </div>
+
+                <!-- Floating Bottom Action Drawer -->
+                <div class="absolute bottom-4 left-4 right-4 space-y-3">
+                    <!-- Action Cards -->
+                    <div class="flex gap-2 overflow-x-auto pb-2 snap-x">
+                        <div class="snap-center shrink-0 w-32 bg-[var(--accent-primary)] p-3 rounded-[var(--border-radius)] flex flex-col justify-between h-32 shadow-xl border border-white/20">
+                            <span class="text-xs font-bold uppercase opacity-80">Melee</span>
+                            <div>
+                                <div class="font-serif font-bold leading-tight">Longsword</div>
+                                <div class="text-xs mt-1 font-bold">+5 to hit</div>
+                            </div>
+                        </div>
+                        <div class="snap-center shrink-0 w-32 bg-[var(--bg-surface)] p-3 rounded-[var(--border-radius)] flex flex-col justify-between h-32 shadow-xl border border-[var(--bg-elevated)]">
+                            <span class="text-xs font-bold uppercase text-[var(--text-secondary)]">Bonus</span>
+                            <div>
+                                <div class="font-serif font-bold text-[var(--text-primary)] leading-tight">Second Wind</div>
+                                <div class="text-xs mt-1 text-[var(--accent-success)]">Heal 1d10+3</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 3: The "Split View" (Hybrid) -->
+        <div class="flex flex-col items-center">
+            <h2 class="text-2xl font-bold mb-2">3. The "Split View"</h2>
+            <p class="text-sm text-gray-400 mb-6 text-center max-w-xs">Top half shows the narrative digest and map; bottom half is a permanent mechanical keypad.</p>
+            
+            <div class="mockup-container flex flex-col" id="mockup3">
+                <div class="phone-notch"></div>
+                
+                <!-- Top Half: Context -->
+                <div class="h-1/2 pt-12 p-6 bg-[var(--bg-base)] flex flex-col justify-end">
+                    <h3 class="font-serif font-bold text-2xl mb-2">Goblin Ambush</h3>
+                    <p class="text-sm text-[var(--text-secondary)] mb-4">You are cornered in the alley. The Goblin boss readies a heavy crossbow, aiming directly at the cleric.</p>
+                    
+                    <div class="flex justify-between items-center bg-[var(--bg-surface)] p-3 rounded-[var(--border-radius)] border border-[var(--bg-elevated)]">
+                        <div>
+                            <div class="text-xs text-[var(--text-secondary)] font-bold uppercase">HP</div>
+                            <div class="font-bold text-lg text-[var(--accent-success)]">24 / 24</div>
+                        </div>
+                        <div class="h-8 w-px bg-[var(--bg-elevated)]"></div>
+                        <div>
+                            <div class="text-xs text-[var(--text-secondary)] font-bold uppercase">Spell Slots</div>
+                            <div class="flex gap-1 mt-1">
+                                <div class="w-3 h-3 rounded-full bg-[var(--accent-primary)]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[var(--accent-primary)]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[var(--bg-elevated)]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Half: The Command Center -->
+                <div class="h-1/2 bg-[var(--bg-surface)] border-t-2 border-[var(--bg-elevated)] p-4 pb-8 flex flex-col">
+                    <div class="text-xs font-bold text-[var(--text-secondary)] uppercase mb-3 text-center">Your Actions</div>
+                    
+                    <div class="grid grid-cols-2 gap-3 flex-grow">
+                        <!-- Big Button -->
+                        <button class="col-span-2 bg-[var(--accent-primary)] rounded-[var(--border-radius)] flex flex-col justify-center items-center p-4">
+                            <span class="font-serif font-bold text-lg">Cast Fireball</span>
+                            <span class="text-xs opacity-80 mt-1">3rd Level • 8d6 Damage</span>
+                        </button>
+                        <!-- Grid Buttons -->
+                        <button class="bg-[var(--bg-elevated)] rounded-[var(--border-radius)] flex flex-col justify-center items-center p-3">
+                            <span class="font-bold">Dodge</span>
+                        </button>
+                        <button class="bg-[var(--bg-elevated)] rounded-[var(--border-radius)] flex flex-col justify-center items-center p-3">
+                            <span class="font-bold">Inventory</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Theming Controls -->
+    <div class="mt-16 text-center bg-gray-900 p-6 rounded-2xl max-w-xl mx-auto border border-gray-700">
+        <h3 class="font-bold text-lg mb-4">Test Campaign-Level Theming (FR27b)</h3>
+        <p class="text-sm text-gray-400 mb-4">Click below to inject a custom theme payload, demonstrating how our headless Tailwind strategy handles visual reskins without changing the HTML structure.</p>
+        <div class="flex justify-center gap-4">
+            <button onclick="setTheme('default')" class="px-6 py-2 bg-indigo-600 rounded-lg font-bold">Default (Sci-Fi / Modern)</button>
+            <button onclick="setTheme('shadowdark')" class="px-6 py-2 bg-gray-800 border border-gray-500 rounded-sm font-bold shadow-[4px_4px_0px_#000]">Shadowdark (Retro B&W)</button>
+        </div>
+    </div>
+
+    <script>
+        function setTheme(themeName) {
+            const containers = document.querySelectorAll('.mockup-container');
+            containers.forEach(container => {
+                // Remove all existing themes
+                container.classList.remove('theme-shadowdark');
+                
+                // Add new theme if not default
+                if (themeName !== 'default') {
+                    container.classList.add(`theme-${themeName}`);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

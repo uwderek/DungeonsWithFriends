@@ -171,6 +171,7 @@ Platform Admins or authorized creators can define new component definitions (att
 - **FR25:** GMs can upload, manage, and assign a library of 2D Battlemaps and static imagery (e.g., NPC portraits, scenic vistas) to specific encounters.
 - **FR26:** GMs can upload or select audio tracks and trigger streaming battle music/ambience for all connected players.
 - **FR27:** GMs can toggle specific campaign mechanics between "Theater of the Mind" (narrative/image-based) and "Tactical" (Battlemap/Grid-based).
+- **FR27b:** GMs can apply distinct visual themes (e.g., Gritty B&W for Shadowdark, Vibrant for Pathfinder, Anime-styled) to a campaign instance, changing the global UI styling for all participating players.
 
 ### 4. Asynchronous Gameplay & Encounter Resolution
 **Primary Path (Core Usage)**
