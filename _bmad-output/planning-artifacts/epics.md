@@ -483,8 +483,9 @@ So that invalid actions (like exploring a room while dead) do not permanently co
 **Acceptance Criteria:**
 **Given** the server receives an offline action that is rendered invalid by a chronologically prior action (e.g., the acting character was killed before they took the action)
 **When** the SyncFacade attempts resolution
-**Then** the server rejects the invalid action and initiates an Auto-Rollback for that client
-**And** the client is updated to the correct authoritative server state, notifying the user why their action was rejected.
+**Then** the Authoritative Server Rules Engine explicitly overrides the Local Rules Engine
+**And** the client is updated to the correct authoritative server state
+**And** any invalid "Ghost Tokens" are visually snapped back to their true server coordinates on the battlemap, notifying the user why their action was rejected.
 
 ### Epic 5: Advanced GM Controls & Simulation
 
@@ -501,15 +502,16 @@ So that I can use my preferred virtual tabletop while maintaining an accurate ch
 **Then** the Nhost backend receives, authenticates, and parses the payload
 **And** the result is injected into the campaign's unified event log, updating the game state if it was a mechanical action.
 
-### Story 5.2: GM Forced Roll Triggers
+### Story 5.2: GM Forced Roll Triggers & Timeouts
 As a GM,
-I want the ability to trigger ability checks, saving throws, and custom rolls to individual players, the entire party, or specific enemies,
-So that I can actively manage the game state and prompt players for required interactions.
+I want the ability to trigger ability checks, saving throws, and custom rolls to individual players, the entire party, or specific enemies, and set an optional temporal limit,
+So that I can actively manage the game state and prevent the game from soft-locking if a player is offline.
 
 **Acceptance Criteria:**
 **Given** an active campaign session
 **When** the GM selects targets (individuals, group, or enemies) and chooses a specific roll type (e.g., "Dexterity Save")
 **Then** a targeted prompt is sent to the selected players' devices demanding the roll
+**And** if the GM applies a Time Limit (e.g., 5 minutes), the system will automatically roll on the player's behalf using their base stats if they fail to respond in time
 **And** the GM can see who has successfully rolled and what their results are in real-time.
 
 ### Story 5.3: Headless Encounter Simulation
@@ -546,32 +548,44 @@ So that the system can automatically validate actions and apply correct mechanic
 **Acceptance Criteria:**
 **Given** the game is in Tactical Mode with a gridded battlemap
 **When** a player attempts an action with specific range/line-of-sight requirements
-**Then** the rules engine calculates the exact distance and obstacles on the canvas
+**Then** the rules engine must provide proactive UI highlighting for valid targets *before* execution to prevent client/server spatial disagreements
 **And** either validates the action or rejects it with a specific mechanical reason (e.g., "Target is behind full cover").
 
-### Story 6.2: Autonomous Battle Simulation & RL Training Pipeline
+### Story 6.2: Local Autonomous Battle Simulation & RL Training Pipeline
 As a Developer,
-I want to build a headless simulation pipeline that uses Reinforcement Learning (RL) to play encounters millions of times,
-So that the system can train highly optimized AI combatants that understand optimal positioning and ability usage.
+I want to build a headless simulation pipeline that uses Reinforcement Learning (RL) to play encounters millions of times locally on the user's device,
+So that the system can train highly optimized AI combatants without spinning up expensive server compute resources.
 
 **Acceptance Criteria:**
 **Given** a set of creature stat blocks and a battlemap layout
 **When** the RL training pipeline is triggered
-**Then** the engine simulates the battle iteratively, rewarding the AI for efficient damage and survival
-**And** generates an optimized decision-making model payload for those specific creatures.
+**Then** the engine simulates the battle iteratively using local device compute resources
+**And** generates an optimized decision-making model payload for those specific creatures
+**And** includes a strict compute timeout limit (e.g., 5 seconds max simulation time on mobile) with a fallback to basic CR math if RL fails to converge.
 
-### Story 6.3: Auto-Balancing Encounters
+### Story 6.3: Standalone Workstation Simulation Tool
+As a Creator or Power User,
+I want to run the headless encounter simulation pipeline as a standalone executable on a high-powered workstation,
+So that I can rapidly optimize characters or complex monster behaviors without being constrained by mobile device hardware.
+
+**Acceptance Criteria:**
+**Given** a desktop environment
+**When** the user runs the standalone simulator with a defined JSON encounter payload
+**Then** the simulator runs all imported JSON payloads through a strict baseline heuristic sanity check (Zod limits) *before* the first RL epoch begins
+**And** executes the RL pipeline iteratively using available CPU/GPU resources, outputting an optimized decision-making model.
+
+### Story 6.4: Auto-Balancing Encounters (Local)
 As a GM,
-I want to click a single button to auto-balance an encounter against my specific party composition,
+I want to click a single button to auto-balance an encounter against my specific party composition using local compute,
 So that I don't accidentally cause a Total Party Kill (TPK) or create an overwhelmingly boring fight.
 
 **Acceptance Criteria:**
 **Given** the GM has drafted an encounter in the Builder
 **When** they select "Auto-Balance"
-**Then** the system utilizes the RL models and headless simulation to predict the outcome
-**And** automatically adds, removes, or scales enemies until the predicted success probability matches the GM's selected difficulty threshold (e.g., "Hard - 70% win rate").
+**Then** the system utilizes the local RL models and headless simulation to predict the outcome
+**And** automatically adds, removes, or scales enemies until the predicted success probability matches the GM's selected difficulty threshold.
 
-### Story 6.4: Searchable Campaign Help System
+### Story 6.5: Searchable Campaign Help System
 As a Player or GM,
 I want to access a searchable help system containing all official rules and custom house rules for the current campaign,
 So that I can quickly resolve rules disputes during play and provide context grounding for AI engine tools.
@@ -582,18 +596,18 @@ So that I can quickly resolve rules disputes during play and provide context gro
 **Then** the system returns relevant excerpts from both the base system ruleset and the GM's published House Rules
 **And** the rules text is formatted cleanly for mobile and desktop reading.
 
-### Story 6.5: Rules Engine MCP Server Integration
+### Story 6.6: Rules Engine MCP Server Integration
 As a Developer,
-I want to expose the campaign's active ruleset and game state via the Model Context Protocol (MCP),
-So that AI agents (like the Natural Language Rules Translator) have secure, context-aware access to the specific rules governing the current match.
+I want to expose the campaign's active ruleset and specific, restricted game state actions via the Model Context Protocol (MCP),
+So that AI agents have secure, context-aware access to rules without direct state manipulation access.
 
 **Acceptance Criteria:**
 **Given** the App Backend is running
-**When** an external LLM agent attempts to interpret a complex rule or GM request
-**Then** the agent can query the Rules Engine MCP Server to receive the exact current mechanical state and active rules definitions
-**And** use this context to ground its subsequent responses or JSON updates.
+**When** an external LLM agent attempts to interpret a rule
+**Then** the MCP Server explicitly restricts raw state variable access, forcing use of strictly typed endpoints
+**And** the MCP Server issues temporary "State Lock Tokens". If the game state ledger updates (due to async combat) before the LLM returns its payload, the MCP server rejects the payload with a `STATE_STALE` error.
 
-### Story 6.6: Natural Language Rules Translation (LLM)
+### Story 6.7: Natural Language Rules Translation (LLM)
 As a GM,
 I want to input plain-text hypothetical rules (e.g., "Fire magic is twice as effective here"),
 So that the system can translate my intent into the strict JSON schema required by the new Full Rules Engine.
@@ -650,7 +664,8 @@ So that other players can discover and use my structured game systems.
 **Given** a Creator has built a template locally
 **When** they select "Publish to Marketplace"
 **Then** the JSON payload is uploaded to Nhost storage and a public marketplace entry is created
-**And** the entry includes a title, description, and preview image.
+**And** the entry includes a title, description, and preview image
+**And** the system automatically generates a "Read-Only Interactive Sandbox" version of the template for the marketplace.
 
 ### Story 7.3: Official System Curation (API)
 As a Platform Administrator,
@@ -669,9 +684,11 @@ So that I can access high-quality creator content and compensate the designers.
 
 **Acceptance Criteria:**
 **Given** a marketplace entry with a set token price
-**When** a player clicks "Unlock" and possesses sufficient tokens
-**Then** the tokens are deducted from their account ledger
-**And** the template becomes permanently available for them to load in the Character Builder.
+**When** a player clicks "Test Sandbox"
+**Then** they can load the interactive template into a secure, offline, read-only state to verify its functionality before purchase
+**And** when they click "Unlock" and possess sufficient tokens, the tokens are deducted from their account ledger
+**And** the full template becomes permanently available for them to load in the Character Builder
+**And** GMs have the option to purchase a "Campaign License" tier, which temporarily grants all players currently in their specific campaign access to the required templates for the duration of the campaign without spending individual tokens.
 
 ### Story 7.5: Automated UGC Moderation
 As a Developer,
@@ -704,4 +721,5 @@ So that the platform's API and marketplace are protected from unauthorized bulk 
 **Given** standard platform API traffic
 **When** an account or IP address exhibits rapid, non-human request patterns (e.g., attempting to download every marketplace template sequentially in milliseconds)
 **Then** the server automatically rate-limits or temporarily bans the offending IP/Token
-**And** logs the event for Administrative review.
+**And** logs the event for Administrative review
+**And** free-tier accounts have a strict hard cap on daily marketplace downloads to ensure scraping is economically unviable.
