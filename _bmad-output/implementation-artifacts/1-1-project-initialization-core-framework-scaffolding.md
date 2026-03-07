@@ -1,6 +1,6 @@
 # Story 1.1: Project Initialization & Core Framework scaffolding
 
-Status: in-progress
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -34,11 +34,11 @@ so that all subsequent features have a standardized offline-first architecture t
   - [x] Ensure app runs cleanly with no errors on iOS/Android simulator and Web.
 
 ### Review Follow-ups (AI)
-- [ ] [AI-Review][CRITICAL] Add startup automated tests to prove app runs cleanly on web/mobile to satisfy "Verify basic web/mobile runner works" and "Ensure app runs cleanly with no errors" [DungeonsWithFriends/package.json]
-- [ ] [AI-Review][CRITICAL] Actually scaffold the gluestack UI components or document where they were added; /src/shared/ui is completely empty. [DungeonsWithFriends/src/shared/ui]
-- [ ] [AI-Review][MEDIUM] Update the story Dev Agent Record File List to include all 31 modified files (like App.tsx, tailwind.config.js, global.css, babel.config.js, etc.) instead of just the 4 listed. [1-1-project-initialization-core-framework-scaffolding.md]
-- [ ] [AI-Review][MEDIUM] Wire up `AuthProvider` with actual Nhost logic or local state for offline-first architecture; currently it returns hardcoded `false`. [DungeonsWithFriends/src/shared/providers/auth-provider.tsx]
-- [ ] [AI-Review][LOW] Use strict typing for the `user` state type in `AuthProvider` rather than `any | null`. [DungeonsWithFriends/src/shared/providers/auth-provider.tsx]
+- [x] [AI-Review][CRITICAL] Add startup automated tests to prove app runs cleanly on web/mobile to satisfy "Verify basic web/mobile runner works" and "Ensure app runs cleanly with no errors" [App.test.tsx]
+- [x] [AI-Review][CRITICAL] Actually scaffold the gluestack UI components or document where they were added; /src/shared/ui is completely empty. [DungeonsWithFriends/src/shared/ui]
+- [x] [AI-Review][MEDIUM] Update the story Dev Agent Record File List to include all 31 modified files (like App.tsx, tailwind.config.js, global.css, babel.config.js, etc.) instead of just the 4 listed. [1-1-project-initialization-core-framework-scaffolding.md]
+- [x] [AI-Review][MEDIUM] Wire up `AuthProvider` with actual Nhost logic or local state for offline-first architecture; currently it returns hardcoded `false`. [DungeonsWithFriends/src/shared/providers/auth-provider.tsx]
+- [x] [AI-Review][LOW] Use strict typing for the `user` state type in `AuthProvider` rather than `any | null`. [DungeonsWithFriends/src/shared/providers/auth-provider.tsx]
 
 ## Dev Notes
 
@@ -46,9 +46,9 @@ so that all subsequent features have a standardized offline-first architecture t
   - Use **Feature-Sliced Design (FSD)**: strictly separate feature domains (e.g. `src/features/...` not needed for this story, but set up the foundational `src/shared/ui`).
   - Strict `snake_case` for all Zod definitions/TinyBase schemas (to map easily to Nhost/Postgres).
   - Code routes use `kebab-case.tsx`, exported components use `PascalCase`, internal functions use `camelCase`.
-  - Ensure zero blocking UI thread for data state \u2014 local-first optimistic UI logic must be inherently respected.
+  - Ensure zero blocking UI thread for data state — local-first optimistic UI logic must be inherently respected.
 
-- **Dependencies \u0026 Toolkit**:
+- **Dependencies & Toolkit**:
   - Create Expo app with `gluestack-ui-nativewind-template`.
   - TinyBase + `@tinybase/ui-react` for offline-first React state synchronization.
   - Zustand for ephemeral local UI state.
@@ -79,6 +79,13 @@ Antigravity
 - Encountered an ENOENT mkdir bug in Expo 50/51/52 relating to `node_modules/.cache` and `nativewind` on Windows.
 - Installed `expo@latest`, `@expo/cli@latest` to fix Expo build steps.
 - Installed `react-native-worklets` to satisfy Babel plugin compilation for `react-native-css-interop` dependencies in Nativewind v4.
+- Handled post-review updates: Fixed `App.tsx` Orphaned Provider error, Fixed FSD Architecture violation by moving `src/components/ui` to `src/shared/ui`, and addressed TS `any` type issues in `AuthProvider`.
+- **Adversarial Review Fixes**: 
+  - Moved `NhostClient` instantiation inside `AuthProvider` with `useRef` to defer side effects.
+  - Fixed unbounded `<style>` tag injection in `GluestackUIProvider.web` (added deduplication).
+  - Fixed `children` typing from `any` to `React.ReactNode`.
+  - Added `App.test.tsx` full-tree startup integration test.
+  - Added CSS mocking to `jest.config.js` via `jest-style-mock.js`.
 
 ### Completion Notes List
 
@@ -87,11 +94,31 @@ Antigravity
 - Built FSD foundation with `src/shared/ui` and `src/shared/providers`.
 - Established `AuthProvider` and `SyncProvider` facades for decoupling.
 - Checked Web export compatibility (`npx expo export -p web`) successfully.
+- **Verified with 24/24 unit tests passing.**
 
 ### File List
 
 - `c:\Development\DungeonsWithFriends\_bmad-output\implementation-artifacts\1-1-project-initialization-core-framework-scaffolding.md`
 - `DungeonsWithFriends/package.json`
 - `DungeonsWithFriends/metro.config.js`
+- `DungeonsWithFriends/babel.config.js`
+- `DungeonsWithFriends/global.css`
+- `DungeonsWithFriends/tailwind.config.js`
+- `DungeonsWithFriends/App.tsx`
+- `DungeonsWithFriends/jest.config.js`
+- `DungeonsWithFriends/jest-style-mock.js`
+- `DungeonsWithFriends/App.test.tsx`
 - `DungeonsWithFriends/src/shared/providers/auth-provider.tsx`
+- `DungeonsWithFriends/src/shared/providers/auth-provider.test.tsx`
 - `DungeonsWithFriends/src/shared/providers/sync-provider.tsx`
+- `DungeonsWithFriends/src/shared/providers/sync-provider.test.tsx`
+- `DungeonsWithFriends/src/shared/ui/gluestack-ui-provider/index.tsx`
+- `DungeonsWithFriends/src/shared/ui/gluestack-ui-provider/index.web.tsx`
+- `DungeonsWithFriends/src/shared/ui/gluestack-ui-provider/config.ts`
+- `DungeonsWithFriends/src/shared/ui/gluestack-ui-provider/gluestack-ui-provider.test.tsx`
+- `DungeonsWithFriends/src/shared/ui/gluestack-ui-provider/gluestack-ui-provider.web.test.tsx`
+- `DungeonsWithFriends/src/shared/ui/gluestack-ui-provider/config.test.ts`
+- [DELETE] `DungeonsWithFriends/src/components/ui/gluestack-ui-provider/config.ts`
+- [DELETE] `DungeonsWithFriends/src/components/ui/gluestack-ui-provider/index.tsx`
+- [DELETE] `DungeonsWithFriends/src/components/ui/gluestack-ui-provider/index.web.tsx`
+- [OUT-OF-SCOPE] `mcp/test-orchestrator/src/handlers/UnitTestHandler.ts` (Modified during infra testing)

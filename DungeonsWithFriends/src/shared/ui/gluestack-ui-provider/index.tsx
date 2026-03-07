@@ -9,7 +9,7 @@ export function GluestackUIProvider({
   ...props
 }: {
   mode?: 'light' | 'dark';
-  children?: any;
+  children?: React.ReactNode;
 }) {
   return (
     <View

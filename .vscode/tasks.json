@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Stop Expo Web Server",
+            "type": "shell",
+            "command": "npx kill-port 8081"
+        },
+        {
+            "label": "Start Expo Web Server",
+            "type": "npm",
+            "script": "web",
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/DungeonsWithFriends",
+                "env": {
+                    "BROWSER": "none"
+                }
+            },
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "expo start|Starting project",
+                    "endsPattern": "Starting Metro Bundler|Logs will appear in the browser console"
+                }
+            }
+        }
+    ]
+}

@@ -2,6 +2,7 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { FileTestFailures, TestFailure, TestResult } from '../types.js';
+import { parseCoverageGaps } from './CoverageHandler.js';
 import { cleanStackTrace, extractLogsForTest, getCommand, PROJECT_ROOT, serverLog } from '../utils.js';
 import { runLint } from './LintHandler.js';
 
@@ -231,13 +232,31 @@ export function runUnitTests(projectRoot: string, testFile?: string, skipCoverag
         summaryParts.push(`(Snapshots: ${stats.snapshots.failed} failed, ${stats.snapshots.matched} passed)`);
     }
 
-    // Overall success: no failures
-    const overallSuccess = failed === 0;
+    // Overall success: no test failures
+    const testsPass = failed === 0;
+
+    // Include coverage gaps in the result when coverage was collected
+    let coverageGaps: TestResult['coverageGaps'] = undefined;
+    let coverageSuccess = true;
+    if (!skipCoverage) {
+        const { gaps, totalGaps } = parseCoverageGaps(coverageDir, projectRoot);
+        if (totalGaps > 0) {
+            coverageGaps = gaps;
+            coverageSuccess = false;
+            summaryParts.push(`${totalGaps} file(s) below 80% coverage threshold`);
+            trace.push(`Coverage gaps found: ${totalGaps} file(s)`);
+        } else {
+            trace.push('All files meet the 80% coverage threshold');
+        }
+    }
+
+    const overallSuccess = testsPass && coverageSuccess;
 
     const result: TestResult = {
         success: overallSuccess,
         phase: 'unit',
         testFailures: failures.length > 0 ? failures : undefined,
+        coverageGaps,
         lintErrors: [], // Explicitly empty to show lint passed
         summary: summaryParts.join(', ') + '.',
         debugTrace: debug ? trace : undefined

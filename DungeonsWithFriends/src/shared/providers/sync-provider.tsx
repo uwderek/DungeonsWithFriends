@@ -29,7 +29,12 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <SyncContext.Provider value={{ isSyncing, lastSyncTime: null, triggerManualSync }}>
+        <SyncContext.Provider value={{
+            isSyncing,
+            // TODO: Update lastSyncTime when real Nhost sync is implemented; currently always null
+            lastSyncTime: null,
+            triggerManualSync
+        }}>
             <TinyBaseProvider store={store}>
                 {children}
             </TinyBaseProvider>
