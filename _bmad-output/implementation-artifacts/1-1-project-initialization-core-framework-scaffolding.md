@@ -1,6 +1,6 @@
 # Story 1.1: Project Initialization & Core Framework scaffolding
 
-Status: review
+Status: in-progress
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -32,6 +32,13 @@ so that all subsequent features have a standardized offline-first architecture t
   - [x] Scaffold `SyncProvider` and `AuthProvider` facade files.
 - [x] Task 4: Validate Setup (AC: 4)
   - [x] Ensure app runs cleanly with no errors on iOS/Android simulator and Web.
+
+### Review Follow-ups (AI)
+- [ ] [AI-Review][CRITICAL] Add startup automated tests to prove app runs cleanly on web/mobile to satisfy "Verify basic web/mobile runner works" and "Ensure app runs cleanly with no errors" [DungeonsWithFriends/package.json]
+- [ ] [AI-Review][CRITICAL] Actually scaffold the gluestack UI components or document where they were added; /src/shared/ui is completely empty. [DungeonsWithFriends/src/shared/ui]
+- [ ] [AI-Review][MEDIUM] Update the story Dev Agent Record File List to include all 31 modified files (like App.tsx, tailwind.config.js, global.css, babel.config.js, etc.) instead of just the 4 listed. [1-1-project-initialization-core-framework-scaffolding.md]
+- [ ] [AI-Review][MEDIUM] Wire up `AuthProvider` with actual Nhost logic or local state for offline-first architecture; currently it returns hardcoded `false`. [DungeonsWithFriends/src/shared/providers/auth-provider.tsx]
+- [ ] [AI-Review][LOW] Use strict typing for the `user` state type in `AuthProvider` rather than `any | null`. [DungeonsWithFriends/src/shared/providers/auth-provider.tsx]
 
 ## Dev Notes
 

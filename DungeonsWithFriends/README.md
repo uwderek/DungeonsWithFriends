@@ -10,11 +10,6 @@ First, install your dependencies.
 npm install
 ```
 
-### Note on Expected `npm install` Warnings
-During installation, you will see a few deprecation warnings related to packages like `glob@7.2.3` and `rimraf@3.0.2`. **Do not attempt to 'fix' these**. 
-
-These ancient utilities are deeply hardcoded into the internal build tools of React Native 0.73 and TailwindCSS/Nativewind. Attempting to force-upgrade them to modern versions will fundamentally break the Expo Metro bundler because the modern packages dropped legacy synchronous APIs. As proven by `npm audit`, they carry zero security vulnerabilities. They are simply logged by npm because their authors stopped maintaining them.
-
 ### Running the App Locally
 
 To start the development server:
@@ -33,30 +28,34 @@ npx expo export -p web
 
 ## 🧪 Testing Architecture
 
-The project contains two distinct layers of automated testing mandated by the architecture.
+> **CRITICAL RULE**: ALL testing, linting, and coverage mapping must occur strictly through the **Test Orchestrator MCP** server. Do not run `jest` or `playwright` natively, and do not use generic terminal commands to execute tests.
 
-### 1. Unit & Component Testing (Jest / React Testing Library)
-We use Jest for asserting pure JavaScript domain logic, and `@testing-library/react-native` for isolating UI components. Tests should be strictly co-located within Feature Slices (e.g., `src/features/builder/ui/button.test.tsx`).
+The Test Orchestrator wraps Jest and Playwright to automatically assert project constraints (like fixing lint errors first) and aggregates assertions and runtime logs into structural payloads.
 
-To run the suite:
-```bash
-npm run test
-```
+### Using the Test Orchestrator MCP
 
-To run in watch mode:
-```bash
-npm run test:watch
-```
+As an AI developer, you have access to the `test-orchestrator` MCP server which provides the following tools:
 
-### 2. End-to-End Testing (Playwright)
-We use Playwright strictly for full-system integration checks on the web target (simulating user browser workflows). These are located in the `/e2e` folder.
+1. **`run_tests`**: The primary tool for running the full workflow (Lint → Unit tests). You can optionally set `includeE2E: true` to run End-to-End tests as well. Set `skipLint: true` only if you specifically need to bypass the mandatory linting phase.
+2. **`run_lint`**: Runs TypeScript type checking independently. Returns the file, line, column, and error message for each issue.
+3. **`run_unit_tests`**: Runs only the Jest unit tests. Supports limiting execution to a specific file via the `file` parameter. Set `skipCoverage: true` to bypass coverage collection.
+4. **`run_e2e_tests`**: Runs Playwright E2E tests. By default (`runAllProjects: true`), it uses a fail-fast "chromium-first" strategy: if chromium passes, it runs other simulated browsers (Mobile Chrome, Mobile Safari). Use the `file` parameter to isolate a specific spec.
+5. **`get_coverage_gaps`**: Retrieves files with coverage below the 80% threshold and their exact uncovered line numbers, based on the *last* test run. Does not execute tests itself.
 
-To install the Playwright browser binaries (only needed once):
-```bash
-npx playwright install
-```
+**Debugging Tests**
+Every tool accepts a `debug: true` parameter. If a tool fails to parse or times out, re-run it with `debug: true` to receive internal execution traces.
 
-To run the Playwright suite (which will automatically spin up the `npm run web` dev server in the background):
-```bash
-npm run test:e2e
-```
+### Logging Requirements
+To aid debugging during automated tests, application code is expected to log its execution cleanly.
+1. **Always prefixed:** `console.log('[SyncProvider] Initializing');`
+2. **Captured natively:** If an E2E or Unit test fails, the orchestrator parses the execution buffers for that specific test run and includes the exact logs printed by the React components during assertion into the `logs` payload automatically.
+
+### Evaluating Test Results
+Do not search for output natively on disk. The test-orchestrator automatically captures and surfaces these to you directly:
+- **`run_tests` output:** Parses test assertions into structured JSON arrays listing the exact locator missed or element missing.
+- **Trace Debugging:** Use the `debug: true` flag inside an MCP tool invocation (or `--debug` in the CLI) if the tests fail catastrophically and you need to view the execution timeline.
+
+### Coverage Expectations
+The project maintains a strict minimum baseline of **80% Code Coverage**.
+- Each test run outputs `coverageGaps` with line details if files fall beneath the threshold.
+- Run `get_coverage_gaps` to request the exact line numbers missing branch coverage to guide testing efforts.

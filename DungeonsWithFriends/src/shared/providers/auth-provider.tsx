@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { NhostClient } from '@nhost/nhost-js';
 
 // TODO: Replace with actual Nhost config from environment variables
+// @ts-ignore - Supressed until @nhost/react and @nhost/nhost-js are upgraded to the urql standard
 const nhost = new NhostClient({
     subdomain: 'local', // Replace with your Nhost subdomain
     region: 'local' // Replace with your Nhost region

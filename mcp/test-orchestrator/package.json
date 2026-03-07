@@ -1,0 +1,27 @@
+{
+    "name": "test-orchestrator-mcp",
+    "version": "1.0.0",
+    "description": "MCP server for orchestrating test workflows: lint → unit → e2e",
+    "type": "module",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "tsc && node dist/index.js",
+        "cli": "node dist/cli.js",
+        "lint": "node dist/cli.js run_lint",
+        "unit": "node dist/cli.js run_unit_tests",
+        "e2e": "node dist/cli.js run_e2e_tests",
+        "tests": "node dist/cli.js run_tests",
+        "coverage": "node dist/cli.js get_coverage_gaps",
+        "//mcp": "AGENTS: Do NOT use these CLI scripts. Use the MCP tools directly. These are for human manual use only."
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.0.0",
+        "@toon-format/toon": "^2.1.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "typescript": "^5.0.0"
+    }
+}
