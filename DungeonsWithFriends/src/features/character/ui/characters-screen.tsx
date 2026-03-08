@@ -4,19 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Settings, LogOut } from 'lucide-react-native';
 import { useAuth } from '@/shared/providers/auth-provider';
 import { AppSidebar, HamburgerButton } from '@/shared/ui/navigation/app-sidebar';
-import { HeroBanner } from './hero-banner';
-import { CharacterGrid } from '@/features/character/ui/character-grid';
-import { CampaignSection } from '@/features/campaign/ui/campaign-section';
+import { CharacterGrid } from './character-grid';
 import { FriendsList } from '@/features/friends/ui/friends-list';
-import { heroData, characters, myCampaigns, recruitingCampaigns, friends } from './mock-data';
+import { characters, friends } from '@/features/dashboard/ui/mock-data';
 
-// Filter characters in active campaigns only for dashboard
-const activeCampaignNames = myCampaigns
-  .filter(c => c.status === 'active')
-  .map(c => c.name);
-const activeCharacters = characters.filter(c => activeCampaignNames.includes(c.campaignName));
-
-export const DashboardScreen: React.FC = () => {
+export const CharactersScreen: React.FC = () => {
   const { logout } = useAuth();
   const { width } = useWindowDimensions();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -48,7 +40,7 @@ export const DashboardScreen: React.FC = () => {
                 <HamburgerButton onPress={() => setSidebarOpen(true)} />
               )}
               <Text style={{ fontSize: 14, color: '#6B7280', letterSpacing: 0.5 }}>
-                Dashboard
+                Characters
               </Text>
             </View>
 
@@ -94,30 +86,24 @@ export const DashboardScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
           >
             <View style={{ maxWidth: 1200, alignSelf: 'center', width: '100%' }}>
-              {/* Hero Banner */}
-              <HeroBanner data={heroData} />
+              {/* Page Title */}
+              <Text
+                style={{
+                  fontFamily: 'Cinzel',
+                  fontSize: 28,
+                  fontWeight: '700',
+                  color: '#D97706',
+                  marginBottom: 24
+                }}
+              >
+                All Characters
+              </Text>
 
               {/* Main Content Layout */}
-              <View style={{ marginTop: 32, flexDirection: isDesktop ? 'row' : 'column', gap: 32 }}>
-                {/* Left Column - Character & Campaigns */}
-                <View style={{ flex: 1, gap: 32 }}>
-                  {/* Active Characters */}
-                  <CharacterGrid characters={activeCharacters} title="Characters" />
-
-                  {/* Campaigns */}
-                  <CampaignSection
-                    title="Campaigns"
-                    campaigns={myCampaigns}
-                    friends={friends}
-                  />
-
-                  {/* Recruiting Campaigns */}
-                  <CampaignSection
-                    title="Campaigns Recruiting Players"
-                    campaigns={recruitingCampaigns}
-                    friends={friends}
-                    showJoinButton
-                  />
+              <View style={{ flexDirection: isDesktop ? 'row' : 'column', gap: 32 }}>
+                {/* Left Column - All Characters */}
+                <View style={{ flex: 1 }}>
+                  <CharacterGrid characters={characters} title="Characters" />
                 </View>
 
                 {/* Right Column - Friends (Desktop only) */}

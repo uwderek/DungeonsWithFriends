@@ -11,6 +11,10 @@ export const THEME_TOKENS = {
         text_primary: '--color-text-primary',               // Primary text (e.g., White)
         text_secondary: '--color-text-secondary',           // Muted text (e.g., Gray-400)
         border_primary: '--color-border-primary',           // Standard borders
+        gold: '--color-gold',                               // Gold accent from reference design
+        ember: '--color-ember',                             // Red/ember for health/status
+        dungeon_stone: '--color-dungeon-stone',             // Card backgrounds
+        dungeon_deep: '--color-dungeon-deep',             // Deep backgrounds
     },
     fonts: {
         heading: '--font-heading', // e.g., Cinzel

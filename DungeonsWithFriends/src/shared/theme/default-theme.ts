@@ -13,6 +13,11 @@ export const DEFAULT_THEME = {
     [THEME_TOKENS.colors.text_secondary]: '#9CA3AF',         // Gray 400
     [THEME_TOKENS.colors.border_primary]: '#312E81',         // Indigo 900
 
+    [THEME_TOKENS.colors.gold]: '#D97706',                   // Gold/Amber 600
+    [THEME_TOKENS.colors.ember]: '#DC2626',                // Red 600 for health
+    [THEME_TOKENS.colors.dungeon_stone]: '#312E81',          // Indigo 900 for cards
+    [THEME_TOKENS.colors.dungeon_deep]: '#0F172A',           // Slate 900 for deep backgrounds
+
     [THEME_TOKENS.fonts.heading]: 'Cinzel',
     [THEME_TOKENS.fonts.body]: 'Inter',
 

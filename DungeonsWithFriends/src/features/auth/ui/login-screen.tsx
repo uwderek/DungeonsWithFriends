@@ -51,7 +51,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onForgotPasswo
     };
 
     return (
-        <SafeAreaView className="flex-1 bg-background-primary">
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#000000' }}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 className="flex-1"
@@ -59,42 +59,42 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onForgotPasswo
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <View className="px-6 pt-4">
                         <TouchableOpacity onPress={onBack} className="w-10 h-10 items-center justify-center">
-                            {React.createElement(ChevronLeft as any, { size: 28, color: "var(--color-accent-primary)" })}
+                            <ChevronLeft size={28} color="#D97706" />
                         </TouchableOpacity>
                     </View>
 
                     <View className="flex-1 px-6 pt-8">
-                        <Text className="text-3xl text-typography-primary font-bold mb-2" style={{ fontFamily: 'Cinzel' }}>
+                        <Text className="text-3xl text-white font-bold mb-2" style={{ fontFamily: 'Cinzel' }}>
                             Welcome Back
                         </Text>
-                        <Text className="text-typography-secondary mb-8">
+                        <Text className="text-gray-400 mb-8">
                             Ready to continue your adventure?
                         </Text>
 
                         <View className="space-y-6">
                             <View>
-                                <Text className="text-accent-primary text-sm mb-2 font-medium">Email Address</Text>
+                                <Text className="text-amber-600 text-sm mb-2 font-medium">Email Address</Text>
                                 <TextInput
                                     placeholder="Enter your email"
-                                    placeholderTextColor="var(--color-text-secondary)"
+                                    placeholderTextColor="#6B7280"
                                     value={email}
                                     onChangeText={setEmail}
                                     autoCapitalize="none"
                                     keyboardType="email-address"
-                                    className="bg-background-secondary text-typography-primary h-14 px-4 rounded-xl border border-border-primary"
+                                    style={{ backgroundColor: '#1E1B4B', color: '#FFFFFF', height: 56, paddingHorizontal: 16, borderRadius: 8, borderWidth: 1, borderColor: '#312E81' }}
                                 />
                                 {errors.email && <Text className="text-red-500 text-xs mt-1">{errors.email}</Text>}
                             </View>
 
                             <View>
-                                <Text className="text-accent-primary text-sm mb-2 font-medium">Password</Text>
+                                <Text className="text-amber-600 text-sm mb-2 font-medium">Password</Text>
                                 <TextInput
                                     placeholder="Enter your password"
-                                    placeholderTextColor="var(--color-text-secondary)"
+                                    placeholderTextColor="#6B7280"
                                     value={password}
                                     onChangeText={setPassword}
                                     secureTextEntry
-                                    className="bg-background-secondary text-typography-primary h-14 px-4 rounded-xl border border-border-primary"
+                                    style={{ backgroundColor: '#1E1B4B', color: '#FFFFFF', height: 56, paddingHorizontal: 16, borderRadius: 8, borderWidth: 1, borderColor: '#312E81' }}
                                 />
                                 {errors.password && <Text className="text-red-500 text-xs mt-1">{errors.password}</Text>}
                             </View>
@@ -103,13 +103,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onForgotPasswo
                                 onPress={onForgotPassword}
                                 className="self-end"
                             >
-                                <Text className="text-accent-primary text-sm font-medium">Forgot Password?</Text>
+                                <Text className="text-amber-600 text-sm font-medium">Forgot Password?</Text>
                             </TouchableOpacity>
                         </View>
 
                         {serverError && (
-                            <View className="mt-6 bg-red-900/30 border border-red-500/50 p-4 rounded-xl">
-                                <Text className="text-red-200 text-sm text-center">{serverError}</Text>
+                            <View style={{ marginTop: 24, backgroundColor: 'rgba(220, 38, 38, 0.2)', borderWidth: 1, borderColor: 'rgba(220, 38, 38, 0.5)', padding: 16, borderRadius: 8 }}>
+                                <Text className="text-red-400 text-sm text-center">{serverError}</Text>
                             </View>
                         )}
                     </View>
@@ -118,11 +118,18 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onForgotPasswo
                         <TouchableOpacity
                             onPress={handleLogin}
                             disabled={isSubmitting}
-                            className={`flex-row items-center justify-center h-14 rounded-xl ${isSubmitting ? 'bg-indigo-800' : 'bg-accent-primary'}`}
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: 56,
+                                borderRadius: 8,
+                                backgroundColor: isSubmitting ? '#92400E' : '#D97706'
+                            }}
                             activeOpacity={0.8}
                         >
-                            {React.createElement(LogIn as any, { size: 20, color: "white", className: "mr-2" })}
-                            <Text className="text-typography-primary font-bold text-lg">
+                            <LogIn size={20} color="#000000" />
+                            <Text className="text-black font-bold text-lg ml-2">
                                 {isSubmitting ? 'Verifying...' : 'Login'}
                             </Text>
                         </TouchableOpacity>

@@ -32,11 +32,14 @@ if (Platform.OS === 'web') {
   setupGlobalErrorHandlers();
 }
 
+import { useWindowDimensions } from 'react-native';
+
 // Features
 import { WelcomeScreen } from "@/features/auth/ui/welcome-screen";
 import { LoginScreen } from "@/features/auth/ui/login-screen";
 import { RegisterScreen } from "@/features/auth/ui/register-screen";
 import { DashboardScreen } from "@/features/dashboard/ui/dashboard-screen";
+import { CharactersScreen } from "@/features/character/ui/characters-screen";
 import { CreatorToolsScreen } from "@/features/creator/ui/CreatorToolsScreen";
 
 // Shared UI
@@ -46,6 +49,8 @@ function AppContent() {
   const { isAuthenticated, offlineMode, isLoading, continueOffline } = useAuth();
   const [authScreen, setAuthScreen] = useState<'welcome' | 'login' | 'register'>('welcome');
   const [activeTab, setActiveTab] = useState<'home' | 'campaigns' | 'characters' | 'friends' | 'creator' | 'settings'>('home');
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   if (isLoading) {
     return (
@@ -57,11 +62,12 @@ function AppContent() {
   if (isAuthenticated || offlineMode) {
     return (
       <View className="flex-1">
-        <View className="flex-1 pb-20 lg:pb-0 lg:pl-64">
+        <View className="flex-1">
           {activeTab === 'home' && <DashboardScreen />}
+          {activeTab === 'characters' && <CharactersScreen />}
           {activeTab === 'creator' && <CreatorToolsScreen />}
           {/* Other screens for campaigns, characters, etc. would go here */}
-          {(activeTab !== 'home' && activeTab !== 'creator') && (
+          {(activeTab !== 'home' && activeTab !== 'characters' && activeTab !== 'creator') && (
             <View className="flex-1 items-center justify-center bg-background-primary p-8">
               <Text className="text-2xl text-typography-primary font-bold mb-2" style={{ fontFamily: 'Cinzel' }}>
                 Coming Soon
@@ -72,10 +78,6 @@ function AppContent() {
             </View>
           )}
         </View>
-        <BottomTabBar
-          activeTab={activeTab}
-          onTabPress={setActiveTab}
-        />
       </View>
     );
   }
