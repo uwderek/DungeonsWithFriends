@@ -41,8 +41,8 @@ story_location: "c:\\Development\\DungeonsWithFriends\\_bmad-output\\implementat
 
 development_status:
   epic-1: in-progress
-  1-1-project-initialization-core-framework-scaffolding: in-progress
-  1-2-user-authentication-offline-only-mode: backlog
+  1-1-project-initialization-core-framework-scaffolding: done
+  1-2-user-authentication-offline-only-mode: done
   1-3-custom-component-definition-for-creators-desktop: backlog
   1-4-load-pre-created-optimal-character-templates: backlog
   1-5-interactive-character-sheet-manual-overrides: backlog

@@ -4,12 +4,24 @@ module.exports = {
   // NOTE: Update this to include the paths to all of your component files.
   content: [
     "./App.{js,jsx,ts,tsx}",
-    "./src/components/ui/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
       colors: {
+        background: {
+          primary: 'var(--color-background-primary)',
+          secondary: 'var(--color-background-secondary)',
+        },
+        accent: {
+          primary: 'var(--color-accent-primary)',
+          secondary: 'var(--color-accent-secondary)',
+        },
+        typography: {
+          primary: 'var(--color-text-primary)',
+          secondary: 'var(--color-text-secondary)',
+        },
         primary: {
           0: "var(--color-primary-0)",
           50: "var(--color-primary-50)",
@@ -161,9 +173,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        heading: undefined,
-        body: undefined,
-        mono: undefined,
+        heading: ["var(--font-heading)", "serif"],
+        body: ["var(--font-body)", "sans-serif"],
       },
       fontWeight: {
         hairline: "100",
