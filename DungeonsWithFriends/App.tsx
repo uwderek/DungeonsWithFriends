@@ -1,7 +1,7 @@
 import "./global.css";
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import { AuthProvider, useAuth } from "@/shared/providers/auth-provider";
 import { SyncProvider } from "@/shared/providers/sync-provider";
 import { ThemeProvider } from "@/shared/theme/theme-provider";
@@ -12,6 +12,7 @@ import { WelcomeScreen } from "@/features/auth/ui/welcome-screen";
 import { LoginScreen } from "@/features/auth/ui/login-screen";
 import { RegisterScreen } from "@/features/auth/ui/register-screen";
 import { DashboardScreen } from "@/features/dashboard/ui/dashboard-screen";
+import { CreatorToolsScreen } from "@/features/creator/ui/CreatorToolsScreen";
 
 // Shared UI
 import { BottomTabBar } from "@/shared/ui/navigation/bottom-tab-bar";
@@ -19,7 +20,7 @@ import { BottomTabBar } from "@/shared/ui/navigation/bottom-tab-bar";
 function AppContent() {
   const { isAuthenticated, offlineMode, isLoading } = useAuth();
   const [authScreen, setAuthScreen] = useState<'welcome' | 'login' | 'register'>('welcome');
-  const [activeTab, setActiveTab] = useState<'home' | 'campaigns' | 'characters' | 'friends' | 'settings'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'campaigns' | 'characters' | 'friends' | 'creator' | 'settings'>('home');
 
   if (isLoading) {
     return (
@@ -32,7 +33,19 @@ function AppContent() {
     return (
       <View className="flex-1">
         <View className="flex-1 pb-20 lg:pb-0 lg:pl-64">
-          <DashboardScreen />
+          {activeTab === 'home' && <DashboardScreen />}
+          {activeTab === 'creator' && <CreatorToolsScreen />}
+          {/* Other screens for campaigns, characters, etc. would go here */}
+          {(activeTab !== 'home' && activeTab !== 'creator') && (
+            <View className="flex-1 items-center justify-center bg-background-primary p-8">
+              <Text className="text-2xl text-typography-primary font-bold mb-2" style={{ fontFamily: 'Cinzel' }}>
+                Coming Soon
+              </Text>
+              <Text className="text-typography-secondary text-center">
+                This feature is under development. Check back in a future update!
+              </Text>
+            </View>
+          )}
         </View>
         <BottomTabBar
           activeTab={activeTab}

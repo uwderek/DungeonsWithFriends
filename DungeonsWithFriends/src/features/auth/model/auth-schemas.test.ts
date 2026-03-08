@@ -1,4 +1,4 @@
-import { registrationSchema } from './auth-schemas';
+import { registrationSchema, loginSchema } from '@/features/auth/model/auth-schemas';
 
 describe('registrationSchema', () => {
     it('validates a correct registration object', () => {
@@ -39,5 +39,34 @@ describe('registrationSchema', () => {
             is_age_verified: true,
         };
         expect(registrationSchema.safeParse(invalidData).success).toBe(false);
+    });
+});
+
+describe('loginSchema', () => {
+    it('validates a correct login payload', () => {
+        const valid = {
+            email: 'test@example.com',
+            password: 'password123'
+        };
+        const result = loginSchema.safeParse(valid);
+        expect(result.success).toBe(true);
+    });
+
+    it('rejects empty password', () => {
+        const invalid = {
+            email: 'test@example.com',
+            password: ''
+        };
+        const result = loginSchema.safeParse(invalid);
+        expect(result.success).toBe(false);
+    });
+
+    it('rejects invalid email', () => {
+        const invalid = {
+            email: 'not-an-email',
+            password: 'password123'
+        };
+        const result = loginSchema.safeParse(invalid);
+        expect(result.success).toBe(false);
     });
 });

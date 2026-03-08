@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Platform } from 'react-native';
-import { Home, Swords, Users, Users2, Settings } from 'lucide-react-native';
+import { Home, Swords, Users, Users2, Database, Settings } from 'lucide-react-native';
 
 interface BottomTabBarProps {
-    activeTab: 'home' | 'campaigns' | 'characters' | 'friends' | 'settings';
+    activeTab: 'home' | 'campaigns' | 'characters' | 'friends' | 'creator' | 'settings';
     onTabPress: (tab: any) => void;
 }
 
@@ -13,6 +13,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
         { id: 'campaigns', label: 'Campaigns', Icon: Swords },
         { id: 'characters', label: 'Characters', Icon: Users },
         { id: 'friends', label: 'Friends', Icon: Users2 },
+        { id: 'creator', label: 'Creator', Icon: Database },
         { id: 'settings', label: 'Settings', Icon: Settings },
     ] as const;
 

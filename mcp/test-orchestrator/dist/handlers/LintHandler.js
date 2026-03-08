@@ -100,7 +100,7 @@ export function runLint(projectRoot) {
                 phase: 'lint',
                 lintErrors: tsLintErrors,
                 rawStderr: tsRawStderr,
-                summary: `Found ${totalErrors} TypeScript lint error(s) across ${tsLintErrors.length} file(s).`,
+                summary: `Found ${totalErrors} TypeScript lint error(s) across ${tsLintErrors.length} file(s). CSS lint skipped.`,
             };
         }
         // tsc failed but no parseable errors — return the raw output
@@ -109,7 +109,7 @@ export function runLint(projectRoot) {
                 success: false,
                 phase: 'lint',
                 rawStderr: tsRawStderr,
-                summary: 'TypeScript type check failed with unparseable output. Check rawStderr for details.',
+                summary: 'TypeScript type check failed with unparseable output. CSS lint skipped. Check rawStderr for details.',
             };
         }
     }

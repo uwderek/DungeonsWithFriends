@@ -145,9 +145,14 @@ export function parseCoverageGaps(coverageDir, projectRoot, threshold = 80, filt
             // Determine if we should include details for this file
             let includeDetails = true;
             if (filterBase) {
-                // normalized check
-                const coverageBase = path.basename(filePath).replace(/\.[jt]sx?$/, '');
-                if (!coverageBase.includes(filterBase) && !filterBase.includes(coverageBase)) {
+                // Use full path comparison when possible to avoid collisions
+                // with common filenames (e.g., index.tsx)
+                const normalizedFilter = filterFile
+                    .replace(/\.(test|spec)\./, '.')
+                    .replace(/\\/g, '/');
+                const normalizedCoverage = filePath.replace(/\\/g, '/');
+                if (!normalizedCoverage.endsWith(normalizedFilter) &&
+                    !normalizedCoverage.includes(filterBase)) {
                     includeDetails = false;
                 }
             }

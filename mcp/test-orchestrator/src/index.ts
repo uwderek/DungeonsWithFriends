@@ -173,8 +173,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     }
                 }
 
-                // Step 2: Unit tests
-                const unitResult = runUnitTests(projectRoot, testFile, false, debug);
+                // Step 2: Unit tests (lint already passed above, skip redundant re-run)
+                const unitResult = runUnitTests(projectRoot, testFile, false, debug, /* skipLint */ true);
                 if (!unitResult.success) {
                     result = {
                         ...unitResult,

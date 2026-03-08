@@ -32,18 +32,29 @@ jest.mock('react-native-safe-area-context', () => {
     };
 });
 
-jest.mock('lucide-react-native', () => ({
-    Home: 'IconHome',
-    Swords: 'IconSwords',
-    Users: 'IconUsers',
-    Users2: 'IconUsers2',
-    Settings: 'IconSettings',
-    LogOut: 'IconLogOut',
-    LogIn: 'IconLogIn',
-    UserPlus: 'IconUserPlus',
-    WifiOff: 'IconWifiOff',
-    ChevronRight: 'IconChevronRight',
-}));
+jest.mock('lucide-react-native', () => {
+    const icon = () => null;
+    return {
+        Home: icon,
+        Swords: icon,
+        Users: icon,
+        Users2: icon,
+        Settings: icon,
+        LogOut: icon,
+        LogIn: icon,
+        UserPlus: icon,
+        WifiOff: icon,
+        ChevronRight: icon,
+        Plus: icon,
+        Database: icon,
+        FileCode: icon,
+        Trash2: icon,
+        X: icon,
+        Save: icon,
+        AlertCircle: icon,
+        Info: icon,
+    };
+});
 
 jest.mock('expo-font', () => ({
     loadAsync: jest.fn().mockResolvedValue(true),
