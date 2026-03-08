@@ -7,9 +7,10 @@ import { useAuth } from '@/shared/providers/auth-provider';
 interface WelcomeScreenProps {
     onLogin: () => void;
     onRegister: () => void;
+    onContinueOffline: () => void;
 }
 
-export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLogin, onRegister }) => {
+export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLogin, onRegister, onContinueOffline }) => {
     const { login } = useAuth(); // We'll keep this if we need other auth info, though login is a method
 
     return (
@@ -52,7 +53,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLogin, onRegiste
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={() => { }} // Will be wired to continueOffline in Task 2
+                    onPress={onContinueOffline}
                     className="flex-row items-center justify-center h-14"
                     activeOpacity={0.7}
                 >

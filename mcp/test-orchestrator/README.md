@@ -54,6 +54,7 @@ All tools accept optional parameters:
 | `skipLint` | `run_tests` | Skip TypeScript type checking |
 | `includeE2E` | `run_tests` | Include E2E tests after unit tests |
 | `skipCoverage` | `run_unit_tests` | Skip coverage collection |
+| `inspect` | `run_tests`, `run_unit_tests`, `run_e2e_tests` | Enable Node.js inspector for Chrome DevTools debugging |
 | `runAllProjects` | `run_e2e_tests` | Run all browsers after chromium (default: true) |
 
 ## Debug Mode
@@ -64,6 +65,25 @@ When `debug: true` is passed, the tool returns a `debugTrace` array with interna
 - Parsing steps
 
 Use this when output is unclear or unexpected.
+---
+
+## Chrome Developer Tools Debugging 🛠️
+
+You can debug your tests using the standard Chrome Developer Tools inspector.
+
+### 1. Unit Tests
+Run `run_unit_tests` with `inspect: true`. The process will start with `--inspect-brk`, which pauses execution until a debugger attaches.
+
+**Steps:**
+1. Call `run_unit_tests` with `{ "inspect": true }`.
+2. Open Chrome and go to `chrome://inspect`.
+3. Click **"Open dedicated DevTools for Node"** or find the target under "Remote Target" and click **"inspect"**.
+4. You can now set breakpoints and step through your test code.
+
+### 2. E2E Tests (Playwright)
+Run `run_e2e_tests` with `inspect: true`. This will launch Playwright in **headed mode** with the **Playwright Inspector** open. This allows you to step through actions and inspect selectors in real-time.
+
+---
 
 ## E2E Strategy
 
@@ -142,6 +162,7 @@ npm run cli -- run_tests --skip-lint --include-e2e --debug
 | `--skip-coverage` | Skip coverage collection | unit |
 | `--include-e2e` | Include E2E tests after unit tests | tests |
 | `--run-all-projects` | Run all browser projects (default: true) | e2e |
+| `--inspect` | Enable Node.js inspector | unit, e2e, tests |
 | `--debug` | Include debug trace logs | all |
 | `--json` | Output raw JSON instead of TOON format | all |
 | `--help` | Show help message | all |

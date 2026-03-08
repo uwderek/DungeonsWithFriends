@@ -9,6 +9,6 @@
   --color-accent-secondary: #F59E0B;
   --color-text-primary: #ffffff;
   --color-text-secondary: #9ca3af;
-  --font-heading: 'Cinzel';
-  --font-body: 'Inter';
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Inter', sans-serif;
 }

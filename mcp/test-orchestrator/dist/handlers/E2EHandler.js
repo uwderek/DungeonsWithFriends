@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import { cleanStackTrace, getCommand, PROJECT_ROOT, sanitizeFilename, serverLog } from '../utils.js';
+import { cleanOutput, cleanStackTrace, getCommand, PROJECT_ROOT, sanitizeFilename, serverLog } from '../utils.js';
 import { runLint } from './LintHandler.js';
 /**
  * Parse E2E test failures from results.json and capture debug logs
@@ -15,10 +15,19 @@ function parseE2EFailures(rawJsonOutput, logsDir) {
     }
     let results;
     try {
-        results = JSON.parse(rawJsonOutput);
+        // Find the first '{' and the last '}' to extract the JSON object
+        // Playwright sometimes outputs non-JSON text before/after the report
+        const firstBrace = rawJsonOutput.indexOf('{');
+        const lastBrace = rawJsonOutput.lastIndexOf('}');
+        if (firstBrace === -1 || lastBrace === -1) {
+            throw new Error('No JSON object found in stdout');
+        }
+        const jsonContent = rawJsonOutput.substring(firstBrace, lastBrace + 1);
+        results = JSON.parse(jsonContent);
     }
     catch (e) {
         trace.push(`Failed to parse Playwright JSON stdout: ${e}`);
+        trace.push(`Raw stdout start: ${rawJsonOutput.substring(0, 500)}`);
         return { failures: [], debugTrace: trace };
     }
     trace.push(`Loaded results.json. Suites: ${results.suites?.length}`);
@@ -105,10 +114,10 @@ function parseE2EFailures(rawJsonOutput, logsDir) {
             file,
             failures
         })),
-        debugTrace: trace
+        debugTrace: trace.map(t => cleanOutput(t))
     };
 }
-export function runE2ETests(projectRoot, testFile, runAllProjects = true, debug = false) {
+export function runE2ETests(projectRoot, testFile, runAllProjects = true, debug = false, inspect = false) {
     // 1. Run Linting First
     const lintResult = runLint(projectRoot);
     if (!lintResult.success) {
@@ -135,36 +144,49 @@ export function runE2ETests(projectRoot, testFile, runAllProjects = true, debug 
     }
     // Fail-Fast Strategy: 
     // In order to save time with running E2E tests, chromium is run first. 
-    // If there's an error during the chromium run, it is highly likely that the error 
-    // exists in all other browser configurations. By failing early here, we save 
-    // significant time bypassing redundant failing browser tests.
-    // NOTE: Keep this rationale and behavior in place so it doesn't get changed.
-    let cmd = `${getCommand('npx')} playwright test --project=chromium --reporter=json`;
+    // If there is an inspect flag, we run in headed mode with devtools
+    // We use a fixed results file that matches the hardcoded reporter in playwright.config.ts
+    const chromiumResultsPath = path.join(projectRoot, 'output', 'test-results', 'e2e', 'results.json');
+    let cmd = `${getCommand('npx')} playwright test --project=chromium${inspect ? ' --debug' : ''}`;
     if (testFile) {
         cmd += ` "${testFile}"`;
     }
-    // Set the environment variable for playwright.config.ts to pick up the exact JSON output file path
-    const env = { ...process.env, PLAYWRIGHT_JSON_OUTPUT_NAME: resultsPath };
+    // Set the environment variable for playwright.config.ts (as a backup)
+    const env = {
+        ...process.env,
+        PLAYWRIGHT_JSON_OUTPUT_NAME: chromiumResultsPath.replace(/\\/g, '/')
+    };
     try {
         serverLog('DEBUG', 'Running E2E tests (Chromium first)', { cmd });
-        const stdout = execSync(cmd, {
+        execSync(cmd, {
             cwd: projectRoot,
             encoding: 'utf-8',
             stdio: ['ignore', 'pipe', 'pipe'],
-            env
+            env,
+            timeout: 120000 // 2 minute timeout for Expo WebServer start
         });
+        const chromiumResults = fs.readFileSync(chromiumResultsPath, 'utf-8');
+        const { failures: chromiumFailures, debugTrace: chromiumDebugTrace } = parseE2EFailures(chromiumResults, logsDir);
+        // If Chromium tests failed, return immediately
+        if (chromiumFailures.length > 0) {
+            return {
+                success: false,
+                phase: 'e2e',
+                testFailures: chromiumFailures,
+                lintErrors: [],
+                summary: `E2E tests failed in Chromium fail-fast check. Found ${chromiumFailures.reduce((acc, f) => acc + f.failures.length, 0)} failures.`,
+                debugTrace: debug ? chromiumDebugTrace : undefined
+            };
+        }
         // Chromium passed - now run all other projects to ensure full coverage
         if (runAllProjects) {
             try {
-                // To maintain a general-purpose MCP (not hardcoding Firefox/WebKit or Mobile Safari), 
-                // we simply run playwright without project constraints. This will run ALL projects 
-                // defined in the user's playwright.config.ts.
-                let fullCmd = `${getCommand('npx')} playwright test --reporter=json`;
+                let fullCmd = `${getCommand('npx')} playwright test`;
                 if (testFile) {
                     fullCmd += ` "${testFile}"`;
                 }
                 serverLog('DEBUG', 'Running E2E remaining platforms', { fullCmd });
-                const fullStdout = execSync(fullCmd, {
+                execSync(fullCmd, {
                     cwd: projectRoot,
                     encoding: 'utf-8',
                     stdio: ['ignore', 'pipe', 'pipe'],
@@ -179,14 +201,11 @@ export function runE2ETests(projectRoot, testFile, runAllProjects = true, debug 
                 };
             }
             catch (otherError) {
-                const stdoutBuf = otherError.stdout;
-                const stderrBuf = otherError.stderr;
-                const stdoutError = stdoutBuf ? stdoutBuf.toString('utf-8') : '';
-                const stderrError = stderrBuf ? stderrBuf.toString('utf-8') : '';
-                const { failures, debugTrace } = parseE2EFailures(stdoutError, logsDir);
+                const allResults = fs.existsSync(chromiumResultsPath) ? fs.readFileSync(chromiumResultsPath, 'utf-8') : '';
+                const { failures, debugTrace } = parseE2EFailures(allResults, logsDir);
                 if (failures.length === 0 && debugTrace.length > 0) {
-                    debugTrace.push(`execSync Error Message: ${otherError.message}`);
-                    debugTrace.push(`execSync stderr: ${stderrError}`);
+                    debugTrace.push(cleanOutput(`execSync Error Message: ${otherError.message}`));
+                    debugTrace.push(cleanOutput(`execSync stderr: ${otherError.stderr?.toString() || ''}`));
                 }
                 return {
                     success: false,
@@ -207,22 +226,21 @@ export function runE2ETests(projectRoot, testFile, runAllProjects = true, debug 
         };
     }
     catch (error) {
-        const stdoutBuf = error.stdout;
-        const stderrBuf = error.stderr;
-        const stdoutError = stdoutBuf ? stdoutBuf.toString('utf-8') : '';
-        const stderrError = stderrBuf ? stderrBuf.toString('utf-8') : '';
-        const { failures, debugTrace } = parseE2EFailures(stdoutError, logsDir);
+        // Find the most recent chromium results if they exist (using the SAME path as above)
+        const chromiumResultsPath = path.join(projectRoot, 'output', 'test-results', 'e2e', 'results.json');
+        const chromiumResults = fs.existsSync(chromiumResultsPath) ? fs.readFileSync(chromiumResultsPath, 'utf-8') : '';
+        const { failures, debugTrace } = parseE2EFailures(chromiumResults, logsDir);
         // Add error details to trace if parsing fails
         if (failures.length === 0 && debugTrace.length > 0) {
-            debugTrace.push(`execSync Error Message: ${error.message}`);
-            debugTrace.push(`execSync stderr: ${stderrError}`);
+            debugTrace.push(cleanOutput(`execSync Error Message: ${error.message}`));
+            debugTrace.push(cleanOutput(`execSync stderr: ${error.stderr?.toString() || ''}`));
         }
         return {
             success: false,
             phase: 'e2e',
             testFailures: failures.length > 0 ? failures : undefined,
             lintErrors: [],
-            summary: `E2E tests failed in Chromium fail-fast check. Found ${failures.reduce((acc, f) => acc + f.failures.length, 0)} failures.`,
+            summary: cleanOutput(`E2E tests failed in Chromium fail-fast check. Found ${failures.reduce((acc, f) => acc + f.failures.length, 0)} failures.`),
             debugTrace: debug ? debugTrace : undefined
         };
     }

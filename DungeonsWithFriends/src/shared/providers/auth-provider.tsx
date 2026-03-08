@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { NhostClient } from '@nhost/nhost-js';
+import { createNhostClient, NhostClientLike } from '../services/nhost-client';
 import { useStore } from 'tinybase/ui-react';
 
 type User = {
@@ -21,11 +21,11 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// TODO: Replace with config from environment variables
+const nhostConfig = { subdomain: 'local', region: 'local' };
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // TODO: Replace with actual Nhost config from environment variables
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - Suppressed until @nhost/react and @nhost/nhost-js are upgraded to the urql standard
-    const nhostRef = useRef(new NhostClient({ subdomain: 'local', region: 'local' }));
+    const nhostRef = useRef<NhostClientLike>(createNhostClient(nhostConfig));
     const store = useStore();
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -33,24 +33,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<User | null>(null);
     const [offlineMode, setOfflineMode] = useState(false);
 
+    // Structured diagnostic logging
+    useEffect(() => {
+        console.info('[Auth] State Update:', { isAuthenticated, isLoading, offlineMode, hasUser: !!user });
+    }, [isAuthenticated, isLoading, offlineMode, user]);
+
     // Persistence logic using TinyBase
     useEffect(() => {
         if (!store) return;
-
-        const savedMode = store.getCell('settings', 'auth', 'offline_mode');
-        if (savedMode === true) {
-            setOfflineMode(true);
+        try {
+            const savedMode = store.getCell('settings', 'auth', 'offline_mode');
+            if (savedMode === true) {
+                setOfflineMode(true);
+            }
+        } catch (e) {
+            console.warn('[AuthProvider] Failed to read from store:', e);
         }
     }, [store]);
 
     useEffect(() => {
-        // Initial Auth check logic
         const checkAuth = async () => {
-            const auth = (nhostRef.current as any).auth;
-            const session = auth.getSession();
-            if (session) {
-                setIsAuthenticated(true);
-                setUser(session.user as any);
+            const { auth } = nhostRef.current;
+            try {
+                const session = auth.getSession();
+                if (session) {
+                    setIsAuthenticated(true);
+                    setUser(session.user as any);
+                }
+            } catch (e) {
+                console.warn('[AuthProvider] Session check failed:', e);
             }
             setIsLoading(false);
         };
@@ -59,8 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const login = async (email?: string, password?: string) => {
         if (!email || !password) return;
-        const auth = (nhostRef.current as any).auth;
-        const { session, error } = await auth.signIn({ email, password });
+        const { session, error } = await nhostRef.current.auth.signIn({ email, password });
         if (error) throw error;
         if (session) {
             setIsAuthenticated(true);
@@ -71,8 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const register = async (email: string, password: string) => {
-        const auth = (nhostRef.current as any).auth;
-        const { session, error } = await auth.signUp({ email, password });
+        const { session, error } = await nhostRef.current.auth.signUp({ email, password });
         if (error) throw error;
         if (session) {
             setIsAuthenticated(true);
@@ -83,8 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const logout = async () => {
-        const auth = (nhostRef.current as any).auth;
-        await auth.signOut();
+        await nhostRef.current.auth.signOut();
         setIsAuthenticated(false);
         setUser(null);
         setOfflineMode(false);

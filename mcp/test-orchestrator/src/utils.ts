@@ -52,6 +52,22 @@ export function stripAnsi(str: string): string {
 }
 
 /**
+ * Clean output strings (strip ANSI and timing/noisy metadata)
+ */
+export function cleanOutput(str: string): string {
+    if (!str) return '';
+    return stripAnsi(str)
+        .replace(/Duration: \s*\d+(\.\d+)?ms/g, '')
+        .replace(/\d+\s*passed.*?\(\d+(\.\d+)?s\)/g, '')
+        // Strip common noise
+        .replace(/Download the React DevTools for a better development experience.*/g, '')
+        .replace(/.*bundled \d+(\.\d+)?% .*/g, '')
+        .replace(/.*Building JavaScript bundle.*/g, '')
+        .replace(/.*Cleaning session.*/g, '')
+        .trim();
+}
+
+/**
  * Clean stack trace to remove node_modules and internal noise, but PRESERVE code frames
  */
 export function cleanStackTrace(stack: string): string {

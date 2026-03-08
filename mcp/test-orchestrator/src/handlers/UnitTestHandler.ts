@@ -108,7 +108,7 @@ function parseJestOutput(jsonPath: string, logPath: string): {
 /**
  * Run Jest unit tests
  */
-export function runUnitTests(projectRoot: string, testFile?: string, skipCoverage: boolean = false, debug: boolean = false, skipLint: boolean = false): TestResult {
+export function runUnitTests(projectRoot: string, testFile?: string, skipCoverage: boolean = false, debug: boolean = false, skipLint: boolean = false, inspect: boolean = false): TestResult {
     const trace: string[] = [];
 
     // Validate test file exists before running Jest
@@ -190,7 +190,7 @@ export function runUnitTests(projectRoot: string, testFile?: string, skipCoverag
 
     // Build command
     // Use npx jest directly to bypass npm test script restrictions
-    let cmd = `${getCommand('npx')} jest --json --outputFile="${jsonOutput}"`;
+    let cmd = `${getCommand('npx')}${inspect ? ' --inspect-brk' : ''} jest --json --outputFile="${jsonOutput}" --runInBand`;
     if (!skipCoverage) {
         cmd += ' --coverage';
     }

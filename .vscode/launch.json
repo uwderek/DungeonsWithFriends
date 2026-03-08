@@ -9,12 +9,41 @@
             "request": "launch",
             "url": "http://localhost:8081",
             "webRoot": "${workspaceFolder}/DungeonsWithFriends",
+            "runtimeArgs": [
+                "--auto-open-devtools-for-tabs"
+            ],
             "preLaunchTask": "Start Expo Web Server",
             "postDebugTask": "Stop Expo Web Server",
             "sourceMapPathOverrides": {
                 "webpack:///./*": "${webRoot}/*",
                 "webpack:///src/*": "${webRoot}/src/*"
             }
+        },
+        {
+            "name": "Debug Unit Tests (Chrome)",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/mcp/test-orchestrator",
+            "program": "${workspaceFolder}/mcp/test-orchestrator/dist/cli.js",
+            "args": [
+                "run_unit_tests",
+                "--inspect",
+                "--debug"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "Attach to MCP Web Debugger",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         }
     ]
 }

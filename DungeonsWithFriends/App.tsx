@@ -6,6 +6,31 @@ import { AuthProvider, useAuth } from "@/shared/providers/auth-provider";
 import { SyncProvider } from "@/shared/providers/sync-provider";
 import { ThemeProvider } from "@/shared/theme/theme-provider";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Platform } from 'react-native';
+
+// Global error handling for Web
+const setupGlobalErrorHandlers = () => {
+  const errorHandler = (event: ErrorEvent) => {
+    console.error('[GLOBAL WEB ERROR]', event.error);
+  };
+  const rejectionHandler = (event: PromiseRejectionEvent) => {
+    console.error('[UNHANDLED PROMISE REJECTION]', event.reason);
+  };
+
+  window.addEventListener('error', errorHandler);
+  window.addEventListener('unhandledrejection', rejectionHandler);
+
+  // Return cleanup function
+  return () => {
+    window.removeEventListener('error', errorHandler);
+    window.removeEventListener('unhandledrejection', rejectionHandler);
+  };
+};
+
+// Initialize global error handlers on web
+if (Platform.OS === 'web') {
+  setupGlobalErrorHandlers();
+}
 
 // Features
 import { WelcomeScreen } from "@/features/auth/ui/welcome-screen";
@@ -18,7 +43,7 @@ import { CreatorToolsScreen } from "@/features/creator/ui/CreatorToolsScreen";
 import { BottomTabBar } from "@/shared/ui/navigation/bottom-tab-bar";
 
 function AppContent() {
-  const { isAuthenticated, offlineMode, isLoading } = useAuth();
+  const { isAuthenticated, offlineMode, isLoading, continueOffline } = useAuth();
   const [authScreen, setAuthScreen] = useState<'welcome' | 'login' | 'register'>('welcome');
   const [activeTab, setActiveTab] = useState<'home' | 'campaigns' | 'characters' | 'friends' | 'creator' | 'settings'>('home');
 
@@ -76,22 +101,52 @@ function AppContent() {
         <WelcomeScreen
           onLogin={() => setAuthScreen('login')}
           onRegister={() => setAuthScreen('register')}
+          onContinueOffline={continueOffline}
         />
       );
+  }
+}
+
+class GlobalErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error('GLOBAL CRASH:', error);
+    console.error('Component Stack:', errorInfo.componentStack);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View className="flex-1 items-center justify-center bg-background-primary p-10">
+          <Text className="text-red-500 text-xl font-bold mb-4">Application Crash</Text>
+          <Text className="text-typography-secondary text-center">
+            {String(this.state.error)}
+          </Text>
+        </View>
+      );
+    }
+    return this.props.children;
   }
 }
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
+      <GlobalErrorBoundary>
         <SyncProvider>
-          <AuthProvider>
-            <AppContent />
-            <StatusBar style="light" />
-          </AuthProvider>
+          <ThemeProvider>
+            <AuthProvider>
+              <AppContent />
+              <StatusBar style="light" />
+            </AuthProvider>
+          </ThemeProvider>
         </SyncProvider>
-      </ThemeProvider>
+      </GlobalErrorBoundary>
     </SafeAreaProvider>
   );
 }

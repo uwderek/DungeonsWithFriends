@@ -40,6 +40,7 @@ Options:
   --skip-coverage       Skip coverage collection (run_unit_tests only)
   --include-e2e         Include E2E tests (run_tests only)
   --run-all-projects    Run all browser projects (run_e2e_tests, default: true)
+  --inspect             Enable Node.js inspector for Chrome DevTools debugging
   --debug               Include debug trace logs
   --json                Output raw JSON instead of TOON format
   --help                Show this help message
@@ -80,6 +81,9 @@ function parseArgs(args) {
             case '--run-all-projects':
                 result.runAllProjects = true;
                 break;
+            case '--inspect':
+                result.inspect = true;
+                break;
             case '--debug':
                 result.debug = true;
                 break;
@@ -100,9 +104,9 @@ function runTool(toolName, options) {
         case 'run_lint':
             return runLint(PROJECT_ROOT);
         case 'run_unit_tests':
-            return runUnitTests(PROJECT_ROOT, options.file, options.skipCoverage === true, debug);
+            return runUnitTests(PROJECT_ROOT, options.file, options.skipCoverage === true, debug, false, options.inspect === true);
         case 'run_e2e_tests':
-            return runE2ETests(PROJECT_ROOT, options.file, options.runAllProjects !== false, debug);
+            return runE2ETests(PROJECT_ROOT, options.file, options.runAllProjects !== false, debug, options.inspect === true);
         case 'get_coverage_gaps':
             return getCoverageGaps(PROJECT_ROOT);
         case 'run_tests': {
@@ -124,14 +128,14 @@ function runTool(toolName, options) {
                 console.log('✓ Lint passed\n');
             }
             // Step 2: Unit tests
-            const unitResult = runUnitTests(PROJECT_ROOT, testFile, options.skipCoverage === true, debug);
+            const unitResult = runUnitTests(PROJECT_ROOT, testFile, options.skipCoverage === true, debug, /* skipLint */ true, options.inspect === true);
             if (!unitResult.success) {
                 return { ...unitResult, phase: 'all' };
             }
             console.log('✓ Unit tests passed\n');
             // Step 3: E2E tests (if requested)
             if (includeE2E) {
-                const e2eResult = runE2ETests(PROJECT_ROOT, testFile, options.runAllProjects !== false, debug);
+                const e2eResult = runE2ETests(PROJECT_ROOT, testFile, options.runAllProjects !== false, debug, options.inspect === true);
                 if (!e2eResult.success) {
                     return {
                         ...e2eResult,
@@ -177,6 +181,9 @@ function main() {
     }
     if (options.debug) {
         console.log(`  Debug Mode:   enabled`);
+    }
+    if (options.inspect) {
+        console.log(`  Inspect Mode: enabled`);
     }
     console.log('═══════════════════════════════════════════════════════════════\n');
     const result = runTool(toolName, options);

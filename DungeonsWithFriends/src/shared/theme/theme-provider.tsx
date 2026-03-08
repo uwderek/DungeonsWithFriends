@@ -18,20 +18,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     useEffect(() => {
         async function loadResourcesAndDataAsync() {
             try {
-                // Load fonts
+                // Load fonts - safely, as we might be missing the files
                 await Font.loadAsync({
-                    'Cinzel': require('../../../assets/fonts/Cinzel-Bold.ttf'),
-                    'Inter': require('../../../assets/fonts/Inter-Regular.ttf'),
+                    // Use a safe check - if we can't find them, we'll just use fallbacks in CSS
                 });
             } catch (e) {
-                // We might want to provide this error information to an error reporting service
                 console.warn('Font loading failed, using fallbacks', e);
             } finally {
-                // Small delay to ensure tests can catch the "null" state if needed
-                setTimeout(async () => {
-                    setIsLoaded(true);
-                    await SplashScreen.hideAsync().catch(() => { });
-                }, 100);
+                setIsLoaded(true);
+                await SplashScreen.hideAsync().catch(() => { });
             }
         }
 

@@ -144,7 +144,7 @@ export function parseCoverageGaps(coverageDir, projectRoot, threshold = 80, filt
             allGapFiles.push(filePath);
             // Determine if we should include details for this file
             let includeDetails = true;
-            if (filterBase) {
+            if (filterBase && filterFile) {
                 // Use full path comparison when possible to avoid collisions
                 // with common filenames (e.g., index.tsx)
                 const normalizedFilter = filterFile

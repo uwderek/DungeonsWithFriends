@@ -58,6 +58,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
                         type: 'boolean',
                         description: 'Include internal debug trace logs in response (default: false)',
                     },
+                    inspect: {
+                        type: 'boolean',
+                        description: 'Enable Node.js inspector for Chrome DevTools debugging (default: false)',
+                    },
                 },
             },
         },
@@ -86,6 +90,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
                     debug: {
                         type: 'boolean',
                         description: 'Include internal debug trace logs in response (default: false)',
+                    },
+                    inspect: {
+                        type: 'boolean',
+                        description: 'Enable Node.js inspector for Chrome DevTools debugging (default: false)',
                     },
                 },
             },
@@ -137,14 +145,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
             case 'run_unit_tests': {
                 const debug = args?.debug === true;
-                result = runUnitTests(projectRoot, args?.file as string | undefined, args?.skipCoverage === true, debug);
+                const inspect = args?.inspect === true;
+                result = runUnitTests(projectRoot, args?.file as string | undefined, args?.skipCoverage === true, debug, false, inspect);
                 break;
             }
 
             case 'run_e2e_tests': {
                 const runAllProjects = args?.runAllProjects !== false;  // Default true
                 const debug = args?.debug === true;
-                result = runE2ETests(projectRoot, args?.file as string | undefined, runAllProjects, debug);
+                const inspect = args?.inspect === true;
+                result = runE2ETests(projectRoot, args?.file as string | undefined, runAllProjects, debug, inspect);
                 break;
             }
 
@@ -156,6 +166,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 const skipLint = args?.skipLint === true;
                 const includeE2E = args?.includeE2E === true;
                 const debug = args?.debug === true;
+                const inspect = args?.inspect === true;
                 const testFile = args?.file as string | undefined;
 
                 // Step 1: Lint (unless skipped)
@@ -174,7 +185,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 }
 
                 // Step 2: Unit tests (lint already passed above, skip redundant re-run)
-                const unitResult = runUnitTests(projectRoot, testFile, false, debug, /* skipLint */ true);
+                const unitResult = runUnitTests(projectRoot, testFile, false, debug, /* skipLint */ true, inspect);
                 if (!unitResult.success) {
                     result = {
                         ...unitResult,
@@ -186,7 +197,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 // Step 3: E2E tests (if requested)
                 let e2eTrace: string[] = [];
                 if (includeE2E) {
-                    const e2eResult = runE2ETests(projectRoot, testFile, true, debug);
+                    const e2eResult = runE2ETests(projectRoot, testFile, true, debug, inspect);
                     e2eTrace = e2eResult.debugTrace || [];
 
                     if (!e2eResult.success) {

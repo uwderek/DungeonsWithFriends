@@ -13,6 +13,10 @@ export declare function getCommand(cmd: string): string;
  */
 export declare function stripAnsi(str: string): string;
 /**
+ * Clean output strings (strip ANSI and timing/noisy metadata)
+ */
+export declare function cleanOutput(str: string): string;
+/**
  * Clean stack trace to remove node_modules and internal noise, but PRESERVE code frames
  */
 export declare function cleanStackTrace(stack: string): string;

@@ -6,9 +6,7 @@ export default defineConfig({
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
     workers: process.env.CI ? 1 : undefined,
-    reporter: process.env.PLAYWRIGHT_JSON_OUTPUT_NAME
-        ? [['json', { outputFile: process.env.PLAYWRIGHT_JSON_OUTPUT_NAME }]]
-        : [['html']],
+    reporter: [['json', { outputFile: "./output/test-results/e2e/results.json" }], ['list']],
     use: {
         baseURL: "http://localhost:8081",
         trace: "on-first-retry",

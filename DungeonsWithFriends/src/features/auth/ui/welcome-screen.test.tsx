@@ -31,6 +31,7 @@ import { WelcomeScreen } from './welcome-screen';
 describe('WelcomeScreen', () => {
     const mockOnLogin = jest.fn();
     const mockOnRegister = jest.fn();
+    const mockOnContinueOffline = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -38,7 +39,7 @@ describe('WelcomeScreen', () => {
 
     it('renders all three authentication options', () => {
         const { getByText } = render(
-            <WelcomeScreen onLogin={mockOnLogin} onRegister={mockOnRegister} />
+            <WelcomeScreen onLogin={mockOnLogin} onRegister={mockOnRegister} onContinueOffline={mockOnContinueOffline} />
         );
 
         expect(getByText(/Login/i)).toBeTruthy();
@@ -48,7 +49,7 @@ describe('WelcomeScreen', () => {
 
     it('calls onLogin on Login click', () => {
         const { getByText } = render(
-            <WelcomeScreen onLogin={mockOnLogin} onRegister={mockOnRegister} />
+            <WelcomeScreen onLogin={mockOnLogin} onRegister={mockOnRegister} onContinueOffline={mockOnContinueOffline} />
         );
 
         fireEvent.press(getByText(/Login/i));
@@ -57,22 +58,19 @@ describe('WelcomeScreen', () => {
 
     it('calls onRegister on Register click', () => {
         const { getByText } = render(
-            <WelcomeScreen onLogin={mockOnLogin} onRegister={mockOnRegister} />
+            <WelcomeScreen onLogin={mockOnLogin} onRegister={mockOnRegister} onContinueOffline={mockOnContinueOffline} />
         );
 
         fireEvent.press(getByText(/Register/i));
         expect(mockOnRegister).toHaveBeenCalled();
     });
 
-    // Offline mode behavior will be tested more deeply after Task 2 implementation
-    it('calls continueOffline when Continue Offline is clicked', () => {
-        // This will require mocking AuthProvider's context or checking the result
-        // But for now, let's just assert the button exists and handles a press
+    it('calls onContinueOffline when Continue Offline is clicked', () => {
         const { getByText } = render(
-            <WelcomeScreen onLogin={mockOnLogin} onRegister={mockOnRegister} />
+            <WelcomeScreen onLogin={mockOnLogin} onRegister={mockOnRegister} onContinueOffline={mockOnContinueOffline} />
         );
 
         fireEvent.press(getByText(/Continue Offline/i));
-        // Task 2 will implement the actual logic, for now we just want it to render
+        expect(mockOnContinueOffline).toHaveBeenCalled();
     });
 });

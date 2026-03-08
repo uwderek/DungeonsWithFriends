@@ -43,6 +43,17 @@ export function stripAnsi(str) {
     return str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 }
 /**
+ * Clean output strings (strip ANSI and timing/noisy metadata)
+ */
+export function cleanOutput(str) {
+    if (!str)
+        return '';
+    return stripAnsi(str)
+        .replace(/Duration: \s*\d+(\.\d+)?ms/g, '')
+        .replace(/\d+\s*passed.*?\(\d+(\.\d+)?s\)/g, '')
+        .trim();
+}
+/**
  * Clean stack trace to remove node_modules and internal noise, but PRESERVE code frames
  */
 export function cleanStackTrace(stack) {
