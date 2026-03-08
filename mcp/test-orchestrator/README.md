@@ -7,7 +7,7 @@ An MCP server that orchestrates the test workflow for the Dungeons With Friends 
 | Tool | Description |
 |------|-------------|
 | `run_tests` | Full workflow: lint → unit tests. Set `includeE2E: true` for E2E. |
-| `run_lint` | TypeScript type checking only |
+| `run_lint` | TypeScript type checking + CSS linting (Stylelint) |
 | `run_unit_tests` | Jest unit tests with coverage |
 | `run_e2e_tests` | Playwright E2E (chromium-first, then all browsers) |
 | `get_coverage_gaps` | Files below 80% coverage from last run |
@@ -19,7 +19,10 @@ An MCP server that orchestrates the test workflow for the Dungeons With Friends 
 This MCP server is explicitly designed to handle the complexity of test environments for you. **DO NOT** use default testing commands like `npm test` or `npx jest` directly, as they bypass critical architectural constraints.
 
 ### 1. Mandatory Linting
-Linting must **always** run and pass before unit tests can execute. The `run_tests` tool automatically enforces this sequence. If linting fails, it will return the file name, line, and column error contexts. **You must fix lint errors before attempting test execution.**
+Linting must **always** run and pass before unit tests can execute. The `run_tests` tool automatically enforces this sequence. Linting now runs **both TypeScript (`tsc`) and CSS (`stylelint`)**. If either fails, it will return the file name, line, and column error contexts. **You must fix lint errors before attempting test execution.**
+
+### 1a. Raw Stderr Passthrough
+When a linting or testing tool crashes without producing parseable output (e.g., Babel syntax errors, module resolution failures), the `rawStderr` field in the response will contain the raw process error output. This eliminates the need to run commands manually for debugging.
 
 ### 2. Reading and Evaluating Test Results
 When testing fails, the MCP returns a structured payload.

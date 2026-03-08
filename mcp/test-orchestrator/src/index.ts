@@ -38,7 +38,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
         {
             name: 'run_tests',
-            description: 'Run the full test workflow: lint → unit tests. Returns structured errors, failures, and coverage gaps. Linting must pass before tests run.',
+            description: 'Run the full test workflow: lint (TypeScript + CSS) → unit tests. Returns structured errors, failures, and coverage gaps. Linting must pass before tests run.',
             inputSchema: {
                 type: 'object',
                 properties: {
@@ -63,7 +63,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
         {
             name: 'run_lint',
-            description: 'Run TypeScript type checking only. Returns file, line, column, and error message for each error.',
+            description: 'Run TypeScript type checking and CSS linting (Stylelint). Returns file, line, column, and error message for each error.',
             inputSchema: {
                 type: 'object',
                 properties: {},

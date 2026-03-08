@@ -28,10 +28,10 @@ Test Orchestrator CLI
 Usage: npm run cli -- <tool> [options]
 
 Tools:
-  run_lint              Run TypeScript type checking
+  run_lint              Run TypeScript type checking + CSS linting
   run_unit_tests        Run Jest unit tests
   run_e2e_tests         Run Playwright E2E tests  
-  run_tests             Run full workflow: lint → unit tests
+  run_tests             Run full workflow: lint (TS + CSS) → unit tests
   get_coverage_gaps     Get files below 75% coverage
 
 Options:

@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { parseCoverageGaps } from './CoverageHandler.js';
 import { cleanStackTrace, extractLogsForTest, getCommand, PROJECT_ROOT, serverLog } from '../utils.js';
 import { runLint } from './LintHandler.js';
 /**
@@ -150,6 +151,7 @@ export function runUnitTests(projectRoot, testFile, skipCoverage = false, debug 
         cmd += ` "${testFile}"`;
     }
     trace.push(`Command: ${cmd}`);
+    let capturedStderr = '';
     try {
         serverLog('DEBUG', 'Running unit tests', { cmd });
         const stdout = execSync(cmd, {
@@ -167,8 +169,10 @@ export function runUnitTests(projectRoot, testFile, skipCoverage = false, debug 
         let outStr = '';
         if (execError.stdout)
             outStr += execError.stdout.toString('utf-8');
-        if (execError.stderr)
-            outStr += '\n' + execError.stderr.toString('utf-8');
+        if (execError.stderr) {
+            capturedStderr = execError.stderr.toString('utf-8');
+            outStr += '\n' + capturedStderr;
+        }
         fs.writeFileSync(logFilePath, outStr);
         trace.push('Jest execution completed with failure exit code (expected for test failures)');
     }
@@ -196,15 +200,36 @@ export function runUnitTests(projectRoot, testFile, skipCoverage = false, debug 
     if (stats.snapshots.total > 0) {
         summaryParts.push(`(Snapshots: ${stats.snapshots.failed} failed, ${stats.snapshots.matched} passed)`);
     }
-    // Overall success: no failures
-    const overallSuccess = failed === 0;
+    // Overall success: no test failures
+    const testsPass = failed === 0;
+    // Include coverage gaps in the result when coverage was collected
+    let coverageGaps = undefined;
+    let coverageSuccess = true;
+    if (!skipCoverage) {
+        const { gaps, totalGaps } = parseCoverageGaps(coverageDir, projectRoot);
+        if (totalGaps > 0) {
+            coverageGaps = gaps;
+            coverageSuccess = false;
+            summaryParts.push(`${totalGaps} file(s) below 80% coverage threshold`);
+            trace.push(`Coverage gaps found: ${totalGaps} file(s)`);
+        }
+        else {
+            trace.push('All files meet the 80% coverage threshold');
+        }
+    }
+    const overallSuccess = testsPass && coverageSuccess;
+    // Include rawStderr when Jest failed without producing parseable results
+    const includeStderr = (failures.length === 0 && !testsPass && capturedStderr) ||
+        (!fs.existsSync(jsonOutput) && capturedStderr);
     const result = {
         success: overallSuccess,
         phase: 'unit',
         testFailures: failures.length > 0 ? failures : undefined,
+        coverageGaps,
         lintErrors: [], // Explicitly empty to show lint passed
         summary: summaryParts.join(', ') + '.',
-        debugTrace: debug ? trace : undefined
+        debugTrace: debug ? trace : undefined,
+        rawStderr: includeStderr ? capturedStderr.substring(0, 5000) : undefined,
     };
     return result;
 }

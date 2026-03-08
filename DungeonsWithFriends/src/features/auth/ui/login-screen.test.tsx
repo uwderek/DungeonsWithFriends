@@ -1,25 +1,13 @@
 import React from 'react';
-import { render, fireEvent, act } from '@testing-library/react-native';
+import { render, fireEvent, act, waitFor } from '@testing-library/react-native';
 import { LoginScreen } from '@/features/auth/ui/login-screen';
-import { AuthProvider } from '@/shared/providers/auth-provider';
 
-// Mock @nhost/nhost-js
-jest.mock('@nhost/nhost-js', () => ({
-    NhostClient: jest.fn().mockImplementation(() => ({
-        auth: {
-            getSession: jest.fn().mockReturnValue(null),
-            signIn: jest.fn().mockResolvedValue({ session: { user: {} }, error: null }),
-            signUp: jest.fn(),
-            signOut: jest.fn(),
-        },
-    })),
-}));
+// Module-level mock controls
+const mockLogin = jest.fn().mockResolvedValue(undefined);
 
-// Mock tinybase/ui-react
-jest.mock('tinybase/ui-react', () => ({
-    useStore: jest.fn(() => ({
-        getCell: jest.fn(),
-        setCell: jest.fn(),
+jest.mock('@/shared/providers/auth-provider', () => ({
+    useAuth: jest.fn(() => ({
+        login: mockLogin,
     })),
 }));
 
@@ -30,48 +18,122 @@ jest.mock('lucide-react-native', () => ({
 }));
 
 describe('LoginScreen', () => {
+    const onBack = jest.fn();
+    const onForgotPassword = jest.fn();
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        mockLogin.mockResolvedValue(undefined);
+    });
+
     it('renders correctly with email and password fields', () => {
         const { getByPlaceholderText, getByText } = render(
-            <AuthProvider>
-                <LoginScreen onBack={jest.fn()} onForgotPassword={jest.fn()} />
-            </AuthProvider>
+            <LoginScreen onBack={onBack} onForgotPassword={onForgotPassword} />
         );
 
-        expect(getByPlaceholderText(/Email/i)).toBeTruthy();
-        expect(getByPlaceholderText(/Password/i)).toBeTruthy();
+        expect(getByPlaceholderText(/Enter your email/i)).toBeTruthy();
+        expect(getByPlaceholderText(/Enter your password/i)).toBeTruthy();
         expect(getByText(/Login/i)).toBeTruthy();
     });
 
-    it('calls AuthProvider.login when valid credentials are submitted', async () => {
-        const { getByPlaceholderText, getByText } = render(
-            <AuthProvider>
-                <LoginScreen onBack={jest.fn()} onForgotPassword={jest.fn()} />
-            </AuthProvider>
+
+
+    it('shows validation errors for empty email', async () => {
+        const { getByText, getByPlaceholderText } = render(
+            <LoginScreen onBack={onBack} onForgotPassword={onForgotPassword} />
         );
 
-        fireEvent.changeText(getByPlaceholderText(/Email/i), 'test@example.com');
-        fireEvent.changeText(getByPlaceholderText(/Password/i), 'password123');
-
+        // Submit with empty fields
         await act(async () => {
             fireEvent.press(getByText(/Login/i));
         });
 
-        // Success state or transition check
+        // Zod validation should produce an error for email
+        expect(getByText(/Invalid email/i)).toBeTruthy();
     });
 
-    it('shows error for invalid email format', async () => {
+    it('shows validation error for invalid email format', async () => {
         const { getByPlaceholderText, getByText } = render(
-            <AuthProvider>
-                <LoginScreen onBack={jest.fn()} onForgotPassword={jest.fn()} />
-            </AuthProvider>
+            <LoginScreen onBack={onBack} onForgotPassword={onForgotPassword} />
         );
 
-        fireEvent.changeText(getByPlaceholderText(/Email/i), 'invalid-email');
+        fireEvent.changeText(getByPlaceholderText(/Enter your email/i), 'invalid-email');
 
         await act(async () => {
             fireEvent.press(getByText(/Login/i));
         });
 
-        expect(getByText(/Invalid email address/i)).toBeTruthy();
+        expect(getByText(/Invalid email/i)).toBeTruthy();
+    });
+
+    it('calls login and shows submitting state on valid credentials', async () => {
+        // Make login hang to test submitting state
+        let resolveLogin: () => void;
+        mockLogin.mockImplementation(() => new Promise<void>(r => { resolveLogin = r; }));
+
+        const { getByPlaceholderText, getByText } = render(
+            <LoginScreen onBack={onBack} onForgotPassword={onForgotPassword} />
+        );
+
+        fireEvent.changeText(getByPlaceholderText(/Enter your email/i), 'test@example.com');
+        fireEvent.changeText(getByPlaceholderText(/Enter your password/i), 'password123');
+
+        await act(async () => {
+            fireEvent.press(getByText(/Login/i));
+        });
+
+        // Should show "Verifying..." while submitting
+        expect(getByText(/Verifying/i)).toBeTruthy();
+
+        // Resolve login
+        await act(async () => {
+            resolveLogin!();
+        });
+
+        // Should return to "Login" text
+        expect(getByText(/Login/i)).toBeTruthy();
+    });
+
+    it('shows server error when login throws', async () => {
+        mockLogin.mockRejectedValue(new Error('Network error'));
+
+        const { getByPlaceholderText, getByText } = render(
+            <LoginScreen onBack={onBack} onForgotPassword={onForgotPassword} />
+        );
+
+        fireEvent.changeText(getByPlaceholderText(/Enter your email/i), 'test@example.com');
+        fireEvent.changeText(getByPlaceholderText(/Enter your password/i), 'password123');
+
+        await act(async () => {
+            fireEvent.press(getByText(/Login/i));
+        });
+
+        expect(getByText(/Network error/i)).toBeTruthy();
+    });
+
+    it('shows fallback error when login throws without message', async () => {
+        mockLogin.mockRejectedValue({});
+
+        const { getByPlaceholderText, getByText } = render(
+            <LoginScreen onBack={onBack} onForgotPassword={onForgotPassword} />
+        );
+
+        fireEvent.changeText(getByPlaceholderText(/Enter your email/i), 'test@example.com');
+        fireEvent.changeText(getByPlaceholderText(/Enter your password/i), 'password123');
+
+        await act(async () => {
+            fireEvent.press(getByText(/Login/i));
+        });
+
+        expect(getByText(/Login failed/i)).toBeTruthy();
+    });
+
+    it('calls onForgotPassword handler', () => {
+        const { getByText } = render(
+            <LoginScreen onBack={onBack} onForgotPassword={onForgotPassword} />
+        );
+
+        fireEvent.press(getByText(/Forgot Password/i));
+        expect(onForgotPassword).toHaveBeenCalled();
     });
 });

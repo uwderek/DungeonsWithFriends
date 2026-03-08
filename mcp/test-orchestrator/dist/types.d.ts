@@ -44,4 +44,5 @@ export interface TestResult {
     coverageGaps?: CoverageGap[];
     summary?: string;
     debugTrace?: string[];
+    rawStderr?: string;
 }

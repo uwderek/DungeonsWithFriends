@@ -2,6 +2,7 @@ import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { getCommand, serverLog } from '../utils.js';
+import { runCSSLint } from './CSSLintHandler.js';
 /**
  * Parse TypeScript compiler output for errors
  */
@@ -61,9 +62,12 @@ function enrichAndGroupErrors(rawErrors, projectRoot) {
     }));
 }
 /**
- * Run TypeScript type checking
+ * Run TypeScript type checking and CSS linting
  */
 export function runLint(projectRoot) {
+    let tsLintErrors = [];
+    let tsRawStderr;
+    // Step 1: TypeScript type checking
     try {
         // Add --pretty false to prevent color codes and formatting issues
         const cmd = `${getCommand('npx')} tsc --noEmit --pretty false`;
@@ -73,7 +77,6 @@ export function runLint(projectRoot) {
             encoding: 'utf-8',
             stdio: ['ignore', 'pipe', 'pipe'], // Ignore stdin, pipe stdout/stderr
         });
-        return { success: true, phase: 'lint', summary: 'No lint errors found.' };
     }
     catch (error) {
         const execError = error;
@@ -85,14 +88,42 @@ export function runLint(projectRoot) {
             });
         }
         const rawErrors = parseLintOutput(output);
-        const lintErrors = enrichAndGroupErrors(rawErrors, projectRoot);
-        // Calculate total errors for summary
-        const totalErrors = lintErrors.reduce((acc, curr) => acc + curr.errors.length, 0);
+        tsLintErrors = enrichAndGroupErrors(rawErrors, projectRoot);
+        // If tsc failed but we couldn't parse any errors, include raw stderr
+        if (tsLintErrors.length === 0 && output.length > 0) {
+            tsRawStderr = output.substring(0, 5000); // Cap at 5KB
+        }
+        if (tsLintErrors.length > 0) {
+            const totalErrors = tsLintErrors.reduce((acc, curr) => acc + curr.errors.length, 0);
+            return {
+                success: false,
+                phase: 'lint',
+                lintErrors: tsLintErrors,
+                rawStderr: tsRawStderr,
+                summary: `Found ${totalErrors} TypeScript lint error(s) across ${tsLintErrors.length} file(s).`,
+            };
+        }
+        // tsc failed but no parseable errors — return the raw output
+        if (tsRawStderr) {
+            return {
+                success: false,
+                phase: 'lint',
+                rawStderr: tsRawStderr,
+                summary: 'TypeScript type check failed with unparseable output. Check rawStderr for details.',
+            };
+        }
+    }
+    // Step 2: CSS linting via Stylelint
+    const cssResult = runCSSLint(projectRoot);
+    if (!cssResult.success) {
+        // Merge any CSS errors into the response
         return {
             success: false,
             phase: 'lint',
-            lintErrors,
-            summary: `Found ${totalErrors} lint error(s) across ${lintErrors.length} file(s).`,
+            lintErrors: cssResult.lintErrors,
+            rawStderr: cssResult.rawStderr,
+            summary: cssResult.summary || 'CSS lint check failed.',
         };
     }
+    return { success: true, phase: 'lint', summary: 'No lint errors found (TypeScript + CSS).' };
 }

@@ -182,6 +182,8 @@ export function runUnitTests(projectRoot: string, testFile?: string, skipCoverag
     }
     trace.push(`Command: ${cmd}`);
 
+    let capturedStderr = '';
+
     try {
         serverLog('DEBUG', 'Running unit tests', { cmd });
         const stdout = execSync(cmd, {
@@ -197,7 +199,10 @@ export function runUnitTests(projectRoot: string, testFile?: string, skipCoverag
         const logFilePath = path.join(logsDir, `unit-${Date.now()}.log`);
         let outStr = '';
         if (execError.stdout) outStr += execError.stdout.toString('utf-8');
-        if (execError.stderr) outStr += '\n' + execError.stderr.toString('utf-8');
+        if (execError.stderr) {
+            capturedStderr = execError.stderr.toString('utf-8');
+            outStr += '\n' + capturedStderr;
+        }
         fs.writeFileSync(logFilePath, outStr);
 
         trace.push('Jest execution completed with failure exit code (expected for test failures)');
@@ -252,6 +257,10 @@ export function runUnitTests(projectRoot: string, testFile?: string, skipCoverag
 
     const overallSuccess = testsPass && coverageSuccess;
 
+    // Include rawStderr when Jest failed without producing parseable results
+    const includeStderr = (failures.length === 0 && !testsPass && capturedStderr) ||
+        (!fs.existsSync(jsonOutput) && capturedStderr);
+
     const result: TestResult = {
         success: overallSuccess,
         phase: 'unit',
@@ -259,7 +268,8 @@ export function runUnitTests(projectRoot: string, testFile?: string, skipCoverag
         coverageGaps,
         lintErrors: [], // Explicitly empty to show lint passed
         summary: summaryParts.join(', ') + '.',
-        debugTrace: debug ? trace : undefined
+        debugTrace: debug ? trace : undefined,
+        rawStderr: includeStderr ? capturedStderr.substring(0, 5000) : undefined,
     };
     return result;
 }

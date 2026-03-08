@@ -3,116 +3,251 @@ import { render, act } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { AuthProvider, useAuth } from './auth-provider';
 
-// Mock @nhost/nhost-js to avoid real network initialization
+// We need per-test mock control, so we use module-level mocks with overrides
+const mockGetSession = jest.fn().mockReturnValue(null);
+const mockSignIn = jest.fn().mockResolvedValue({ session: null, error: null });
+const mockSignUp = jest.fn().mockResolvedValue({ session: null, error: null });
+const mockSignOut = jest.fn().mockResolvedValue(undefined);
+
 jest.mock('@nhost/nhost-js', () => ({
     NhostClient: jest.fn().mockImplementation(() => ({
         auth: {
-            getSession: jest.fn().mockReturnValue(null),
-            signIn: jest.fn(),
-            signUp: jest.fn(),
-            signOut: jest.fn(),
+            getSession: mockGetSession,
+            signIn: mockSignIn,
+            signUp: mockSignUp,
+            signOut: mockSignOut,
         },
     })),
 }));
 
-// Mock tinybase/ui-react
+const mockGetCell = jest.fn().mockReturnValue(undefined);
+const mockSetCell = jest.fn();
+const mockStore = { getCell: mockGetCell, setCell: mockSetCell };
+
 jest.mock('tinybase/ui-react', () => ({
-    useStore: jest.fn(() => ({
-        getCell: jest.fn(),
-        setCell: jest.fn(),
-    })),
+    useStore: jest.fn(() => mockStore),
 }));
 
-// Consumer component for testing the context
-function AuthConsumer() {
-    const { isAuthenticated, isLoading, user, offlineMode } = useAuth() as any;
-    return (
-        <>
-            <Text testID="isAuthenticated">{String(isAuthenticated)}</Text>
-            <Text testID="isLoading">{String(isLoading)}</Text>
-            <Text testID="user">{user ? user.email : 'null'}</Text>
-            <Text testID="offlineMode">{String(offlineMode)}</Text>
-        </>
-    );
+// Helper to capture auth context
+function AuthCapture({ onCapture }: { onCapture: (ctx: any) => void }) {
+    const ctx = useAuth();
+    onCapture(ctx);
+    return <Text testID="ready">ready</Text>;
 }
 
 describe('AuthProvider', () => {
-    it('renders children without crashing', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        mockGetSession.mockReturnValue(null);
+        mockSignIn.mockResolvedValue({ session: null, error: null });
+        mockSignUp.mockResolvedValue({ session: null, error: null });
+        mockGetCell.mockReturnValue(undefined);
+    });
+
+    it('renders children', () => {
         const { getByText } = render(
-            <AuthProvider>
-                <Text>Hello</Text>
-            </AuthProvider>
+            <AuthProvider><Text>Hello</Text></AuthProvider>
         );
         expect(getByText('Hello')).toBeTruthy();
     });
 
-    it('provides initial state: not authenticated, loading, no user, offlineMode false', async () => {
-        const { getByTestId } = render(
-            <AuthProvider>
-                <AuthConsumer />
-            </AuthProvider>
-        );
+    it('restores offline mode from TinyBase store', async () => {
+        mockGetCell.mockReturnValue(true);
 
-        // After useEffect runs, isLoading becomes false
-        await act(async () => { });
-
-        expect(getByTestId('isAuthenticated').props.children).toBe('false');
-        expect(getByTestId('isLoading').props.children).toBe('false');
-        expect(getByTestId('user').props.children).toBe('null');
-        expect(getByTestId('offlineMode').props.children).toBe('false');
-    });
-
-    it('exposes continueOffline function that sets offlineMode to true', async () => {
-        let authCtx: any = null;
-
-        function Capture() {
-            authCtx = useAuth();
-            return null;
-        }
-
+        let ctx: any;
         render(
             <AuthProvider>
-                <Capture />
+                <AuthCapture onCapture={c => { ctx = c; }} />
             </AuthProvider>
         );
-
         await act(async () => { });
 
-        expect(authCtx.offlineMode).toBe(false);
-
-        await act(async () => {
-            authCtx.continueOffline();
-        });
-
-        expect(authCtx.offlineMode).toBe(true);
+        expect(ctx.offlineMode).toBe(true);
     });
 
-    it('exposes login and logout functions that do not throw', async () => {
-        let authCtx: ReturnType<typeof useAuth> | null = null;
+    it('does not restore offline if store returns falsy', async () => {
+        mockGetCell.mockReturnValue(false);
 
-        function Capture() {
-            authCtx = useAuth();
-            return null;
-        }
-
-        const { unmount } = render(
+        let ctx: any;
+        render(
             <AuthProvider>
-                <Capture />
+                <AuthCapture onCapture={c => { ctx = c; }} />
             </AuthProvider>
         );
-
         await act(async () => { });
 
-        expect(() => authCtx!.login()).not.toThrow();
-        expect(() => authCtx!.logout()).not.toThrow();
+        expect(ctx.offlineMode).toBe(false);
+    });
 
-        unmount();
+    it('handles store being null gracefully', async () => {
+        const { useStore } = require('tinybase/ui-react');
+        useStore.mockReturnValueOnce(null);
+
+        let ctx: any;
+        render(
+            <AuthProvider>
+                <AuthCapture onCapture={c => { ctx = c; }} />
+            </AuthProvider>
+        );
+        await act(async () => { });
+
+        expect(ctx.offlineMode).toBe(false);
+    });
+
+    it('sets authenticated state when session exists at mount', async () => {
+        mockGetSession.mockReturnValue({
+            user: { id: '1', email: 'user@test.com' },
+        });
+
+        let ctx: any;
+        render(
+            <AuthProvider>
+                <AuthCapture onCapture={c => { ctx = c; }} />
+            </AuthProvider>
+        );
+        await act(async () => { });
+
+        expect(ctx.isAuthenticated).toBe(true);
+        expect(ctx.user).toEqual({ id: '1', email: 'user@test.com' });
+    });
+
+    it('login with valid credentials sets authenticated state', async () => {
+        mockSignIn.mockResolvedValue({
+            session: { user: { id: '2', email: 'logged@test.com' } },
+            error: null,
+        });
+
+        let ctx: any;
+        render(
+            <AuthProvider>
+                <AuthCapture onCapture={c => { ctx = c; }} />
+            </AuthProvider>
+        );
+        await act(async () => { });
+
+        await act(async () => {
+            await ctx.login('logged@test.com', 'pass123');
+        });
+
+        expect(ctx.isAuthenticated).toBe(true);
+        expect(ctx.user.email).toBe('logged@test.com');
+    });
+
+    it('login throws when signIn returns error', async () => {
+        mockSignIn.mockResolvedValue({
+            session: null,
+            error: new Error('Invalid credentials'),
+        });
+
+        let ctx: any;
+        render(
+            <AuthProvider>
+                <AuthCapture onCapture={c => { ctx = c; }} />
+            </AuthProvider>
+        );
+        await act(async () => { });
+
+        await expect(ctx.login('bad@test.com', 'wrong')).rejects.toThrow('Invalid credentials');
+    });
+
+    it('login without credentials is a no-op', async () => {
+        let ctx: any;
+        render(
+            <AuthProvider>
+                <AuthCapture onCapture={c => { ctx = c; }} />
+            </AuthProvider>
+        );
+        await act(async () => { });
+
+        await act(async () => {
+            await ctx.login();
+        });
+
+        expect(mockSignIn).not.toHaveBeenCalled();
+    });
+
+    it('register with valid credentials sets authenticated state', async () => {
+        mockSignUp.mockResolvedValue({
+            session: { user: { id: '3', email: 'new@test.com' } },
+            error: null,
+        });
+
+        let ctx: any;
+        render(
+            <AuthProvider>
+                <AuthCapture onCapture={c => { ctx = c; }} />
+            </AuthProvider>
+        );
+        await act(async () => { });
+
+        await act(async () => {
+            await ctx.register('new@test.com', 'pass123');
+        });
+
+        expect(ctx.isAuthenticated).toBe(true);
+        expect(ctx.user.email).toBe('new@test.com');
+    });
+
+    it('register throws when signUp returns error', async () => {
+        mockSignUp.mockResolvedValue({
+            session: null,
+            error: new Error('Email already exists'),
+        });
+
+        let ctx: any;
+        render(
+            <AuthProvider>
+                <AuthCapture onCapture={c => { ctx = c; }} />
+            </AuthProvider>
+        );
+        await act(async () => { });
+
+        await expect(ctx.register('dup@test.com', 'pass')).rejects.toThrow('Email already exists');
+    });
+
+    it('continueOffline sets offline mode and persists to store', async () => {
+        let ctx: any;
+        render(
+            <AuthProvider>
+                <AuthCapture onCapture={c => { ctx = c; }} />
+            </AuthProvider>
+        );
+        await act(async () => { });
+
+        await act(async () => {
+            ctx.continueOffline();
+        });
+
+        expect(ctx.offlineMode).toBe(true);
+        expect(mockSetCell).toHaveBeenCalledWith('settings', 'auth', 'offline_mode', true);
+    });
+
+    it('logout clears state and persists', async () => {
+        // Start authenticated
+        mockGetSession.mockReturnValue({
+            user: { id: '1', email: 'user@test.com' },
+        });
+
+        let ctx: any;
+        render(
+            <AuthProvider>
+                <AuthCapture onCapture={c => { ctx = c; }} />
+            </AuthProvider>
+        );
+        await act(async () => { });
+        expect(ctx.isAuthenticated).toBe(true);
+
+        await act(async () => {
+            await ctx.logout();
+        });
+
+        expect(ctx.isAuthenticated).toBe(false);
+        expect(ctx.user).toBeNull();
     });
 });
 
 describe('useAuth', () => {
     it('throws when used outside of AuthProvider', () => {
-        // Suppress the expected console.error React outputs for thrown errors in render
         const spy = jest.spyOn(console, 'error').mockImplementation(() => { });
 
         function BadConsumer() {
