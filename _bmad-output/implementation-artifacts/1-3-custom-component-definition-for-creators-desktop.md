@@ -1,6 +1,6 @@
 # Story 1.3: Custom Component Definition for Creators (Desktop)
 
-Status: in-progress
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -43,44 +43,44 @@ so that I can build sheets and templates for non-standard game systems.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Define Zod Schemas for Component Definitions (AC: 7)
-  - [ ] Create `src/features/creator/model/component-schemas.ts` with Zod schemas for `component_definition` table
-  - [ ] Define supported data types enum: `text`, `number`, `boolean`, `select`, `calculated`
-  - [ ] Define validation rule schemas (min, max, required, pattern, options for select)
-  - [ ] Create `component-schemas.test.ts` with full validation coverage
-- [ ] Task 2: Create TinyBase Component Store Integration (AC: 4, 5)
-  - [ ] Create `src/features/creator/model/component-store.ts` — hooks and helpers for component CRUD against TinyBase
-  - [ ] Implement `useComponentDefinitions()` hook to list all definitions
-  - [ ] Implement `useComponentDefinition(id)` hook for single definition
-  - [ ] Implement `createComponentDefinition()`, `updateComponentDefinition()`, `deleteComponentDefinition()` mutations
-  - [ ] Implement debounced auto-save logic (300ms debounce)
-  - [ ] Create `component-store.test.ts` with full CRUD test coverage
-- [ ] Task 3: Build Component List View (AC: 1, 5)
-  - [ ] Create `src/features/creator/ui/component-list.tsx` — displays all existing component definitions as cards
-  - [ ] Include "Create New Component" action button
-  - [ ] Each card shows: name, type badge, label, edit/delete actions
-  - [ ] Empty state with guidance text for first-time creators
-  - [ ] Create `component-list.test.tsx`
-- [ ] Task 4: Build Component Editor Form (AC: 2, 3, 4)
-  - [ ] Create `src/features/creator/ui/component-editor.tsx` — form for creating/editing a single component definition
-  - [ ] Fields: component_name, data_type (dropdown), label, description, default_value (type-aware input), required toggle, validation rules
-  - [ ] Implement inline validation using Zod `.safeParse()` with real-time field-level error display
-  - [ ] Implement onChange auto-save with debounce and "Saved" indicator
-  - [ ] Desktop layout: properties panel styling with high-density form layout
-  - [ ] Create `component-editor.test.tsx`
-- [ ] Task 5: Build Creator Tools Screen & Desktop Gate (AC: 1, 6)
-  - [ ] Create `src/features/creator/ui/creator-tools-screen.tsx` — container for creator functionality
-  - [ ] Implement responsive gate: render full editor on desktop (≥1024px), show "Desktop Required" message on mobile
-  - [ ] Route integration: wire into App.tsx navigation (accessible via "Settings" tab or dedicated creator route on desktop sidebar)
-  - [ ] Create `creator-tools-screen.test.tsx`
-- [ ] Task 6: Wire Navigation to Creator Tools (AC: 1)
-  - [ ] Add "Creator Tools" entry point accessible from the dashboard or settings on desktop
-  - [ ] Ensure navigation respects current auth/offline state
-- [ ] Task 7: Validation & Full Test Suite (all ACs)
-  - [ ] Verify all existing tests still pass (regression guard)
-  - [ ] Verify component definitions round-trip through TinyBase correctly
-  - [ ] Verify mobile gate prevents editor rendering on small viewports
-  - [ ] Verify inline validation fires on invalid input
+- [x] Task 1: Define Zod Schemas for Component Definitions (AC: 7)
+  - [x] Create `src/features/creator/model/component-schemas.ts` with Zod schemas for `component_definition` table
+  - [x] Define supported data types enum: `text`, `number`, `boolean`, `select`, `calculated`
+  - [x] Define validation rule schemas (min, max, required, pattern, options for select)
+  - [x] Create `component-schemas.test.ts` with full validation coverage
+- [x] Task 2: Create TinyBase Component Store Integration (AC: 4, 5)
+  - [x] Create `src/features/creator/model/component-store.ts` — hooks and helpers for component CRUD against TinyBase
+  - [x] Implement `useComponentDefinitions()` hook to list all definitions
+  - [x] Implement `useComponentDefinition(id)` hook for single definition
+  - [x] Implement `createComponentDefinition()`, `updateComponentDefinition()`, `deleteComponentDefinition()` mutations
+  - [x] Implement debounced auto-save logic (300ms debounce)
+  - [x] Create `component-store.test.ts` with full CRUD test coverage
+- [x] Task 3: Build Component List View (AC: 1, 5)
+  - [x] Create `src/features/creator/ui/component-list.tsx` — displays all existing component definitions as cards
+  - [x] Include "Create New Component" action button
+  - [x] Each card shows: name, type badge, label, edit/delete actions
+  - [x] Empty state with guidance text for first-time creators
+  - [x] Create `component-list.test.tsx`
+- [x] Task 4: Build Component Editor Form (AC: 2, 3, 4)
+  - [x] Create `src/features/creator/ui/component-editor.tsx` — form for creating/editing a single component definition
+  - [x] Fields: component_name, data_type (dropdown), label, description, default_value (type-aware input), required toggle, validation rules
+  - [x] Implement inline validation using Zod `.safeParse()` with real-time field-level error display
+  - [x] Implement onChange auto-save with debounce and "Saved" indicator
+  - [x] Desktop layout: properties panel styling with high-density form layout
+  - [x] Create `component-editor.test.tsx`
+- [x] Task 5: Build Creator Tools Screen & Desktop Gate (AC: 1, 6)
+  - [x] Create `src/features/creator/ui/creator-tools-screen.tsx` — container for creator functionality
+  - [x] Implement responsive gate: render full editor on desktop (≥1024px), show "Desktop Required" message on mobile
+  - [x] Route integration: wire into App.tsx navigation (accessible via "Settings" tab or dedicated creator route on desktop sidebar)
+  - [x] Create `creator-tools-screen.test.tsx`
+- [x] Task 6: Wire Navigation to Creator Tools (AC: 1)
+  - [x] Add "Creator Tools" entry point accessible from the dashboard or settings on desktop
+  - [x] Ensure navigation respects current auth/offline state
+- [x] Task 7: Validation & Full Test Suite (all ACs)
+  - [x] Verify all existing tests still pass (regression guard)
+  - [x] Verify component definitions round-trip through TinyBase correctly
+  - [x] Verify mobile gate prevents editor rendering on small viewports
+  - [x] Verify inline validation fires on invalid input
 
 ## Dev Notes
 
@@ -263,10 +263,40 @@ DungeonsWithFriends/
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude 3.7 Sonnet
 
 ### Debug Log References
 
+- Fixed silent JSON parse error swallowing in component-store.ts (added console.warn)
+- Fixed debounce timing from 500ms to 300ms per UX spec
+- Added missing UI fields: description, default_value, select options, calculated formula
+- Fixed TypeScript any types in ComponentEditor
+- Removed unnecessary async from store CRUD functions
+- Fixed hardcoded green-500 to use theme token success-500
+- Added delete functionality to ComponentListView
+
 ### Completion Notes List
 
+- All 7 acceptance criteria implemented
+- All 7 tasks completed
+- Code review findings addressed:
+  - Critical: JSON parse error handling now logs warnings
+  - Critical: Missing UI fields added (description, default_value, select options, formula)
+  - Medium: Debounce timing corrected to 300ms
+  - Medium: TypeScript types fixed (removed any)
+  - Low: Theme tokens used instead of hardcoded colors
+  - Low: Async overhead removed from synchronous operations
+
 ### File List
+
+- `src/features/creator/model/component-schemas.ts` - Zod schemas for component definitions
+- `src/features/creator/model/component-schemas.test.ts` - Schema validation tests
+- `src/features/creator/model/component-store.ts` - TinyBase hooks and CRUD operations (FIXED: error handling, removed async)
+- `src/features/creator/model/component-store.test.ts` - Store operation tests (FIXED: non-async mocks)
+- `src/features/creator/ui/ComponentListView.tsx` - Component list with create/edit/delete (FIXED: added delete action)
+- `src/features/creator/ui/ComponentListView.test.tsx` - List tests (FIXED: added delete test)
+- `src/features/creator/ui/ComponentEditor.tsx` - Component editor form (FIXED: types, debounce, fields, indicator)
+- `src/features/creator/ui/ComponentEditor.test.tsx` - Editor tests (FIXED: 300ms debounce, new field tests)
+- `src/features/creator/ui/CreatorToolsScreen.tsx` - Creator tools screen with desktop gate (FIXED: non-async create)
+- `src/features/creator/ui/CreatorToolsScreen.test.tsx` - Screen tests (FIXED: non-async mock)
+- `App.tsx` - Updated to include CreatorToolsScreen route

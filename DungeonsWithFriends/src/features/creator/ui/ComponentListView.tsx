@@ -1,16 +1,19 @@
 import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Plus, Database, FileCode, Trash2 } from 'lucide-react-native';
-import { useComponentDefinitions } from '../model/component-store';
+import { useComponentDefinitions, deleteComponentDefinition } from '../model/component-store';
+import { useStore } from 'tinybase/ui-react';
 import { BaseCard } from '../../../shared/ui/atoms/base-card';
 
 interface ComponentListViewProps {
     onCreate: () => void;
     onEdit: (id: string) => void;
+    onDelete?: (id: string) => void;
 }
 
-export const ComponentListView: React.FC<ComponentListViewProps> = ({ onCreate, onEdit }) => {
+export const ComponentListView: React.FC<ComponentListViewProps> = ({ onCreate, onEdit, onDelete }) => {
     const components = useComponentDefinitions();
+    const store = useStore();
 
     return (
         <ScrollView className="flex-1 bg-background-primary p-6">
@@ -56,8 +59,23 @@ export const ComponentListView: React.FC<ComponentListViewProps> = ({ onCreate, 
                                 onPress={() => onEdit(comp.component_id)}
                                 accentColor="var(--color-accent-primary)"
                                 headerContent={
-                                    <View className="bg-background-tertiary p-2 rounded-lg">
-                                        {React.createElement(FileCode as any, { size: 18, color: "var(--color-accent-primary)" })}
+                                    <View className="flex-row items-center space-x-2">
+                                        <View className="bg-background-tertiary p-2 rounded-lg">
+                                            {React.createElement(FileCode as any, { size: 18, color: "var(--color-accent-primary)" })}
+                                        </View>
+                                        {onDelete && store && (
+                                            <TouchableOpacity
+                                                onPress={(e) => {
+                                                    e.stopPropagation();
+                                                    deleteComponentDefinition(store, comp.component_id);
+                                                    onDelete(comp.component_id);
+                                                }}
+                                                className="bg-background-tertiary p-2 rounded-lg"
+                                                testID={`delete-button-${comp.component_id}`}
+                                            >
+                                                {React.createElement(Trash2 as any, { size: 18, color: "var(--color-error-500)" })}
+                                            </TouchableOpacity>
+                                        )}
                                     </View>
                                 }
                             >

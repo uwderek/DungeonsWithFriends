@@ -20,7 +20,8 @@ export const useComponentDefinitions = (): ComponentDefinition[] => {
         if (typeof row.validation_rules === 'string') {
             try {
                 validation_rules = JSON.parse(row.validation_rules);
-            } catch {
+            } catch (e) {
+                console.warn('Failed to parse validation_rules for component:', id, e);
                 validation_rules = {};
             }
         } else {
@@ -48,7 +49,8 @@ export const useComponentDefinition = (id: string): ComponentDefinition | undefi
     if (typeof row.validation_rules === 'string') {
         try {
             validation_rules = JSON.parse(row.validation_rules);
-        } catch {
+        } catch (e) {
+            console.warn('Failed to parse validation_rules for component:', id, e);
             validation_rules = {};
         }
     } else {
@@ -65,10 +67,10 @@ export const useComponentDefinition = (id: string): ComponentDefinition | undefi
 /**
  * Create a new component definition
  */
-export const createComponentDefinition = async (
+export const createComponentDefinition = (
     store: Store,
     data: Partial<Omit<ComponentDefinition, 'component_id'>>
-): Promise<string> => {
+): string => {
     const component_id = crypto.randomUUID();
     const now = new Date().toISOString();
 
@@ -100,11 +102,11 @@ export const createComponentDefinition = async (
 /**
  * Update an existing component definition
  */
-export const updateComponentDefinition = async (
+export const updateComponentDefinition = (
     store: Store,
     id: string,
     data: Partial<ComponentDefinition>
-): Promise<void> => {
+): void => {
     const currentRow = store.getRow(TABLE_NAME, id);
     if (!currentRow) throw new Error(`Component ${id} not found`);
 
@@ -139,9 +141,9 @@ export const updateComponentDefinition = async (
 /**
  * Delete a component definition
  */
-export const deleteComponentDefinition = async (
+export const deleteComponentDefinition = (
     store: Store,
     id: string
-): Promise<void> => {
+): void => {
     store.delRow(TABLE_NAME, id);
 };

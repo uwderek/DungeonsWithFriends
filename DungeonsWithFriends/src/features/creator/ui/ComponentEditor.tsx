@@ -3,7 +3,7 @@ import { View, Text, TextInput, ScrollView, TouchableOpacity, Switch } from 'rea
 import { X, Save, AlertCircle, Info } from 'lucide-react-native';
 import { useComponentDefinition, updateComponentDefinition } from '../model/component-store';
 import { useStore } from 'tinybase/ui-react';
-import { componentDefinitionSchema } from '../model/component-schemas';
+import { componentDefinitionSchema, ComponentDefinition } from '../model/component-schemas';
 
 interface ComponentEditorProps {
     componentId: string;
@@ -15,9 +15,10 @@ export const ComponentEditor: React.FC<ComponentEditorProps> = ({ componentId, o
     const component = useComponentDefinition(componentId);
 
     // Form state
-    const [formData, setFormData] = useState<any>(null);
+    const [formData, setFormData] = useState<ComponentDefinition | null>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSaving, setIsSaving] = useState(false);
+    const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
     // Auto-save debounce ref
     const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -70,9 +71,10 @@ export const ComponentEditor: React.FC<ComponentEditorProps> = ({ componentId, o
             } finally {
                 if (isMountedRef.current) {
                     setIsSaving(false);
+                    setLastSaved(new Date());
                 }
             }
-        }, 500);
+        }, 300);
 
         return () => {
             if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -87,18 +89,21 @@ export const ComponentEditor: React.FC<ComponentEditorProps> = ({ componentId, o
         );
     }
 
-    const updateField = (field: string, value: any) => {
-        setFormData((prev: any) => ({ ...prev, [field]: value }));
+    const updateField = <K extends keyof ComponentDefinition>(field: K, value: ComponentDefinition[K]) => {
+        setFormData((prev: ComponentDefinition | null) => prev ? { ...prev, [field]: value } : null);
     };
 
-    const updateValidationRule = (rule: string, value: any) => {
-        setFormData((prev: any) => ({
-            ...prev,
-            validation_rules: {
-                ...(prev.validation_rules || {}),
-                [rule]: value
-            }
-        }));
+    const updateValidationRule = (rule: string, value: unknown) => {
+        setFormData((prev: ComponentDefinition | null) => {
+            if (!prev) return null;
+            return {
+                ...prev,
+                validation_rules: {
+                    ...(prev.validation_rules || {}),
+                    [rule]: value
+                }
+            };
+        });
     };
 
     return (
@@ -116,7 +121,10 @@ export const ComponentEditor: React.FC<ComponentEditorProps> = ({ componentId, o
                     {isSaving && (
                         <Text className="text-typography-secondary text-xs italic">Saving...</Text>
                     )}
-                    <View className={`w-2 h-2 rounded-full ${isSaving ? 'bg-accent-primary' : 'bg-green-500 opacity-50'}`} />
+                    <View className={`w-2 h-2 rounded-full ${isSaving ? 'bg-accent-primary' : lastSaved ? 'bg-success-500' : 'bg-typography-tertiary'}`} />
+                    {lastSaved && !isSaving && (
+                        <Text className="text-success-500 text-xs">Saved</Text>
+                    )}
                 </View>
             </View>
 
@@ -165,13 +173,25 @@ export const ComponentEditor: React.FC<ComponentEditorProps> = ({ componentId, o
                             )}
                         </View>
 
+                        {/* Description Field */}
+                        <View>
+                            <Text className="text-typography-secondary text-sm mb-1 ml-1 font-medium">Description</Text>
+                            <TextInput
+                                className="bg-background-secondary text-typography-primary h-12 px-4 rounded-xl border border-border-primary"
+                                value={formData.description || ''}
+                                onChangeText={(v) => updateField('description', v || undefined)}
+                                placeholder="Optional description"
+                                placeholderTextColor="var(--color-text-secondary)"
+                            />
+                        </View>
+
                         <View>
                             <Text className="text-typography-secondary text-sm mb-1 ml-1 font-medium">Data Type</Text>
                             <View className="flex-row flex-wrap -m-1">
                                 {["text", "number", "boolean", "select", "calculated"].map((type) => (
                                     <TouchableOpacity
                                         key={type}
-                                        onPress={() => updateField('data_type', type)}
+                                        onPress={() => updateField('data_type', type as ComponentDefinition['data_type'])}
                                         testID={`type-button-${type}`}
                                         className={`m-1 px-4 py-2 rounded-lg border ${formData.data_type === type ? 'bg-accent-primary/20 border-accent-primary' : 'bg-background-secondary border-border-primary'}`}
                                     >
@@ -268,6 +288,50 @@ export const ComponentEditor: React.FC<ComponentEditorProps> = ({ componentId, o
                             </View>
                         </View>
                     )}
+                    {formData.data_type === 'select' && (
+                        <View className="space-y-4">
+                            <View>
+                                <Text className="text-typography-secondary text-xs mb-1 ml-1">Options (comma-separated)</Text>
+                                <TextInput
+                                    className="bg-background-secondary text-typography-primary h-12 px-4 rounded-xl border border-border-primary"
+                                    value={(formData.validation_rules?.options || []).join(', ')}
+                                    onChangeText={(v) => updateValidationRule('options', v.split(',').map(s => s.trim()).filter(Boolean))}
+                                    testID="input-options"
+                                    placeholder="Option 1, Option 2, Option 3"
+                                />
+                            </View>
+                        </View>
+                    )}
+
+                    {formData.data_type === 'calculated' && (
+                        <View className="space-y-4">
+                            <View>
+                                <Text className="text-typography-secondary text-xs mb-1 ml-1">Formula</Text>
+                                <TextInput
+                                    className="bg-background-secondary text-typography-primary font-mono h-12 px-4 rounded-xl border border-border-primary"
+                                    value={formData.validation_rules?.formula || ''}
+                                    onChangeText={(v) => updateValidationRule('formula', v || undefined)}
+                                    testID="input-formula"
+                                    placeholder="floor((strength_score - 10) / 2)"
+                                    autoCapitalize="none"
+                                />
+                                <Text className="text-typography-tertiary text-[10px] mt-1 ml-1">Use component names as variables</Text>
+                            </View>
+                        </View>
+                    )}
+
+                    {/* Default Value - shown for all types */}
+                    <View className="mt-4 pt-4 border-t border-border-primary">
+                        <Text className="text-typography-secondary text-xs mb-1 ml-1">Default Value</Text>
+                        <TextInput
+                            className="bg-background-secondary text-typography-primary h-12 px-4 rounded-xl border border-border-primary"
+                            value={formData.default_value || ''}
+                            onChangeText={(v) => updateField('default_value', v || undefined)}
+                            testID="input-default-value"
+                            placeholder={formData.data_type === 'number' ? '0' : 'Default value'}
+                            keyboardType={formData.data_type === 'number' ? 'numeric' : 'default'}
+                        />
+                    </View>
                 </View>
             </ScrollView>
         </View>

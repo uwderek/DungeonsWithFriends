@@ -66,7 +66,7 @@ describe('CreatorToolsScreen', () => {
 
     it('handles create and open editor', async () => {
         (useWindowDimensions as jest.Mock).mockReturnValue({ width: 1200 });
-        (createComponentDefinition as jest.Mock).mockResolvedValue('new-id');
+        (createComponentDefinition as jest.Mock).mockReturnValue('new-id');
 
         const { getByTestId, getByText } = render(<CreatorToolsScreen />);
 
@@ -80,7 +80,7 @@ describe('CreatorToolsScreen', () => {
 
     it('closes editor', async () => {
         (useWindowDimensions as jest.Mock).mockReturnValue({ width: 1200 });
-        (createComponentDefinition as jest.Mock).mockResolvedValue('new-id');
+        (createComponentDefinition as jest.Mock).mockReturnValue('new-id');
 
         const { getByTestId, queryByText } = render(<CreatorToolsScreen />);
 

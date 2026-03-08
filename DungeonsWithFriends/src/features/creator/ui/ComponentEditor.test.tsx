@@ -72,7 +72,7 @@ describe('ComponentEditor', () => {
         fireEvent.changeText(input, 'New Label');
 
         act(() => {
-            jest.advanceTimersByTime(600);
+            jest.advanceTimersByTime(350);
         });
 
         await waitFor(() => {
@@ -126,7 +126,7 @@ describe('ComponentEditor', () => {
         fireEvent(getByTestId('switch-required'), 'onValueChange', true);
 
         act(() => {
-            jest.advanceTimersByTime(600);
+            jest.advanceTimersByTime(350);
         });
 
         await waitFor(() => {
@@ -151,7 +151,7 @@ describe('ComponentEditor', () => {
         fireEvent.changeText(getByTestId('input-pattern'), '^[A-Z]');
 
         act(() => {
-            jest.advanceTimersByTime(600);
+            jest.advanceTimersByTime(350);
         });
 
         await waitFor(() => {
@@ -195,7 +195,7 @@ describe('ComponentEditor', () => {
         fireEvent.changeText(getByTestId('input-max'), '20');
 
         act(() => {
-            jest.advanceTimersByTime(600);
+            jest.advanceTimersByTime(350);
         });
 
         await waitFor(() => {
@@ -207,6 +207,109 @@ describe('ComponentEditor', () => {
                         min: 10,
                         max: 20
                     })
+                })
+            );
+        });
+    });
+
+    it('updates select options field', async () => {
+        const selectComponent = { ...mockComponent, data_type: 'select' as const };
+        (useComponentDefinition as jest.Mock).mockReturnValue(selectComponent);
+
+        const { getByTestId } = render(
+            <ComponentEditor componentId={componentId} onClose={mockOnClose} />
+        );
+
+        fireEvent.changeText(getByTestId('input-options'), 'Option 1, Option 2');
+
+        act(() => {
+            jest.advanceTimersByTime(350);
+        });
+
+        await waitFor(() => {
+            expect(updateComponentDefinition).toHaveBeenCalledWith(
+                expect.anything(),
+                componentId,
+                expect.objectContaining({
+                    validation_rules: expect.objectContaining({
+                        options: ['Option 1', 'Option 2']
+                    })
+                })
+            );
+        });
+    });
+
+    it('updates formula for calculated type', async () => {
+        const calculatedComponent = { ...mockComponent, data_type: 'calculated' as const };
+        (useComponentDefinition as jest.Mock).mockReturnValue(calculatedComponent);
+
+        const { getByTestId } = render(
+            <ComponentEditor componentId={componentId} onClose={mockOnClose} />
+        );
+
+        fireEvent.changeText(getByTestId('input-formula'), 'floor((score - 10) / 2)');
+
+        act(() => {
+            jest.advanceTimersByTime(350);
+        });
+
+        await waitFor(() => {
+            expect(updateComponentDefinition).toHaveBeenCalledWith(
+                expect.anything(),
+                componentId,
+                expect.objectContaining({
+                    validation_rules: expect.objectContaining({
+                        formula: 'floor((score - 10) / 2)'
+                    })
+                })
+            );
+        });
+    });
+
+    it('updates description field', async () => {
+        (useComponentDefinition as jest.Mock).mockReturnValue(mockComponent);
+
+        const { getByPlaceholderText } = render(
+            <ComponentEditor componentId={componentId} onClose={mockOnClose} />
+        );
+
+        const input = getByPlaceholderText(/Optional description/i);
+        fireEvent.changeText(input, 'Test description');
+
+        act(() => {
+            jest.advanceTimersByTime(350);
+        });
+
+        await waitFor(() => {
+            expect(updateComponentDefinition).toHaveBeenCalledWith(
+                expect.anything(),
+                componentId,
+                expect.objectContaining({
+                    description: 'Test description'
+                })
+            );
+        });
+    });
+
+    it('updates default value field', async () => {
+        (useComponentDefinition as jest.Mock).mockReturnValue(mockComponent);
+
+        const { getByTestId } = render(
+            <ComponentEditor componentId={componentId} onClose={mockOnClose} />
+        );
+
+        fireEvent.changeText(getByTestId('input-default-value'), 'My Default');
+
+        act(() => {
+            jest.advanceTimersByTime(350);
+        });
+
+        await waitFor(() => {
+            expect(updateComponentDefinition).toHaveBeenCalledWith(
+                expect.anything(),
+                componentId,
+                expect.objectContaining({
+                    default_value: 'My Default'
                 })
             );
         });

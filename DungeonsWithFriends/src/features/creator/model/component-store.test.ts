@@ -34,7 +34,7 @@ describe('component-store', () => {
         expect(result.current).toEqual([]);
     });
 
-    it('createComponentDefinition adds a new row to TinyBase', async () => {
+    it('createComponentDefinition adds a new row to TinyBase', () => {
         const newComponent = {
             component_name: 'test_comp',
             display_label: 'Test Component',
@@ -42,8 +42,8 @@ describe('component-store', () => {
         };
 
         let id: string = '';
-        await act(async () => {
-            id = await createComponentDefinition(mockStore, newComponent);
+        act(() => {
+            id = createComponentDefinition(mockStore, newComponent);
         });
 
         expect(id).toBeTruthy();
@@ -58,7 +58,7 @@ describe('component-store', () => {
         expect(result.current).toBeUndefined();
     });
 
-    it('updateComponentDefinition updates existing row', async () => {
+    it('updateComponentDefinition updates existing row', () => {
         const id = '550e8400-e29b-41d4-a716-446655440000';
         const now = new Date().toISOString();
         rows[id] = {
@@ -72,8 +72,8 @@ describe('component-store', () => {
             sort_order: 0
         };
 
-        await act(async () => {
-            await updateComponentDefinition(mockStore, id, { display_label: 'Updated' });
+        act(() => {
+            updateComponentDefinition(mockStore, id, { display_label: 'Updated' });
         });
 
         expect(mockStore.setRow).toHaveBeenCalledWith('component_definitions', id, expect.objectContaining({
@@ -119,12 +119,12 @@ describe('component-store', () => {
         expect(result.current?.validation_rules).toEqual({ min: 1 });
     });
 
-    it('updateComponentDefinition throws if not found', async () => {
-        await expect(updateComponentDefinition(mockStore, 'non-existent', {}))
-            .rejects.toThrow('Component non-existent not found');
+    it('updateComponentDefinition throws if not found', () => {
+        expect(() => updateComponentDefinition(mockStore, 'non-existent', {}))
+            .toThrow('Component non-existent not found');
     });
 
-    it('deleteComponentDefinition removes row', async () => {
+    it('deleteComponentDefinition removes row', () => {
         const id = '550e8400-e29b-41d4-a716-446655440001';
         const now = new Date().toISOString();
         rows[id] = {
@@ -138,17 +138,17 @@ describe('component-store', () => {
             sort_order: 0
         };
 
-        await act(async () => {
-            await deleteComponentDefinition(mockStore, id);
+        act(() => {
+            deleteComponentDefinition(mockStore, id);
         });
 
         expect(mockStore.delRow).toHaveBeenCalledWith('component_definitions', id);
     });
 
-    it('uses default values if not provided', async () => {
+    it('uses default values if not provided', () => {
         let id: string = '';
-        await act(async () => {
-            id = await createComponentDefinition(mockStore, {});
+        act(() => {
+            id = createComponentDefinition(mockStore, {});
         });
 
         expect(mockStore.setRow).toHaveBeenCalledWith('component_definitions', id, expect.objectContaining({

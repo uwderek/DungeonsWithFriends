@@ -30,10 +30,16 @@ export const CreatorToolsScreen: React.FC = () => {
         );
     }
 
-    const handleCreate = async () => {
+    const handleCreate = () => {
         if (store) {
-            const newId = await createComponentDefinition(store, {});
+            const newId = createComponentDefinition(store, {});
             setEditingComponentId(newId);
+        }
+    };
+
+    const handleDelete = (id: string) => {
+        if (editingComponentId === id) {
+            setEditingComponentId(null);
         }
     };
 
@@ -44,6 +50,7 @@ export const CreatorToolsScreen: React.FC = () => {
                 <ComponentListView
                     onCreate={handleCreate}
                     onEdit={setEditingComponentId}
+                    onDelete={handleDelete}
                 />
             </View>
 

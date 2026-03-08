@@ -77,4 +77,26 @@ describe('ComponentListView', () => {
         fireEvent.press(getByText('Test Component'));
         expect(mockOnEdit).toHaveBeenCalledWith('1');
     });
+
+    it('calls deleteComponentDefinition when delete button is pressed', () => {
+        const mockOnDelete = jest.fn();
+        const mockStore = { id: 'store' };
+        (useStore as jest.Mock).mockReturnValue(mockStore);
+        (useComponentDefinitions as jest.Mock).mockReturnValue([
+            {
+                component_id: '1',
+                display_label: 'Test Component',
+                data_type: 'text',
+                component_name: 'test_comp'
+            }
+        ]);
+
+        const { getByTestId } = render(
+            <ComponentListView onCreate={mockOnCreate} onEdit={mockOnEdit} onDelete={mockOnDelete} />
+        );
+
+        fireEvent.press(getByTestId('delete-button-1'));
+        expect(deleteComponentDefinition).toHaveBeenCalledWith(mockStore, '1');
+        expect(mockOnDelete).toHaveBeenCalledWith('1');
+    });
 });
