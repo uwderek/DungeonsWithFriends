@@ -31,3 +31,26 @@ jest.mock('react-native-safe-area-context', () => {
         },
     };
 });
+
+jest.mock('lucide-react-native', () => ({
+    Home: 'IconHome',
+    Swords: 'IconSwords',
+    Users: 'IconUsers',
+    Users2: 'IconUsers2',
+    Settings: 'IconSettings',
+    LogOut: 'IconLogOut',
+    LogIn: 'IconLogIn',
+    UserPlus: 'IconUserPlus',
+    WifiOff: 'IconWifiOff',
+    ChevronRight: 'IconChevronRight',
+}));
+
+jest.mock('expo-font', () => ({
+    loadAsync: jest.fn().mockResolvedValue(true),
+    isLoaded: jest.fn().mockReturnValue(true),
+}));
+
+jest.mock('expo-splash-screen', () => ({
+    preventAutoHideAsync: jest.fn().mockResolvedValue(true),
+    hideAsync: jest.fn().mockResolvedValue(true),
+}));

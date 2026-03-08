@@ -13,9 +13,13 @@ import { LoginScreen } from "@/features/auth/ui/login-screen";
 import { RegisterScreen } from "@/features/auth/ui/register-screen";
 import { DashboardScreen } from "@/features/dashboard/ui/dashboard-screen";
 
+// Shared UI
+import { BottomTabBar } from "@/shared/ui/navigation/bottom-tab-bar";
+
 function AppContent() {
   const { isAuthenticated, offlineMode, isLoading } = useAuth();
   const [authScreen, setAuthScreen] = useState<'welcome' | 'login' | 'register'>('welcome');
+  const [activeTab, setActiveTab] = useState<'home' | 'campaigns' | 'characters' | 'friends' | 'settings'>('home');
 
   if (isLoading) {
     return (
@@ -25,7 +29,17 @@ function AppContent() {
 
   // authenticated or offline-first access
   if (isAuthenticated || offlineMode) {
-    return <DashboardScreen />;
+    return (
+      <View className="flex-1">
+        <View className="flex-1 pb-20 lg:pb-0 lg:pl-64">
+          <DashboardScreen />
+        </View>
+        <BottomTabBar
+          activeTab={activeTab}
+          onTabPress={setActiveTab}
+        />
+      </View>
+    );
   }
 
   // Auth Stack
