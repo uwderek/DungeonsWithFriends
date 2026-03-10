@@ -1,6 +1,8 @@
 ---
-stepsCompleted: []
-inputDocuments: ["prd.md", "architecture.md", "ux-design-specification.md"]
+stepsCompleted:
+  - step-01-validate-prerequisites
+  - step-02-design-epics
+inputDocuments: ["prd.md", "architecture.md", "ux-design-specification.md", "1-3-custom-component-definition-for-creators-desktop.md"]
 ---
 
 # DungeonsWithFriends - Epic Breakdown
@@ -87,183 +89,602 @@ NFR9: The system must expose stable, authenticated incoming webhook endpoints ca
 - **Layout Approach:** "Floating HUD" over map background on mobile, contextual action drawer on the bottom ("Thumb Zone"), with full WYSIWYG sheet builder purely disabled on mobile UI.
 - **Sync Protocol:** The "Rewind & Redirect" Sync Protocol.
 - **Design System:** Hybrid Headless Approach (Tailwind CSS + shadcn/ui + DnD Kit). Dynamic Campaign theming via CSS variable injection.
+- **General-Purpose Creator Model:** Sheet elements must be reusable, system-agnostic UI primitives bound to underlying structured game data rather than hard-coded game-specific controls.
+- **System Binding Strategy:** When defining a sheet, the creator must choose a supported game system template or upload custom system JSON so layout elements can bind to that schema and generate placeholder game-specific JSON where required.
 
 ### FR Coverage Map
 
-FR1: Epic 1 - Access character sheet builder and roller offline
-FR2: Epic 1 - Account creation and authentication
-FR3: Epic 2 - Manage friends list
-FR4: Epic 6 - Premium cloud subscription sync
-FR5: Epic 2 - Player profile configuration
-FR6: Epic 2 - Account blocklist management
-FR7: Epic 1 - 17+ age restriction for accounts
-FR8: Epic 1 - Manual export of local character data
-FR9: Epic 1 - Standard account management
-FR10: Epic 1 - View, search, and sort saved characters
-FR11: Epic 1 - Generate character from template/class
-FR12: Epic 1 - Modify character from template and roll dice
-FR13: Epic 1 - Character sheet visibility partitioning
-FR14: Epic 1 - Execute mechanical game actions from sheet
-FR15: Epic 1 - Override system-calculated values
-FR16: Epic 1 - Interactive sheet play offline
-FR17: Epic 1 - Custom component definitions for creators
-FR18: Epic 1 - Import/export custom JSON layouts
-FR19: Epic 2 - Create and manage campaigns
-FR20: Epic 2 - Select game system and rulesets for campaign
-FR21: Epic 2 - Join campaign and bind character
-FR22: Epic 2 - Publish House Rules
-FR23: Epic 2 - View other players in campaign
-FR24: Epic 2 - Text channels and nested threads
-FR25: Epic 3 - Upload and assign 2D battlemaps
-FR26: Epic 2 - Audio tracks and battle music
-FR27: Epic 3 - Toggle Theater of Mind vs Tactical
-FR27b: Epic 2 - Apply visual themes to campaign
-FR28: Epic 4 - Submit mechanical actions offline
-FR29: Epic 4 - Auto-sync and resolve offline actions
-FR30: Epic 4 - Contextual mobile push notifications
-FR31: Epic 3 - Initiative Roll and turn order
-FR32: Epic 3 - View active 2D battlemap and tokens
-FR33: Epic 5 - Webhook ingest from third-party VTTs
-FR34: Epic 1 - Parse dice notation natively
-FR35: Epic 3 - Manually build encounters
-FR36: Epic 6 - Headless simulations and Autobalancing
-FR37: Epic 6 - NL summary of missed events
-FR38: Epic 6 - Require manual GM approval (Rules Engine)
-FR39: Epic 5 - Intercept/modify basic AI actions
-FR40: Epic 6 - Plain-text hypothetical rules
-FR41: Epic 4 - Auto-Rollback for conflicts
-FR42: Epic 2 - Forcefully dismiss player
-FR43: Epic 7 - Upload templates to marketplace
-FR44: Epic 7 - Curate/publish official templates
-FR45: Epic 7 - Purchase premium templates
-FR46: Epic 7 - Algorithmically scan UGC
-FR47: Epic 7 - Immutable playback of actions
-FR49: Epic 7 - Identify and restrict bots
+FR1: Epic 1 - Access the offline visual sheet creator
+FR2: Epic 3 - Account creation and authentication
+FR3: Epic 3 - Friends list management
+FR4: Epic 8 - Premium cloud sync
+FR5: Epic 3 - Player profile configuration
+FR6: Epic 3 - Account-wide blocking
+FR7: Epic 3 - 17+ age gating
+FR8: Epic 2 - Manual export of local character data
+FR9: Epic 3 - Password reset and account deletion
+FR10: Epic 2 - View/search/sort saved characters
+FR11: Epic 2 - Generate optimal characters
+FR12: Epic 2 - Guided character customization
+FR13: Epic 2 - Public/private/GM-only sheet visibility
+FR14: Epic 2 - Execute mechanical actions from sheets
+FR15: Epic 2 - Manual override of calculated values
+FR16: Epic 2 - Play interactive sheets offline
+FR17: Epic 1 - Define custom reusable creator components
+FR18: Epic 1 - Import/export JSON layouts and schema bindings
+FR19: Epic 4 - Create campaigns
+FR20: Epic 4 - Select game systems and rulesets
+FR21: Epic 4 - Join campaign and bind character
+FR22: Epic 4 - Publish house rules
+FR23: Epic 4 - View player roster and public sheet data
+FR24: Epic 4 - Channel chat and nested threads
+FR25: Epic 5 - Upload and manage battlemaps
+FR26: Epic 4 - Campaign audio
+FR27: Epic 5 - Theater-of-the-mind vs tactical toggle
+FR27b: Epic 4 - Campaign theming
+FR28: Epic 6 - Submit actions offline
+FR29: Epic 6 - Sync and resolve offline actions
+FR30: Epic 6 - Narrative push notifications
+FR31: Epic 5 - Initiative roll and turn order
+FR32: Epic 5 - View tactical map and positions
+FR33: Epic 7 - Third-party VTT roll ingestion
+FR34: Epic 2 - Native dice notation parsing
+FR35: Epic 5 - Encounter compendium and encounter setup
+FR36: Epic 7 - Encounter simulation
+FR37: Epic 7 - Narrative catch-up summaries
+FR38: Epic 7 - GM approval gates
+FR39: Epic 7 - AI action interception
+FR40: Epic 7 - Natural-language rules mapping
+FR41: Epic 6 - Rollback/conflict handling
+FR42: Epic 4 - Dismiss player and transfer control
+FR43: Epic 8 - Publish creator templates
+FR44: Epic 8 - Official template publishing
+FR45: Epic 8 - Template purchases/access
+FR46: Epic 8 - UGC moderation
+FR47: Epic 8 - Immutable playback/admin review
+FR49: Epic 8 - Bot restriction and abuse control
 
 ## Epic List
 
-### Epic 1: The Standalone Character Builder & Roller (The MVP)
-Players can access the platform offline, create an account, load pre-created optimal character templates based on class, update them through play, and execute dice rolls. Creators can define custom non-standard game components. 
-**FRs covered:** FR1, FR2, FR7, FR8, FR9, FR10, FR11, FR12, FR13, FR14, FR15, FR16, FR17, FR18, FR34
+### Epic 1: System-Agnostic Sheet Creator Foundation
+Creators can define reusable layout primitives, bind them to a selected or uploaded game-system JSON schema, and build fully custom sheet templates for any TTRPG without requiring game-specific component types.
+**FRs covered:** FR1, FR17, FR18
 
-### Epic 2: The Campaign Hub & Social Layer
-GMs can create campaigns, set rules, apply visual themes, and invite players. Players can manage their friends list, join campaigns with their created characters, and communicate via distinct chat channels.
-**FRs covered:** FR3, FR5, FR6, FR19, FR20, FR21, FR22, FR23, FR24, FR26, FR27b, FR42
+### Epic 2: Offline Playable Character Sheets
+Players can create, load, search, customize, and use interactive character sheets offline, including overrides, visibility settings, and dice-driven sheet actions.
+**FRs covered:** FR8, FR10, FR11, FR12, FR13, FR14, FR15, FR16, FR34
 
-### Epic 3: Standalone Battlemap & Encounters
-GMs can assign 2D battlemaps, build encounters, and toggle tactical combat. Players can view the map, see tokens, and inject into the turn order. Functions standalone but integrates with the character sheet.
+### Epic 3: Identity, Access, and Connected Profiles
+Users can create accounts, manage identity, use offline-only access when needed, and maintain social/account boundaries safely.
+**FRs covered:** FR2, FR3, FR5, FR6, FR7, FR9
+
+### Epic 4: Campaign Hub and Shared Play Spaces
+GMs and players can create campaigns, join them, bind characters, communicate, publish house rules, and apply shared campaign presentation.
+**FRs covered:** FR19, FR20, FR21, FR22, FR23, FR24, FR26, FR27b, FR42
+
+### Epic 5: Tactical Scenes and Encounter Play
+GMs can prepare scenes and encounters, while players can view maps, tokens, and turn-order interactions in tactical mode.
 **FRs covered:** FR25, FR27, FR31, FR32, FR35
 
-### Epic 4: Asynchronous Combat & Resolution
-Players receive narrative push notifications when attacked, and execute mechanical actions that resolve offline and sync automatically with conflict resolution.
+### Epic 6: Asynchronous Turn Resolution
+Players can act offline, receive narrative prompts, and have actions reconciled safely when the system reconnects.
 **FRs covered:** FR28, FR29, FR30, FR41
 
-### Epic 5: Advanced GM Controls & Simulation
-GMs can simulate encounters for balance, intercept basic combatant AI actions, and forcefully trigger ability checks or saves for any character or group. Players can send dice rolls from third-party tools.
-**FRs covered:** FR33, FR39
+### Epic 7: Advanced Automation and External Integrations
+The platform supports third-party roll ingestion, encounter simulation, GM approvals, AI interception, and rules translation.
+**FRs covered:** FR33, FR36, FR37, FR38, FR39, FR40
 
-### Epic 6: Full Game Automation & AI Engine
-Implementation of the full rules engine mapped to the map/battlemap, autonomous simulation of battles, reinforcement learning for optimized AI, auto-balancing encounters, natural language rules parsing, and catch-up summaries.
-**FRs covered:** FR36, FR37, FR38, FR40
-
-### Epic 7: The Creator Marketplace & Administration
-Creators can monetize custom sheets, users can buy them, and platform admins can moderate content, view immutable game logs, and ban malicious bots.
+### Epic 8: Marketplace, Cloud Sync, and Platform Governance
+Creators can publish and monetize templates, users can sync and acquire them, and admins can moderate and protect the ecosystem.
 **FRs covered:** FR4, FR43, FR44, FR45, FR46, FR47, FR49
 
 <!-- Repeat for each epic in epics_list (N = 1, 2, 3...) -->
 
-### Epic 1: The Standalone Character Builder & Roller (The MVP)
+### Epic 1: System-Agnostic Sheet Creator Foundation
 
-Players can access the platform offline, create an account, load pre-created optimal character templates based on class, update them through play, and execute dice rolls. Creators can define custom non-standard game components. 
+Creators can define reusable layout primitives, bind them to a selected or uploaded game-system JSON schema, and build fully custom sheet templates for any TTRPG without requiring game-specific component types.
 
-### Story 1.1: Project Initialization & Core Framework scaffolding
-As a Developer,
-I want the foundational Expo application configured with Gluestack UI, NativeWind v4, and TinyBase,
-So that all subsequent features have a standardized offline-first architecture to build upon.
-
-**Acceptance Criteria:**
-**Given** a clean Expo environment
-**When** the developer initializes the repository
-**Then** Gluestack-UI, NativeWind v4, and TinyBase are installed and configured
-**And** the app runs successfully on web and mobile simulators without errors
-
-### Story 1.2: User Authentication & Offline-Only Mode
-As a Player,
-I want to either create an account (verifying I am 17+) using SSO/email or explicitly choose "Offline-Only Mode",
-So that I can immediately start using the app without being forced to create an account first.
-
-**Acceptance Criteria:**
-**Given** an unauthenticated player opens the app for the first time
-**When** the welcome screen loads
-**Then** they see options to Login, Register, or "Continue Offline"
-**And** selecting "Continue Offline" bypasses authentication and stores all data locally via TinyBase
-**And** account creation includes a 17+ age verification checkbox
-
-### Story 1.3: Custom Component Definition for Creators (Desktop)
+### Story 1.1: Creator Workspace Shell
 As a Creator,
-I want to define new data components and structured data representations (via JSON),
-So that I can build sheets and templates for non-standard game systems.
+I want a desktop-only multi-pane creator workspace with a component palette, layout canvas, and properties panel,
+So that I can begin building system-agnostic character sheet templates in a structured environment.
 
 **Acceptance Criteria:**
-**Given** a Creator is using the Desktop Web version
-**When** they open the Component Editor
-**Then** they can define custom data attributes, types, and labels
-**And** these components are saved to the local TinyBase schema for use in character sheets
+**Given** a creator opens the sheet creator on a desktop viewport
+**When** the creator workspace loads
+**Then** the interface displays a left sidebar for reusable components and controls, a central layout canvas, and a right sidebar for selected element properties
+**And** the pane layout persists during the session without requiring page reloads to restore visibility state.
 
-### Story 1.4: Load Pre-Created Optimal Character Templates
-As a Player,
-I want to select a character class and instantly load a pre-configured optimal character sheet,
-So that I can immediately start playing without a complex rulebook setup.
+**Given** a creator is using a viewport below the desktop creator threshold
+**When** they navigate to the creator workspace
+**Then** the full creator workspace is not rendered
+**And** they see a clear message that the visual creator requires the desktop experience.
 
-**Acceptance Criteria:**
-**Given** the player is creating a new character
-**When** they select a system template and a class
-**Then** the system loads a complete, mathematically sound character sheet template
-**And** transitions the player into a guided walkthrough to manually customize details
+**Given** a creator has not yet selected a game system template or uploaded custom system JSON
+**When** the workspace opens
+**Then** the shell still renders in a gated empty-state form
+**And** the canvas and properties panel clearly indicate that system binding must be chosen before element binding can occur.
 
-### Story 1.5: Interactive Character Sheet & Manual Overrides
-As a Player,
-I want to interact with my loaded character sheet to track changing values (like HP) and manually override system-calculated values,
-So that the sheet reflects the current game state and any custom house rules.
+**Given** the creator selects or focuses a canvas element
+**When** the selection state changes
+**Then** the right properties panel updates to the selected element context
+**And** no game-specific editing controls appear unless they are driven by bound schema metadata.
 
-**Acceptance Criteria:**
-**Given** an active character sheet
-**When** the player taps a value (e.g., maximum HP or an attribute)
-**Then** they can input a manual override value that replaces the templated default
-**And** all changes are saved instantly to the local TinyBase store
+**Given** the creator collapses, expands, or resizes workspace panes
+**When** the workspace state changes
+**Then** the layout updates immediately without blocking the UI
+**And** the state is stored locally for the current creator session.
 
-### Story 1.6: Import/Export JSON Layouts & Local Data Backup
-As a Player or Creator,
-I want to manually export my local character data and import custom JSON sheet layouts,
-So that I can back up my data safely offline and share UI layouts.
+**Given** a creator uses only keyboard navigation
+**When** they move through the creator shell
+**Then** all primary workspace regions, pane toggles, and focusable controls are reachable in a logical order
+**And** visible focus treatment is preserved for desktop accessibility requirements.
 
-**Acceptance Criteria:**
-**Given** the user is in the settings or dashboard menu
-**When** they select "Export Local Data"
-**Then** the system generates a downloadable JSON payload of their TinyBase store
-**And** when they select "Import Layout", standard Zod validation ensures the JSON is structurally sound before merging.
-
-### Story 1.7: Native Dice Parser and Roller
-As a Player,
-I want to tap on a mechanical action (like a weapon) to execute a dice roll using standard notation (e.g., 2d6+4) and see the instant mathematical result,
-So that I can resolve actions quickly.
+### Story 1.2: System Template Selection and Custom JSON Binding
+As a Creator,
+I want to start a sheet by selecting a supported game system template or uploading custom system JSON,
+So that every layout element can bind to a structured data model without requiring hard-coded game-specific components.
 
 **Acceptance Criteria:**
-**Given** a character sheet with defined mechanical actions
-**When** the player taps an action button
-**Then** the system parses the underlying dice notation and calculates a random result in under 200ms
-**And** visually displays the dice result to the player
+**Given** a creator opens the workspace without an active system binding
+**When** they choose to start a new sheet
+**Then** they are prompted to either select a supported system template or upload custom system JSON
+**And** they cannot bind layout elements to game data until one of those options is completed successfully.
 
-### Story 1.8: Data Privacy Partitioning (with Defaults)
-As a Player,
-I want my character sheet sections to have reasonable default visibility settings (Public/Private/GM-Only) that I can optionally adjust,
-So that my secrets are protected by default when I eventually play online.
+**Given** a creator selects a supported system template
+**When** the template is applied to the new sheet
+**Then** the creator workspace loads the template’s structured data definitions and binding targets
+**And** the system generates placeholder game-specific JSON for any required default sections needed by the selected ruleset.
+
+**Given** a creator uploads custom system JSON
+**When** the import is processed
+**Then** the uploaded data is validated against the creator binding contract
+**And** invalid files are rejected with specific validation errors that identify the failing field or structure.
+
+**Given** a creator successfully binds a sheet to a supported system or custom JSON definition
+**When** they open the properties panel for a compatible layout element
+**Then** the available binding options are sourced from the active structured data model
+**And** those bindings remain system-agnostic at the component level.
+
+**Given** a creator changes the active system binding before meaningful layout work has been committed
+**When** they confirm the change
+**Then** the workspace updates to the new binding model
+**And** any generated placeholder JSON is rebuilt to match the newly selected system context.
+
+**Given** a creator attempts to switch the active system binding after layout elements have already been bound
+**When** the system detects the change would invalidate existing bindings
+**Then** the creator is warned before the change is applied
+**And** the UI identifies which existing bindings will need remapping.
+
+**Given** a creator is working offline
+**When** they choose a built-in system template or upload a local custom JSON file
+**Then** the system binding flow completes without requiring a network request
+**And** the selected binding context is saved locally with the sheet draft.
+
+### Story 1.3: General-Purpose Component Registry and Binding Contract
+As a Creator,
+I want a registry of reusable, system-agnostic sheet components with a consistent data-binding contract,
+So that I can build layouts once and bind them to different game systems without creating separate HP, attribute, or skill component types.
 
 **Acceptance Criteria:**
-**Given** a newly loaded character template
-**When** the user views the component settings
-**Then** standard attributes (Name, Class) default to "Public", while inventory/notes default to "Private"
-**And** the user can manually toggle these privacy tags per component
+**Given** a creator opens the component palette after a system binding has been established
+**When** the available creator components are displayed
+**Then** the palette shows only general-purpose component families such as text, value display, input field, selector, checkbox, button, separator, container, list, and table
+**And** no component is hard-coded as a game-specific control such as “D&D HP,” “Pathfinder Save,” or “Skill Block.”
+
+**Given** a creator selects a general-purpose component from the registry
+**When** they place it on the canvas
+**Then** the component is created from a shared registry definition that includes its supported layout options, supported binding modes, editable properties, and default presentation settings
+**And** the created instance remains compatible with multiple game systems through its binding metadata.
+
+**Given** a creator opens the properties panel for a component instance
+**When** they configure data binding
+**Then** the binding options follow a consistent contract for selecting a source path, display mode, interaction mode, and optional fallback/default behavior
+**And** the contract supports binding to either built-in system templates or uploaded custom JSON structures.
+
+**Given** a creator binds different component instances to different parts of the active system model
+**When** those bindings are saved
+**Then** each component stores only generic binding metadata plus layout and presentation settings
+**And** the game-specific meaning is derived from the selected schema path rather than the component type itself.
+
+**Given** a creator adds a component that requires structured defaults to function correctly
+**When** the component is first bound
+**Then** the system can generate placeholder game-specific JSON for any missing compatible data structures required by that binding
+**And** the generated defaults remain editable through the creator workflow.
+
+**Given** a creator attempts to bind a component to incompatible or unsupported schema data
+**When** the binding is validated
+**Then** the system blocks the invalid configuration
+**And** the creator sees a clear explanation of why the selected component and target data shape do not match.
+
+**Given** a creator duplicates or reuses a configured component in another template using the same binding contract
+**When** the component is inserted into the new layout
+**Then** its reusable layout and presentation configuration is preserved
+**And** its binding can either be remapped to the new system context or reattached to a compatible existing schema path.
+
+### Story 1.4: Grid Canvas, Drag-and-Drop Placement, Snapping, and Alignment
+As a Creator,
+I want to drag reusable components onto a structured layout canvas with snapping and alignment assistance,
+So that I can place sheet elements quickly and produce clean, readable layouts without manual pixel-perfect editing.
+
+**Acceptance Criteria:**
+**Given** a creator has an active workspace and system binding
+**When** they drag a component from the left palette onto the layout canvas
+**Then** the component is placed onto the sheet work area as a selectable layout item
+**And** the placement happens without requiring manual JSON editing.
+
+**Given** a creator moves an existing component around the canvas
+**When** the dragged element approaches valid grid positions or alignment edges
+**Then** the element snaps into place using the active layout rules
+**And** the canvas provides visible feedback showing the snap target or alignment guide.
+
+**Given** a creator positions multiple components near one another
+**When** their edges, centers, or shared spacing patterns align
+**Then** the canvas surfaces visual alignment guides
+**And** the creator can place the components in a way that maintains consistent spacing and structure.
+
+**Given** a creator drags a component into an occupied or constrained region of the canvas
+**When** the placement would violate the current layout rules
+**Then** the system prevents invalid placement or resolves it predictably according to the grid model
+**And** the creator receives immediate visual feedback about why the position is not valid.
+
+**Given** a creator repositions a component already on the canvas
+**When** the drag interaction completes
+**Then** the updated layout coordinates and placement metadata are saved to the local sheet draft
+**And** the component remains bound to its existing generic data contract.
+
+**Given** a creator uses keyboard-based movement or fine adjustment controls on a selected component
+**When** they nudge or reposition the item through supported non-pointer controls
+**Then** the component moves according to the same grid and snapping rules
+**And** the layout remains accessible for desktop keyboard workflows.
+
+**Given** a creator has multiple components on the canvas
+**When** they select one or more items for layout adjustment
+**Then** the canvas maintains clear selection state and visible placement boundaries
+**And** the interaction model does not require later stories to understand where elements currently live on the page.
+
+### Story 1.5: Responsive Viewports, Zoom, and Custom Display Dimensions
+As a Creator,
+I want to preview and edit my sheet in mobile, tablet, desktop, and custom-size viewport modes with zoom controls,
+So that I can design layouts that remain usable and readable across the actual screen sizes players will use.
+
+**Acceptance Criteria:**
+**Given** a creator is working in the visual sheet builder
+**When** they open viewport controls
+**Then** they can switch between predefined mobile, tablet, and desktop preview modes
+**And** the canvas updates to reflect the selected display profile without losing placed components.
+
+**Given** a creator wants to test a specific device or table size
+**When** they enter custom pixel width and height values
+**Then** the canvas renders using those explicit dimensions
+**And** the current sheet layout is previewed within that custom display boundary.
+
+**Given** a creator changes viewport modes between mobile, tablet, desktop, or custom
+**When** the canvas re-renders in the selected mode
+**Then** previously placed elements preserve their binding and layout intent
+**And** the system shows the resulting layout behavior for that viewport context rather than silently falling back to a desktop-only arrangement.
+
+**Given** a creator is inspecting a dense or large layout
+**When** they use zoom-in, zoom-out, or reset zoom controls
+**Then** the work area scale changes without mutating the underlying sheet dimensions
+**And** the creator can continue selecting, moving, and editing components at the adjusted zoom level.
+
+**Given** a creator has placed components that no longer fit horizontally in a smaller viewport
+**When** the selected viewport causes those layout constraints to be evaluated
+**Then** the canvas reflects the configured responsive wrapping or stacking behavior for compatible layout structures
+**And** the creator can see when items remain side by side versus when they flow to the next line or section.
+
+**Given** a creator is comparing layout behavior across viewport modes
+**When** they switch repeatedly between display profiles
+**Then** the current viewport selection, zoom level, and custom dimension settings remain understandable and visible in the workspace
+**And** the creator is not forced to reconfigure the preview state after every mode change.
+
+**Given** a creator is using keyboard-accessible creator controls
+**When** they navigate viewport and zoom options without a pointer
+**Then** all viewport toggles, custom dimension inputs, and zoom commands are reachable and operable
+**And** the preview system remains usable under desktop accessibility expectations.
+
+### Story 1.6: Card and Group Container Composition
+As a Creator,
+I want to create reusable card and group containers that can hold nested sheet elements and decorative frame assets,
+So that I can compose visually coherent sections like saving throws, inventory blocks, spell panels, or rules summaries without hand-building every structure from scratch.
+
+**Acceptance Criteria:**
+**Given** a creator adds a card or group container to the canvas
+**When** the container is placed in the layout
+**Then** it behaves as a reusable parent element that can hold nested child components
+**And** the container participates in the same grid, selection, and binding model as other creator elements.
+
+**Given** a creator drags supported child components into a card or group container
+**When** the drop interaction completes
+**Then** the child elements become part of that container’s internal layout structure
+**And** the creator can reposition or reorder them within the container without breaking their bindings.
+
+**Given** a creator wants to build a themed section such as a saving throws panel or inventory card
+**When** they configure the card or group container
+**Then** they can define shared presentation settings such as padding, spacing, background styling, title treatment, and internal layout behavior
+**And** those shared settings cascade to the container’s visible presentation without forcing game-specific logic into the container type.
+
+**Given** a creator wants decorative framing around a grouped section
+**When** they configure border and frame assets for the container
+**Then** they can assign a full border image or separate corner and edge assets
+**And** the container renders those decorative assets in a way that scales with the contained content instead of requiring a fixed-size layout.
+
+**Given** a creator resizes a card or changes the amount of nested content within it
+**When** the container layout recalculates
+**Then** the grouped section expands or contracts according to its configured layout behavior
+**And** decorative framing and internal spacing remain visually coherent.
+
+**Given** a creator selects a card or group container on the canvas
+**When** they open its configuration controls
+**Then** they can manage both container-level settings and the structure of the nested child elements
+**And** the system clearly distinguishes between editing the parent container and editing an individual nested component.
+
+**Given** a creator uses a group container to collect related mechanics or reference content
+**When** the grouped section is saved in the sheet draft
+**Then** the container preserves its nested composition, shared visual settings, and child element relationships
+**And** the grouped structure can be reused later in other templates as a composable layout pattern.
+
+### Story 1.7: Text Labels, Typography Presets, and Separators
+As a Creator,
+I want reusable text, heading, label, and separator primitives with shared typography presets and local overrides,
+So that I can build readable sheets quickly without manually styling every text element for each game system.
+
+**Acceptance Criteria:**
+**Given** a creator opens the component palette
+**When** they browse available presentation primitives
+**Then** they can add text labels, heading variants, free text blocks, and separator elements to the sheet
+**And** these primitives remain system-agnostic unless the creator explicitly binds them to structured data.
+
+**Given** a creator adds a heading or label element to the canvas
+**When** they open its configuration in the properties panel
+**Then** they can choose from predefined typography roles such as heading levels, body text, caption text, or label styles
+**And** the selected role applies shared default font, size, spacing, and emphasis settings.
+
+**Given** a creator wants consistent sheet-wide text styling
+**When** they configure the sheet’s typography defaults
+**Then** label, heading, and text primitives inherit those global defaults automatically
+**And** creators are not forced to manually restyle every individual text element to achieve a coherent presentation.
+
+**Given** a creator needs a specific text element to differ from the shared sheet defaults
+**When** they apply local typography overrides
+**Then** they can adjust properties such as font choice, size, weight, alignment, spacing, or color for that specific element
+**And** the override affects only the selected element rather than mutating the global typography preset.
+
+**Given** a creator wants a text primitive to display bound game data rather than static copy
+**When** they bind the text element to a valid schema path
+**Then** the text primitive can render structured values or text derived from the active system model
+**And** the text component remains a general-purpose display primitive instead of becoming a game-specific widget.
+
+**Given** a creator adds a separator element between sheet sections
+**When** they configure its presentation
+**Then** they can control spacing, orientation, thickness, style treatment, and decorative appearance
+**And** the separator improves visual grouping without introducing hidden layout behavior outside the current canvas rules.
+
+**Given** a creator switches between viewport modes or uses zoomed canvas preview
+**When** text and separator elements are re-rendered in the workspace
+**Then** the typography hierarchy and spacing relationships remain understandable
+**And** the creator can still assess readability and section separation across responsive contexts.
+
+### Story 1.8: Value-Pair, Selector, Checkbox, and Interactive Field Primitives
+As a Creator,
+I want reusable value-pair and interactive field primitives that can be arranged in multiple patterns and bound to structured game data,
+So that I can model things like saving throws, proficiencies, toggles, counters, and action controls without creating game-specific field components.
+
+**Acceptance Criteria:**
+**Given** a creator opens the component palette after establishing a system binding
+**When** they browse available field primitives
+**Then** they can add reusable value-pair, selector, checkbox, and action-field components to the sheet
+**And** those primitives remain general-purpose rather than being pre-labeled for a specific game system.
+
+**Given** a creator adds a value-pair style primitive to the canvas
+**When** they configure its layout pattern
+**Then** they can choose among supported arrangements such as label above value, label beside value, value before label, label plus selector plus value, or label above value above secondary label
+**And** the primitive preserves its binding contract regardless of the chosen visual arrangement.
+
+**Given** a creator binds a field primitive to structured game data
+**When** the properties panel validates the binding
+**Then** the field can display or edit compatible values from the active schema
+**And** unsupported combinations are blocked with clear validation feedback.
+
+**Given** a creator configures a selector or checkbox-style primitive
+**When** they define its behavior
+**Then** the field can represent binary, multi-state, or enumerated interactions supported by the active schema
+**And** the control remains reusable for cases like proficiency flags, inspiration tracking, or other system-defined toggles.
+
+**Given** a creator adds an action-oriented field such as a button or interactive control
+**When** they configure its generic behavior
+**Then** they can associate it with a structured action target, input value, or state transition defined by the active schema
+**And** the primitive remains generic enough to support use cases such as healing, damage, reset actions, or mode switching without becoming a hard-coded system button.
+
+**Given** a creator needs multiple related field primitives in the same section
+**When** they place and configure them inside a shared layout or container
+**Then** the controls can be aligned and styled consistently with shared defaults
+**And** each field still preserves its own binding, arrangement, and interaction settings.
+
+**Given** a creator previews or saves the sheet draft
+**When** the configured field primitives are rendered in the current viewport context
+**Then** their labels, values, states, and interaction affordances remain legible and structurally consistent
+**And** the creator can verify that the same primitive can serve multiple game-system use cases through different bindings.
+
+### Story 1.9: Repeating Lists and Configurable Data Tables
+As a Creator,
+I want reusable repeating-list and configurable-table primitives that can bind to structured collections in the active game schema,
+So that I can represent skills, proficiencies, inventory, actions, spells, resistances, and other grouped records without creating separate table components for each game.
+
+**Acceptance Criteria:**
+**Given** a creator opens the component palette after establishing a system binding
+**When** they browse collection-oriented primitives
+**Then** they can add a repeating list or configurable data table to the sheet
+**And** the primitive is defined generically rather than as a hard-coded “skills table,” “inventory list,” or “spellbook table.”
+
+**Given** a creator adds a repeating list to the canvas
+**When** they bind it to a structured collection in the active schema
+**Then** the list renders from that collection definition
+**And** each repeated row or entry follows a configurable item layout instead of requiring a game-specific list implementation.
+
+**Given** a creator adds a configurable data table to the canvas
+**When** they define the table structure
+**Then** they can specify which columns are shown, the order of those columns, the label or heading for each column, and the display treatment used in each column
+**And** every column remains bound through the same general-purpose binding contract.
+
+**Given** a creator wants a list or table to support different content types
+**When** they configure the collection primitive
+**Then** the same primitive can be used for use cases such as languages, proficiencies, actions, spell entries, resistances, immunities, or inventory rows
+**And** the difference in meaning comes from the bound schema and configured columns rather than from a unique component type.
+
+**Given** a creator wants visual variations for a collection primitive
+**When** they configure the display mode
+**Then** they can choose supported presentations such as comma-separated output, stacked list rows, grouped rows, or structured table output
+**And** the chosen presentation remains compatible with the bound collection data.
+
+**Given** a creator needs richer collection content
+**When** they configure row-level display behavior
+**Then** a row or cell can include supporting text, icons, badges, or secondary information fields sourced from the same record
+**And** the collection remains reusable for both simple and information-dense use cases.
+
+**Given** a creator binds a collection primitive to incompatible schema data
+**When** the binding is validated
+**Then** the system blocks the invalid binding
+**And** the creator sees clear feedback about whether the target data shape is not a collection, lacks required fields, or conflicts with the configured display model.
+
+**Given** a creator previews the sheet in different viewport contexts
+**When** lists or tables are rendered in narrower layouts
+**Then** the collection primitive respects the responsive layout rules already established for the creator
+**And** the creator can verify whether the configured columns remain visible, wrap, stack, or require an alternate presentation for smaller screens.
+
+### Story 1.10: Template Backgrounds, Theme Presets, and Player Visual Overrides
+As a Creator,
+I want to define sheet backgrounds and shared visual theme presets while optionally allowing players to choose alternate approved backgrounds,
+So that a single sheet can preserve its structure and functionality while supporting different aesthetic presentations.
+
+**Acceptance Criteria:**
+**Given** a creator is editing a sheet template
+**When** they open the visual theme and background configuration controls
+**Then** they can assign a default sheet background and visual theme preset to the template
+**And** the configured visual treatment applies across the sheet without changing its structural layout or bound data model.
+
+**Given** a creator wants to use curated visual options
+**When** they browse available background and theme assets
+**Then** they can choose from a preset list of approved backgrounds or theme presets
+**And** those presets integrate with the existing sheet styling model rather than creating separate template copies.
+
+**Given** a creator wants to allow limited player customization
+**When** they enable player-selectable visual overrides for a sheet
+**Then** they can define which backgrounds or theme variants are available for player choice
+**And** the underlying sheet structure, data bindings, and functional elements remain unchanged regardless of the chosen visual option.
+
+**Given** a creator wants to support custom uploaded backgrounds
+**When** they add a supported image asset to the template configuration
+**Then** the sheet can use that uploaded asset as a background option
+**And** the asset is applied through the sheet’s visual configuration rather than by manually reauthoring layout elements.
+
+**Given** a player or creator selects a different approved background option for the same template
+**When** the sheet preview is re-rendered
+**Then** only the configured visual presentation changes
+**And** the component positions, bindings, and interaction behavior remain intact.
+
+**Given** a creator configures a theme preset alongside typography, card styling, or decorative assets
+**When** the template is rendered in preview mode
+**Then** those visual tokens work together as one coherent presentation layer
+**And** the creator can confirm that changing a visual preset does not corrupt content structure or responsive behavior.
+
+**Given** a creator previews the sheet in different viewport modes after applying a background or theme option
+**When** the template is rendered across those display contexts
+**Then** the background treatment remains visually appropriate within the available screen bounds
+**And** the creator can verify that readability and contrast remain acceptable for the selected presentation.
+
+### Story 1.11: Preview Mode, Save/Load, Import/Export, and Template Sharing
+As a Creator,
+I want to preview, save, load, import, export, and share sheet templates,
+So that I can iterate on creator work safely, reuse templates later, and distribute them without rebuilding the same layout from scratch.
+
+**Acceptance Criteria:**
+**Given** a creator has an in-progress sheet template
+**When** they switch from editing into preview mode
+**Then** the sheet renders using the current layout, bindings, theme configuration, and viewport context
+**And** the creator can inspect the result without exposing editing controls that belong only to the builder workspace.
+
+**Given** a creator makes changes while working in the creator
+**When** the local draft state is persisted
+**Then** the template is saved locally with its layout structure, component bindings, theme configuration, and active system binding context
+**And** the creator can later reopen that saved draft without losing previously configured work.
+
+**Given** a creator has multiple saved templates or drafts
+**When** they open the template loading workflow
+**Then** they can browse and reopen existing saved templates
+**And** the selected template restores its creator state in a predictable way rather than loading as a partially reconstructed layout.
+
+**Given** a creator wants to move a template between devices or share it with another user
+**When** they export the template
+**Then** the system produces a portable artifact containing the layout definition, binding metadata, theme/background settings, and required structured template context
+**And** the exported artifact excludes transient editor-only state that should not be part of the shared template definition.
+
+**Given** a creator imports an exported template artifact or compatible template file
+**When** the import is processed
+**Then** the system validates the file before loading it into the creator
+**And** invalid or incomplete imports are rejected with specific feedback describing what failed.
+
+**Given** a creator imports a template whose required system binding is missing locally
+**When** the creator attempts to open that template
+**Then** the system identifies the missing template or schema dependency
+**And** the creator is guided to select a compatible system template or provide the required custom JSON before continuing.
+
+**Given** a creator wants to share a template for other players or creators to use
+**When** they generate a shareable template artifact
+**Then** the shared result preserves the intended visual and structural behavior of the template
+**And** recipients can load it without needing the original author’s local editor state.
+
+**Given** a creator is offline
+**When** they save, load, import, export, or preview templates
+**Then** the workflow remains available without a required network dependency
+**And** template lifecycle actions continue to function as part of the offline-first creator experience.
+
+### Story 1.12: Runtime Detail Panels, Drill-Down Popups, and Rich Element Configuration
+As a Creator,
+I want sheet elements to open configurable detail panels and popups for deeper runtime information and actions,
+So that players can inspect modifiers, read rules text, view markdown descriptions, and use richer interactions without overcrowding the core sheet layout.
+
+**Acceptance Criteria:**
+**Given** a creator selects a component type that supports deeper runtime details
+**When** they enable detail-panel or popup behavior for that element
+**Then** the element can open a secondary panel, modal, or popup surface at runtime
+**And** that deeper interaction is configured through the same general-purpose creator model rather than a game-specific hard-coded screen.
+
+**Given** a creator configures a detail panel for a bound element
+**When** they define its content sources
+**Then** the panel can display structured data such as modifier breakdowns, override details, descriptive notes, rule explanations, or related supporting fields
+**And** the displayed content is sourced from bound schema paths or configured static content rather than custom one-off component logic.
+
+**Given** a creator wants rich descriptive content in a runtime detail surface
+**When** they configure a text block for that panel or popup
+**Then** the surface can render markdown-supported content for descriptions, spell text, feature notes, or instructional copy
+**And** the markdown presentation remains consistent with the active theme and typography settings.
+
+**Given** a creator wants an element to expose editable or actionable runtime controls from its popup
+**When** they configure the interaction surface
+**Then** the detail view can contain supported generic controls such as toggles, fields, buttons, lists, or secondary values
+**And** those controls still obey the same schema binding and validation rules as the rest of the sheet.
+
+**Given** a creator configures a row in a list or table to open a drill-down surface
+**When** a player activates that row at runtime
+**Then** the detail panel can show record-specific information such as full item details, spell descriptions, notes, or supporting actions
+**And** the row-level popup remains driven by the bound collection record rather than by a separate purpose-built component type.
+
+**Given** a creator has a sheet with multiple interactive detail surfaces
+**When** they preview the sheet in builder preview mode
+**Then** they can verify which elements open drill-down panels, what content appears there, and how those panels behave across supported viewport contexts
+**And** the preview does not require the creator to publish or leave the editing workflow to test those interactions.
+
+**Given** a creator configures a detail surface for a compact mobile or narrow viewport presentation
+**When** that surface is rendered in preview for smaller display contexts
+**Then** the popup or panel uses the appropriate presentation model for the viewport, such as a modal, sheet, or constrained overlay
+**And** the underlying sheet remains readable and structurally intact when the detail surface is dismissed.
+
+**Given** a creator saves or exports a template that includes runtime detail panels
+**When** the template is reopened or imported later
+**Then** the configured drill-down behavior, content bindings, and presentation settings are preserved
+**And** the template remains portable without depending on unpublished editor-only logic.
 
 ### Epic 2: The Campaign Hub & Social Layer
 
