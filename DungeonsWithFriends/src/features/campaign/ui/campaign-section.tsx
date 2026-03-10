@@ -34,84 +34,70 @@ export const CampaignSection: React.FC<CampaignSectionProps> = ({
         {title}
       </Text>
 
-      <View style={{ gap: 12 }}>
-        {sorted.map((campaign, index) => (
+      <View className="gap-4">
+        {sorted.map((campaign) => (
           <TouchableOpacity
             key={campaign.id}
             onPress={() => console.log('Campaign clicked:', campaign.id)}
             activeOpacity={0.7}
-            style={{
-              backgroundColor: '#1E1B4B',
-              borderRadius: 8,
-              padding: 16,
-              borderWidth: 1,
-              borderColor: campaign.friendsJoined.length > 0 ? 'rgba(217, 119, 6, 0.2)' : '#312E81'
-            }}
+            className={`bg-background-secondary rounded-xl p-4 border border-border-primary`}
           >
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <View style={{ flex: 1 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <View className="flex-col sm:flex-row justify-between items-start gap-4">
+              <View className="flex-1 shrink">
+                <View className="flex-row items-center gap-2 flex-wrap mb-1">
                   <Text
                     style={{
                       fontFamily: 'Cinzel',
                       fontSize: 16,
-                      fontWeight: '600',
+                      fontWeight: '700',
                       color: '#FFFFFF'
                     }}
+                    className="shrink"
+                    numberOfLines={1}
                   >
                     {campaign.name}
                   </Text>
                   <StatusBadge status={campaign.status} />
                 </View>
 
-                <Text style={{ fontSize: 14, color: '#9CA3AF', marginBottom: 8 }}>
+                <Text className="text-sm text-typography-secondary mb-3 shrink" numberOfLines={2}>
                   {campaign.description}
                 </Text>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <View className="flex-row items-center gap-4 flex-wrap">
+                  <View className="flex-row items-center gap-1">
                     <Users size={12} color="#6B7280" />
-                    <Text style={{ fontSize: 12, color: '#6B7280' }}>
-                      {campaign.players}/{campaign.maxPlayers} players
+                    <Text className="text-xs text-typography-secondary">
+                      {campaign.players}/{campaign.maxPlayers}
                     </Text>
                   </View>
 
-                  <Text style={{ fontSize: 12, color: '#6B7280' }}>
+                  <Text className="text-xs text-typography-secondary font-medium">
                     {campaign.system}
                   </Text>
 
-                  <Text style={{ fontSize: 12, color: '#6B7280' }}>
-                    DM: {campaign.dm}
-                  </Text>
-
                   {campaign.nextSession && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <View className="flex-row items-center gap-1">
                       <Clock size={12} color="#6B7280" />
-                      <Text style={{ fontSize: 12, color: '#6B7280' }}>
+                      <Text className="text-xs text-typography-secondary" numberOfLines={1}>
                         {campaign.nextSession}
                       </Text>
                     </View>
                   )}
                 </View>
 
-                <FriendAvatars friendIds={campaign.friendsJoined} friends={friends} />
+                <View className="mt-3">
+                  <FriendAvatars friendIds={campaign.friendsJoined} friends={friends} />
+                </View>
               </View>
 
               {showJoinButton && (
                 <TouchableOpacity
                   onPress={() => console.log('Join clicked for campaign:', campaign.id)}
                   activeOpacity={0.7}
-                  style={{
-                    marginLeft: 12,
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                    borderRadius: 4,
-                    borderWidth: 1,
-                    borderColor: '#D97706',
-                    backgroundColor: 'transparent'
-                  }}
+                  className="px-4 py-2 rounded-lg border border-accent-secondary self-start sm:self-center"
                 >
-                  <Text style={{ fontSize: 12, color: '#D97706', fontWeight: '500' }}>
+                  <Text className="text-xs color-accent-secondary font-bold uppercase tracking-wider">
                     Join
                   </Text>
                 </TouchableOpacity>

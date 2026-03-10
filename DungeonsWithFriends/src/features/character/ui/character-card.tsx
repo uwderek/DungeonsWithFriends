@@ -14,7 +14,7 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ name, race, charCl
     return (
         <BaseCard
             onPress={onPress}
-            className="w-40 mr-3"
+            className="w-full flex-1"
             style={{ padding: 0 }} // Override default padding if needed, but BaseCard uses p-5
         >
             <View className="w-full aspect-square bg-black/40 rounded-lg mb-3 items-center justify-center">
@@ -22,12 +22,14 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ name, race, charCl
                     {name.charAt(0)}
                 </Text>
             </View>
-            <Text className="text-sm text-typography-primary font-bold" numberOfLines={1}>
-                {name}
-            </Text>
-            <Text className="text-xs text-typography-secondary">
-                Level {level} {race} {charClass}
-            </Text>
+            <View className="flex-1 shrink">
+                <Text className="text-sm text-typography-primary font-bold" numberOfLines={1}>
+                    {name}
+                </Text>
+                <Text className="text-xs text-typography-secondary" numberOfLines={2}>
+                    Level {level} {race} {charClass}
+                </Text>
+            </View>
         </BaseCard>
     );
 };

@@ -10,15 +10,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({ friends }) => {
   const sortedFriends = [...friends].sort((a, b) => (b.online ? 1 : 0) - (a.online ? 1 : 0));
 
   return (
-    <View
-      style={{
-        backgroundColor: '#1E1B4B',
-        borderRadius: 8,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: '#312E81'
-      }}
-    >
+    <View className="bg-background-secondary rounded-xl p-4 border border-border-primary w-full">
       <Text
         style={{
           fontFamily: 'Cinzel',

@@ -24,63 +24,35 @@ export const DashboardScreen: React.FC = () => {
   const isDesktop = width >= 768;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#000000' }}>
-      <View style={{ flex: 1, flexDirection: 'row' }}>
+    <SafeAreaView className="flex-1 bg-black">
+      <View className="flex-1 flex-row">
         {/* Sidebar - Desktop always visible, Mobile in modal */}
         <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* Main Content */}
-        <View style={{ flex: 1 }}>
+        <View className="flex-1">
           {/* Header */}
-          <View
-            style={{
-              height: 56,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: '#312E81'
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <View className="h-14 flex-row items-center justify-between px-4 border-b border-indigo-900 bg-black/50 backdrop-blur-md">
+            <View className="flex-row items-center gap-3">
               {!isDesktop && (
                 <HamburgerButton onPress={() => setSidebarOpen(true)} />
               )}
-              <Text style={{ fontSize: 14, color: '#6B7280', letterSpacing: 0.5 }}>
+              <Text className="text-sm text-typography-secondary uppercase tracking-widest font-medium">
                 Dashboard
               </Text>
             </View>
 
-            <View style={{ flexDirection: 'row', gap: 12 }}>
+            <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => console.log('Settings clicked')}
-                style={{
-                  height: 40,
-                  width: 40,
-                  borderRadius: 20,
-                  backgroundColor: '#1E1B4B',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: '#312E81'
-                }}
+                className="h-10 w-10 rounded-full bg-indigo-950/50 items-center justify-center border border-indigo-900 shadow-sm"
               >
                 <Settings size={20} color="#9CA3AF" />
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={logout}
-                style={{
-                  height: 40,
-                  width: 40,
-                  borderRadius: 20,
-                  backgroundColor: '#1E1B4B',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: '#312E81'
-                }}
+                className="h-10 w-10 rounded-full bg-indigo-950/50 items-center justify-center border border-indigo-900 shadow-sm"
               >
                 <LogOut size={18} color="#DC2626" />
               </TouchableOpacity>
@@ -89,18 +61,18 @@ export const DashboardScreen: React.FC = () => {
 
           {/* Scrollable Content */}
           <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 24 }}
+            className="flex-1"
+            contentContainerStyle={{ padding: width < 640 ? 16 : 24 }}
             showsVerticalScrollIndicator={false}
           >
-            <View style={{ maxWidth: 1200, alignSelf: 'center', width: '100%' }}>
+            <View className="max-w-[1200px] self-center w-full">
               {/* Hero Banner */}
               <HeroBanner data={heroData} />
 
               {/* Main Content Layout */}
-              <View style={{ marginTop: 32, flexDirection: isDesktop ? 'row' : 'column', gap: 32 }}>
+              <View className="mt-8 flex-col md:flex-row gap-8 items-start">
                 {/* Left Column - Character & Campaigns */}
-                <View style={{ flex: 1, gap: 32 }}>
+                <View className="w-full md:flex-[3] gap-8">
                   {/* Active Characters */}
                   <CharacterGrid characters={activeCharacters} title="Characters" />
 
@@ -113,27 +85,18 @@ export const DashboardScreen: React.FC = () => {
 
                   {/* Recruiting Campaigns */}
                   <CampaignSection
-                    title="Campaigns Recruiting Players"
+                    title="Recruiting"
                     campaigns={recruitingCampaigns}
                     friends={friends}
                     showJoinButton
                   />
                 </View>
 
-                {/* Right Column - Friends (Desktop only) */}
-                {isDesktop && (
-                  <View style={{ width: 256 }}>
-                    <FriendsList friends={friends} />
-                  </View>
-                )}
-              </View>
-
-              {/* Friends List (Mobile - at bottom) */}
-              {!isDesktop && (
-                <View style={{ marginTop: 32 }}>
+                {/* Right Column - Friends (Always rendered, responsive position) */}
+                <View className="w-full md:w-64 lg:w-80 md:sticky md:top-8">
                   <FriendsList friends={friends} />
                 </View>
-              )}
+              </View>
             </View>
           </ScrollView>
         </View>

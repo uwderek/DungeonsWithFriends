@@ -39,16 +39,22 @@ export const BaseCard: React.FC<BaseCardProps> = ({
             <View className="p-5 flex-1 justify-between">
                 {(title || headerContent) && (
                     <View className="mb-2">
-                        <View className="flex-row justify-between items-start">
+                        <View className="flex-row justify-between items-start gap-2">
                             {title && (
-                                <Text className="text-xl text-typography-primary font-bold flex-1" style={{ fontFamily: 'Cinzel' }}>
-                                    {title}
-                                </Text>
+                                <View className="flex-1 shrink">
+                                    <Text
+                                        className="text-xl text-typography-primary font-bold"
+                                        style={{ fontFamily: 'Cinzel' }}
+                                        numberOfLines={2}
+                                    >
+                                        {title}
+                                    </Text>
+                                </View>
                             )}
                             {headerContent}
                         </View>
                         {description && (
-                            <Text className="text-typography-secondary text-sm mt-1" numberOfLines={2}>
+                            <Text className="text-typography-secondary text-sm mt-1 shrink" numberOfLines={3}>
                                 {description}
                             </Text>
                         )}
