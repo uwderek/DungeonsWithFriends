@@ -49,6 +49,9 @@ function AppContent() {
   const { isAuthenticated, offlineMode, isLoading, continueOffline } = useAuth();
   const [authScreen, setAuthScreen] = useState<'welcome' | 'login' | 'register'>('welcome');
   const [activeTab, setActiveTab] = useState<'home' | 'campaigns' | 'characters' | 'friends' | 'creator' | 'settings'>('home');
+  const handleNavigate = (id: string) => {
+    setActiveTab(id as any);
+  };
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
@@ -63,9 +66,9 @@ function AppContent() {
     return (
       <View className="flex-1">
         <View className="flex-1">
-          {activeTab === 'home' && <DashboardScreen />}
-          {activeTab === 'characters' && <CharactersScreen />}
-          {activeTab === 'creator' && <CreatorToolsScreen />}
+          {activeTab === 'home' && <DashboardScreen onNavigate={handleNavigate} />}
+          {activeTab === 'characters' && <CharactersScreen onNavigate={handleNavigate} />}
+          {activeTab === 'creator' && <CreatorToolsScreen onNavigate={handleNavigate} />}
           {/* Other screens for campaigns, characters, etc. would go here */}
           {(activeTab !== 'home' && activeTab !== 'characters' && activeTab !== 'creator') && (
             <View className="flex-1 items-center justify-center bg-background-primary p-8">

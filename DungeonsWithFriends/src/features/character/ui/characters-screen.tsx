@@ -8,7 +8,7 @@ import { CharacterGrid } from './character-grid';
 import { FriendsList } from '@/features/friends/ui/friends-list';
 import { characters, friends } from '@/features/dashboard/ui/mock-data';
 
-export const CharactersScreen: React.FC = () => {
+export const CharactersScreen: React.FC<{ onNavigate?: (id: string) => void }> = ({ onNavigate }) => {
   const { logout } = useAuth();
   const { width } = useWindowDimensions();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -19,7 +19,12 @@ export const CharactersScreen: React.FC = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#000000' }}>
       <View style={{ flex: 1, flexDirection: 'row' }}>
         {/* Sidebar - Desktop always visible, Mobile in modal */}
-        <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <AppSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          activeId="characters"
+          onNavigate={onNavigate}
+        />
 
         {/* Main Content */}
         <View style={{ flex: 1 }}>

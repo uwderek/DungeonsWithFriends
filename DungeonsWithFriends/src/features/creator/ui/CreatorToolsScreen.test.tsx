@@ -4,6 +4,11 @@ import { CreatorToolsScreen } from './CreatorToolsScreen';
 import { useWindowDimensions } from 'react-native';
 import { useComponentDefinitions, createComponentDefinition } from '../model/component-store';
 import { useStore } from 'tinybase/ui-react';
+import { useAuth } from '@/shared/providers/auth-provider';
+
+jest.mock('@/shared/providers/auth-provider', () => ({
+    useAuth: jest.fn(),
+}));
 
 // Mock high level components to avoid deep rendering issues
 jest.mock('./ComponentListView', () => ({
@@ -46,10 +51,22 @@ jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
     default: jest.fn(),
 }));
 
+jest.mock('@/shared/ui/navigation/app-sidebar', () => {
+    const React = require('react');
+    const { View } = require('react-native');
+    return {
+        AppSidebar: ({ children }: any) => <View testID="sidebar">{children}</View>,
+        HamburgerButton: () => <View testID="hamburger" />,
+    };
+});
+
 describe('CreatorToolsScreen', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         (useStore as jest.Mock).mockReturnValue({});
+        (useAuth as jest.Mock).mockReturnValue({
+            logout: jest.fn(),
+        });
     });
 
     it('renders "Desktop Required" on small screens', () => {

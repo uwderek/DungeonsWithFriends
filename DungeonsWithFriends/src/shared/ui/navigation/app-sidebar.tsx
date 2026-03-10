@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Animated, useWindowDimensions } from 'react-native';
-import { Sword, Map, CalendarDays, BookOpen, Users, HelpCircle, Menu, X, User } from 'lucide-react-native';
+import { Sword, Map, CalendarDays, BookOpen, Users, HelpCircle, Menu, X, User, Database } from 'lucide-react-native';
 
 const navItems = [
-  { title: "Dashboard", icon: Sword, url: "/" },
-  { title: "Characters", icon: User, url: "/characters" },
-  { title: "Campaigns", icon: Map, url: "/campaigns" },
-  { title: "Schedule", icon: CalendarDays, url: "/schedule" },
-  { title: "New Adventure", icon: BookOpen, url: "/adventures" },
-  { title: "Friends", icon: Users, url: "/friends" },
-  { title: "Rules Help", icon: HelpCircle, url: "/rules" }
+  { id: "home", title: "Dashboard", icon: Sword, url: "/" },
+  { id: "characters", title: "Characters", icon: User, url: "/characters" },
+  { id: "campaigns", title: "Campaigns", icon: Map, url: "/campaigns" },
+  { id: "schedule", title: "Schedule", icon: CalendarDays, url: "/schedule" },
+  { id: "adventures", title: "New Adventure", icon: BookOpen, url: "/adventures" },
+  { id: "friends", title: "Friends", icon: Users, url: "/friends" },
+  { id: "creator", title: "Creator", icon: Database, url: "/creator" },
+  { id: "rules", title: "Rules Help", icon: HelpCircle, url: "/rules" }
 ];
 
 interface AppSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  activeId?: string;
+  onNavigate?: (id: string) => void;
 }
 
-export const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
+export const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose, activeId, onNavigate }) => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
 
@@ -81,30 +84,38 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose }) => {
 
       {/* Navigation */}
       <ScrollView style={{ flex: 1, paddingHorizontal: 12, paddingTop: 16 }}>
-        {navItems.map((item) => (
-          <TouchableOpacity
-            key={item.title}
-            onPress={() => {
-              console.log('Navigate to:', item.url);
-              if (!isDesktop) onClose();
-            }}
-            activeOpacity={0.7}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 12,
-              paddingVertical: 12,
-              paddingHorizontal: 12,
-              borderRadius: 6,
-              marginBottom: 4
-            }}
-          >
-            <item.icon size={18} color="#9CA3AF" />
-            <Text style={{ fontSize: 14, color: '#9CA3AF' }}>
-              {item.title}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {navItems.map((item) => {
+          const isActive = activeId === item.id;
+          return (
+            <TouchableOpacity
+              key={item.title}
+              onPress={() => {
+                if (onNavigate) {
+                  onNavigate(item.id);
+                } else {
+                  console.log('Navigate to:', item.url);
+                }
+                if (!isDesktop) onClose();
+              }}
+              activeOpacity={0.7}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+                paddingVertical: 12,
+                paddingHorizontal: 12,
+                borderRadius: 6,
+                marginBottom: 4,
+                backgroundColor: isActive ? '#1E1B4B' : 'transparent'
+              }}
+            >
+              <item.icon size={18} color={isActive ? "#D97706" : "#9CA3AF"} />
+              <Text style={{ fontSize: 14, color: isActive ? "#FFFFFF" : '#9CA3AF', fontWeight: isActive ? '600' : '400' }}>
+                {item.title}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
       {/* Friends Section */}

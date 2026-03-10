@@ -16,7 +16,7 @@ const activeCampaignNames = myCampaigns
   .map(c => c.name);
 const activeCharacters = characters.filter(c => activeCampaignNames.includes(c.campaignName));
 
-export const DashboardScreen: React.FC = () => {
+export const DashboardScreen: React.FC<{ onNavigate?: (id: string) => void }> = ({ onNavigate }) => {
   const { logout } = useAuth();
   const { width } = useWindowDimensions();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -27,7 +27,12 @@ export const DashboardScreen: React.FC = () => {
     <SafeAreaView className="flex-1 bg-black">
       <View className="flex-1 flex-row">
         {/* Sidebar - Desktop always visible, Mobile in modal */}
-        <AppSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <AppSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          activeId="home"
+          onNavigate={onNavigate}
+        />
 
         {/* Main Content */}
         <View className="flex-1">
