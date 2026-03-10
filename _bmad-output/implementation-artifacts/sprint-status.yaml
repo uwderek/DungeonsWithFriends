@@ -33,77 +33,83 @@
 # - SM typically creates next story after previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
-generated: "2026-03-06 15:15:00"
+generated: "2026-03-10 13:50:00"
 project: DungeonsWithFriends
 project_key: NOKEY
 tracking_system: file-system
 story_location: "c:\\Development\\DungeonsWithFriends\\_bmad-output\\implementation-artifacts"
 
 development_status:
-  epic-1: in-progress
-  1-1-project-initialization-core-framework-scaffolding: done
-  1-2-user-authentication-offline-only-mode: done
-  1-3-custom-component-definition-for-creators-desktop: done
-  1-4-load-pre-created-optimal-character-templates: backlog
-  1-5-interactive-character-sheet-manual-overrides: backlog
-  1-6-import-export-json-layouts-local-data-backup: backlog
-  1-7-native-dice-parser-and-roller: backlog
-  1-8-data-privacy-partitioning-with-defaults: backlog
+  epic-1: backlog
+  1-1-creator-workspace-shell: backlog
+  1-2-system-template-selection-and-custom-json-binding: backlog
+  1-3-general-purpose-component-registry-and-binding-contract: backlog
+  1-4-grid-canvas-drag-and-drop-placement-snapping-and-alignment: backlog
+  1-5-responsive-viewports-zoom-and-custom-display-dimensions: backlog
+  1-6-card-and-group-container-composition: backlog
+  1-7-text-labels-typography-presets-and-separators: backlog
+  1-8-value-pair-selector-checkbox-and-interactive-field-primitives: backlog
+  1-9-repeating-lists-and-configurable-data-tables: backlog
+  1-10-template-backgrounds-theme-presets-and-player-visual-overrides: backlog
+  1-11-preview-mode-save-load-import-export-and-template-sharing: backlog
+  1-12-runtime-detail-panels-drill-down-popups-and-rich-element-configuration: backlog
   epic-1-retrospective: optional
 
   epic-2: backlog
-  2-1-cloud-backend-syncfacade-initialization: backlog
-  2-2-player-profile-friends-list-management: backlog
-  2-3-campaign-instance-creation-configuration: backlog
-  2-4-campaign-joining-character-binding: backlog
-  2-5-player-campaign-library: backlog
-  2-6-the-campaign-dashboard-player-visibility: backlog
-  2-7-campaign-chat-threaded-conversations: backlog
-  2-8-publishing-house-rules: backlog
-  2-9-campaign-audio-integration: backlog
-  2-10-dynamic-campaign-theming: backlog
+  2-1-local-character-library-and-manual-export: backlog
+  2-2-guided-character-creation-and-customization-flow: backlog
+  2-3-instant-character-generation-from-minimal-inputs: backlog
+  2-4-interactive-offline-sheet-runtime-and-native-dice-resolution: backlog
+  2-5-visibility-partitions-overrides-and-sheet-adjustments: backlog
   epic-2-retrospective: optional
 
   epic-3: backlog
-  3-1-2d-battlemap-scene-imagery-uploads: backlog
-  3-2-encounter-builder-compendium: backlog
-  3-3-token-placement-free-roam-movement: backlog
-  3-4-dynamic-initiative-tracking-turn-based-movement: backlog
-  3-5-character-sheet-battlemap-integration-hud: backlog
+  3-1-age-gate-sign-up-and-authentication: backlog
+  3-2-player-profile-and-visibility-preferences: backlog
+  3-3-friends-discovery-and-relationship-management: backlog
+  3-4-blocklist-safety-controls: backlog
+  3-5-password-reset-and-account-deletion: backlog
   epic-3-retrospective: optional
 
   epic-4: backlog
-  4-1-offline-mechanical-action-submission: backlog
-  4-2-asynchronous-auto-sync-resolution: backlog
-  4-3-contextual-narrative-push-notifications: backlog
-  4-4-auto-rollback-for-state-conflicts: backlog
+  4-1-campaign-creation-and-ruleset-configuration: backlog
+  4-2-invite-links-and-character-binding: backlog
+  4-3-campaign-library-and-dashboard-roster: backlog
+  4-4-campaign-chat-and-threaded-channels: backlog
+  4-5-house-rules-publishing-and-campaign-reference-content: backlog
+  4-6-campaign-audio-and-shared-theme-presentation: backlog
+  4-7-player-dismissal-and-control-reassignment: backlog
   epic-4-retrospective: optional
 
   epic-5: backlog
-  5-1-webhook-integration-for-third-party-vtts: backlog
-  5-2-gm-forced-roll-triggers-timeouts: backlog
-  5-3-headless-encounter-simulation: backlog
-  5-4-basic-ai-action-interception: backlog
+  5-1-battlemap-and-scene-asset-management: backlog
+  5-2-encounter-builder-and-compendium-search: backlog
+  5-3-tactical-map-view-and-token-presence: backlog
+  5-4-initiative-entry-and-turn-order-activation: backlog
+  5-5-theater-of-the-mind-and-tactical-mode-switching: backlog
   epic-5-retrospective: optional
 
   epic-6: backlog
-  6-1-full-rules-engine-map-integration: backlog
-  6-2-local-autonomous-battle-simulation-rl-training-pipeline: backlog
-  6-3-standalone-workstation-simulation-tool: backlog
-  6-4-auto-balancing-encounters-local: backlog
-  6-5-searchable-campaign-help-system: backlog
-  6-6-rules-engine-mcp-server-integration: backlog
-  6-7-natural-language-rules-translation-llm: backlog
-  6-7-natural-language-catch-up-summaries-llm: backlog
-  6-8-deep-rules-gm-approval-gate: backlog
+  6-1-offline-action-ledger-and-pending-state: backlog
+  6-2-reconnection-sync-and-chronological-resolution: backlog
+  6-3-narrative-push-notifications-for-required-input: backlog
+  6-4-conflict-rollback-and-authoritative-state-recovery: backlog
   epic-6-retrospective: optional
 
   epic-7: backlog
-  7-1-cloud-syncing-premium-subscription-tier: backlog
-  7-2-ugc-template-publishing-marketplace: backlog
-  7-3-official-system-curation-api: backlog
-  7-4-premium-template-purchasing-token-economy: backlog
-  7-5-automated-ugc-moderation: backlog
-  7-6-immutable-action-ledger-for-moderation: backlog
-  7-7-automated-bot-detection-restriction: backlog
+  7-1-third-party-vtt-roll-ingestion: backlog
+  7-2-encounter-simulation-and-balance-forecasting: backlog
+  7-3-narrative-catch-up-summaries: backlog
+  7-4-gm-approval-gates-for-high-stakes-outcomes: backlog
+  7-5-ai-action-interception-and-override: backlog
+  7-6-natural-language-rules-mapping: backlog
   epic-7-retrospective: optional
+
+  epic-8: backlog
+  8-1-premium-cloud-sync-and-cross-device-availability: backlog
+  8-2-creator-template-publishing-and-marketplace-listings: backlog
+  8-3-official-system-template-curation: backlog
+  8-4-template-purchasing-unlocking-and-campaign-licensing: backlog
+  8-5-automated-marketplace-moderation: backlog
+  8-6-administrative-audit-playback-and-abuse-restriction: backlog
+  epic-8-retrospective: optional

@@ -686,461 +686,638 @@ So that players can inspect modifiers, read rules text, view markdown descriptio
 **Then** the configured drill-down behavior, content bindings, and presentation settings are preserved
 **And** the template remains portable without depending on unpublished editor-only logic.
 
-### Epic 2: The Campaign Hub & Social Layer
+### Epic 2: Offline Playable Character Sheets
 
-GMs can create campaigns, set rules, apply visual themes, and invite players. Players can manage their friends list, join campaigns with their created characters, and communicate via distinct chat channels.
+Players can create, load, search, customize, and use interactive character sheets offline, including overrides, visibility settings, and dice-driven sheet actions.
 
-### Story 2.1: Cloud Backend & SyncFacade Initialization
-As a Developer,
-I want to configure the Nhost Backend (Postgres, Hasura, Auth) and implement the SyncFacade over TinyBase,
-So that local offline data can synchronize with the cloud when connected.
-
-**Acceptance Criteria:**
-**Given** the local TinyBase architecture is established
-**When** the app detects an active internet connection and authenticated session
-**Then** the SyncFacade correctly pushes local changes and pulls server updates via Nhost GraphQL
-**And** resolves simple conflicts using the "Rewind & Redirect" protocol without data loss
-
-### Story 2.2: Player Profile & Friends List Management
+### Story 2.1: Local Character Library and Manual Export
 As a Player,
-I want to configure a public profile, add friends, and manage a blocklist,
-So that I can easily connect with people I want to play with and avoid those I don't.
+I want a searchable local library of my saved characters with manual export controls,
+So that I can reopen, organize, and back up my offline sheets whenever I need them.
 
 **Acceptance Criteria:**
-**Given** an authenticated player
-**When** they navigate to their social settings
-**Then** they can search for other players by username and send friend requests
-**And** they can manage an account-wide blocklist
+**Given** a player has one or more locally saved characters
+**When** they open the character library
+**Then** they can view, search, and sort saved characters using locally available metadata
+**And** opening a selected entry restores the associated character sheet without requiring authentication or network access.
 
-### Story 2.3: Campaign Instance Creation & Configuration
-As a GM,
-I want to create a new campaign, select the game system/ruleset, and generate an invite link,
-So that I have a dedicated digital space for my game.
+**Given** a player wants to preserve or move a local character
+**When** they choose the export action from the library or character detail view
+**Then** the system generates a one-time local export artifact for that character
+**And** the export completes without requiring premium cloud sync or an authenticated session.
+
+### Story 2.2: Guided Character Creation and Customization Flow
+As a Player,
+I want a guided step-by-step character creation and customization flow,
+So that I can build a valid character without manually editing every part of the sheet structure myself.
+
+**Acceptance Criteria:**
+**Given** a player starts a new character from an offline-capable template
+**When** they enter the creation flow
+**Then** the system presents a structured sequence of character-building steps based on the selected game template
+**And** the player can move forward and backward without losing already entered information.
+
+**Given** a player changes an earlier character-building choice
+**When** the guided flow recalculates dependent sections
+**Then** the affected character data is updated consistently
+**And** the player receives clear feedback where a later selection must be re-evaluated because of that earlier change.
+
+### Story 2.3: Instant Character Generation from Minimal Inputs
+As a Player,
+I want to generate a mechanically valid character from only a small set of key choices,
+So that I can start playing quickly and refine the details later.
+
+**Acceptance Criteria:**
+**Given** a supported character template includes a fast-generation path
+**When** a player selects the minimum required inputs such as class and level
+**Then** the system creates a mathematically valid baseline character configuration
+**And** the generated result is saved as a normal editable character rather than a temporary preview-only artifact.
+
+**Given** a player accepts an instantly generated character
+**When** they open that character in the normal sheet experience
+**Then** they can continue customizing it through the same editing and runtime workflows used by manually built characters
+**And** the generated character remains fully available offline.
+
+### Story 2.4: Interactive Offline Sheet Runtime and Native Dice Resolution
+As a Player,
+I want to use my character sheet interactively offline and resolve dice expressions natively,
+So that I can continue playing and taking mechanical actions even without connectivity.
+
+**Acceptance Criteria:**
+**Given** a player opens a playable character sheet while offline
+**When** they interact with supported controls on the sheet
+**Then** the sheet can execute local mechanical interactions using the configured bindings and action rules
+**And** the experience remains available without requiring an account or network connection.
+
+**Given** a player enters or triggers supported dice notation
+**When** the sheet resolves the expression
+**Then** the system parses standard dice formulas such as `2d6+4`
+**And** returns the calculated result within the expected local performance threshold.
+
+### Story 2.5: Visibility Partitions, Overrides, and Sheet Adjustments
+As a Player,
+I want to control visibility partitions and manually override calculated values where needed,
+So that my sheet can support privacy boundaries, GM collaboration, and edge-case game rulings.
+
+**Acceptance Criteria:**
+**Given** a character sheet exposes supported data partitions
+**When** a player configures the visibility of a sheet section or field
+**Then** that content can be marked as Public, Private, or GM-Only
+**And** the selected visibility state is saved with the character data.
+
+**Given** a player needs to override a calculated value
+**When** they apply a manual override through the supported sheet controls
+**Then** the override is stored explicitly rather than silently replacing the underlying calculated source
+**And** the sheet reflects the active override in a way the player can review later.
+
+### Epic 3: Identity, Access, and Connected Profiles
+
+Users can create accounts, manage identity, use offline-only access when needed, and maintain social/account boundaries safely.
+
+### Story 3.1: Age Gate, Sign-Up, and Authentication
+As a User,
+I want to create an account only after acknowledging the platform age requirement and then authenticate with supported sign-in methods,
+So that account access is compliant and consistent across the platform.
+
+**Acceptance Criteria:**
+**Given** a new user starts account creation
+**When** they enter the sign-up flow
+**Then** the system requires them to acknowledge the 17+ age restriction before completing registration
+**And** account creation cannot finish until that requirement is satisfied.
+
+**Given** a returning user wants to access their account
+**When** they use a supported authentication method
+**Then** the system signs them in using the configured auth provider flow
+**And** successful authentication restores their connected account context without breaking offline-local data access patterns.
+
+### Story 3.2: Player Profile and Visibility Preferences
+As a User,
+I want to configure my player profile and control what profile information is visible to others,
+So that I can present my preferred gaming identity without exposing more information than I want to share.
 
 **Acceptance Criteria:**
 **Given** an authenticated user
-**When** they select "Create Campaign"
-**Then** they can name it, pick a system from available templates, and get a shareable invite URI
-**And** the campaign instance is created in the Nhost database
+**When** they open profile settings
+**Then** they can configure profile details such as display information, gaming preferences, and active-campaign visibility
+**And** they can control which profile elements are public or private according to the supported settings.
 
-### Story 2.4: Campaign Joining & Character Binding
+**Given** another user views a profile with restricted fields
+**When** the platform renders that profile
+**Then** only the information permitted by the configured visibility rules is shown
+**And** hidden details are not exposed through the normal profile surfaces.
+
+### Story 3.3: Friends Discovery and Relationship Management
+As a User,
+I want to search for other players and manage friend relationships,
+So that I can build a network of people I want to play with regularly.
+
+**Acceptance Criteria:**
+**Given** an authenticated user
+**When** they search for another player by supported identity fields such as username
+**Then** the system returns eligible matching accounts
+**And** the user can send, accept, or remove friend relationships through the social workflow.
+
+**Given** two users have an active friend relationship
+**When** they view supported connected profile surfaces
+**Then** the platform can reflect that relationship consistently
+**And** removing the friendship updates both sides of the relationship state.
+
+### Story 3.4: Blocklist Safety Controls
+As a User,
+I want to manage an account-wide blocklist,
+So that I can prevent unwanted direct interaction with specific people across the platform.
+
+**Acceptance Criteria:**
+**Given** an authenticated user
+**When** they add another account to their blocklist
+**Then** the platform prevents normal direct interaction paths covered by the blocklist rules
+**And** the blocked account is stored in account-level safety settings rather than a single-campaign setting.
+
+**Given** a blocked relationship exists
+**When** either affected user attempts a restricted interaction path
+**Then** the platform enforces the blocklist behavior consistently
+**And** the blocked user does not receive misleading confirmation that the restricted interaction succeeded.
+
+### Story 3.5: Password Reset and Account Deletion
+As a User,
+I want standard account recovery and deletion controls,
+So that I can regain access when needed and permanently remove my platform identity when I choose.
+
+**Acceptance Criteria:**
+**Given** a user cannot access their account
+**When** they initiate the password reset flow
+**Then** the system provides the supported account recovery workflow
+**And** a successful reset allows the user to authenticate again without requiring manual administrator intervention.
+
+**Given** a user wants to delete their account
+**When** they confirm the account deletion workflow
+**Then** the platform performs the supported right-to-be-forgotten style deletion process for account-scoped identity data
+**And** the user is informed about the irreversible effect before deletion completes.
+
+### Epic 4: Campaign Hub and Shared Play Spaces
+
+GMs and players can create campaigns, join them, bind characters, communicate, publish house rules, and apply shared campaign presentation.
+
+### Story 4.1: Campaign Creation and Ruleset Configuration
+As a GM,
+I want to create a campaign and configure its system, adventure path, and active rules context,
+So that the play space starts with the correct structure for the game I am running.
+
+**Acceptance Criteria:**
+**Given** an authenticated GM
+**When** they create a new campaign
+**Then** they can define the campaign name and select the game system, adventure path, and active ruleset from the supported campaign configuration workflow
+**And** the new campaign is stored as a distinct campaign instance.
+
+**Given** a GM finishes initial campaign setup
+**When** the campaign is created
+**Then** the campaign has a usable default dashboard state
+**And** the GM can continue managing invitations and settings from that campaign context.
+
+### Story 4.2: Invite Links and Character Binding
 As a Player,
-I want to use an invite link to join a campaign and bind one of my local character sheets to it,
-So that the GM and other players can interact with my character.
+I want to join a campaign using an invite link and bind one of my characters to that campaign,
+So that my chosen character can participate in the shared play space.
 
 **Acceptance Criteria:**
-**Given** a player receives an invite link
-**When** they tap the link and authenticate
-**Then** they are prompted to select an existing standalone character or create a new one
-**And** the selected character's data is synced to the campaign instance
+**Given** a player receives a valid campaign invite link
+**When** they authenticate and open the invite flow
+**Then** they can join the target campaign and choose an existing character or create a new one to bind
+**And** the selected character becomes the campaign-bound character for that membership.
 
-### Story 2.5: Player Campaign Library
-As a Player,
-I want to view a centralized list of all the campaigns I am currently participating in, along with the specific character I have bound to each,
-So that I can easily navigate between my active games.
+**Given** a player attempts to join without a compatible character ready
+**When** the join flow validates their available choices
+**Then** the system guides them to create or select a valid character before finishing campaign entry
+**And** the campaign join workflow does not leave them in a partially bound state.
 
-**Acceptance Criteria:**
-**Given** a player is participating in multiple campaigns
-**When** they open the app's main "Campaigns" tab
-**Then** they see a list of active campaigns
-**And** each entry displays the campaign name, the GM, and the name/avatar of their specific bound character
-
-### Story 2.6: The Campaign Dashboard (Player Visibility)
-As a Player,
-I want to view the avatars and public sheet data of other players in the campaign. As a GM, I want the ability to forcefully dismiss a player from the campaign if necessary.
-
-**Acceptance Criteria:**
-**Given** multiple players have joined a campaign
-**When** a user opens the Campaign Dashboard
-**Then** they can see a roster of all active players and view their "Public" partitioned sheet data
-**And** the GM sees a "Dismiss" action that removes a player and optionally assigns their character to GM control
-
-### Story 2.7: Campaign Chat & Threaded Conversations
-As a Player,
-I want to communicate in real-time using distinct text channels (e.g., In-Character, Out-of-Character) and use nested threads,
-So that we can organize roleplay and rules discussions without cluttering the main log.
-
-**Acceptance Criteria:**
-**Given** an active campaign
-**When** a player navigates to the Chat interface
-**Then** they can post messages in predetermined channels and start/reply to threaded conversations
-**And** messages are synced across all connected clients in real-time
-
-### Story 2.8: Publishing House Rules
-As a GM,
-I want to publish a static text document of "House Rules" visible to everyone on the dashboard,
-So that expectations are clear and easily referenceable.
-
-**Acceptance Criteria:**
-**Given** a GM managing a campaign
-**When** they use the House Rules editor
-**Then** they can save a markdown-formatted document
-**And** all players in the campaign can access and read this document from their dashboard
-
-### Story 2.9: Campaign Audio Integration
-As a GM,
-I want to upload audio tracks and trigger streaming battle music or ambience for all connected players,
-So that I can set the mood for the session.
-
-**Acceptance Criteria:**
-**Given** a GM in an active session
-**When** they upload and play an audio track
-**Then** all connected players' clients begin streaming and playing the audio synchronously
-**And** players can independently control their local volume or mute the audio
-
-### Story 2.10: Dynamic Campaign Theming
-As a GM,
-I want to select a visual theme (via CSS variables) that applies globally to the UI for all players in my campaign,
-So that the app's aesthetic matches our game's genre.
-
-**Acceptance Criteria:**
-**Given** a campaign configuration screen
-**When** the GM selects a predefined theme (e.g., Fantasy, Sci-Fi)
-**Then** the required CSS variables are injected into the Global Shared UI Layer
-**And** all players observe the updated visual styling instantly across menus and character sheets
-
-### Epic 3: Standalone Battlemap & Encounters
-
-GMs can assign 2D battlemaps, build encounters, and toggle tactical combat. Players can view the map, see tokens, and inject into the turn order. Functions standalone but integrates with the character sheet.
-
-### Story 3.1: 2D Battlemap & Scene Imagery Uploads
-As a GM,
-I want to upload static 2D imagery to serve as either a gridded tactical battlemap or a non-gridded atmospheric scene,
-So that I can provide a visual environment for my players regardless of whether combat is occurring.
-
-**Acceptance Criteria:**
-**Given** an active campaign
-**When** the GM navigates to the Encounter Builder
-**Then** they can upload an image file and toggle whether it uses a strict grid (Battlemap) or free placement (Scene)
-**And** the client renders this image on an interactive Canvas/Three.js layer that maintains at least 30fps on mobile.
-
-### Story 3.2: Encounter Builder Compendium
-As a GM,
-I want to search a Compendium database and add pre-configured monsters/NPCs to an encounter,
-So that I don't have to manually build every adversary from scratch.
-
-**Acceptance Criteria:**
-**Given** the GM is building an encounter
-**When** they search for a creature (e.g., "Goblin")
-**Then** the system queries a structured compendium database
-**And** allows the GM to add that entity's pre-configured stats and abilities to the current encounter state
-
-### Story 3.3: Token Placement & Free-Roam Movement
-As a Player,
-I want to view the active 2D scene or battlemap and freely move my character token in real-time,
-So that I can explore the environment before combat starts.
-
-**Acceptance Criteria:**
-**Given** a map or scene is active but Initiative has not been rolled
-**When** a player interacts with their token
-**Then** they can move it freely across the canvas without turn-based restrictions
-**And** the map interface heavily utilizes a read-only or thumb-driven "Action Drawer" on mobile to ensure one-handed playability.
-
-### Story 3.4: Dynamic Initiative Tracking & Turn-Based Movement
-As a GM,
-I want to initiate, conclude, or restart an Initiative sequence on an active map at any time, restricting player movement to turn order,
-So that we can cleanly transition between free-roam exploration and structured combat.
-
-**Acceptance Criteria:**
-**Given** an active map with placed tokens
-**When** the GM clicks "Start Initiative"
-**Then** all connected players receive a prominent UI prompt to roll Initiative
-**And** movement rules instantly transition from "Free Roam" to "Turn Restricted", where only the active token can be moved
-**And** the GM can arbitrarily end the initiative sequence, returning everyone to free-roam mode on the exact same map
-
-### Story 3.5: Character Sheet & Battlemap Integration HUD
-As a Player,
-I want the battlemap to integrate with my character sheet as a "Floating HUD",
-So that I can view the map while still executing mechanical actions from my character sheet underneath.
-
-**Acceptance Criteria:**
-**Given** the player is viewing the active Battlemap
-**When** they need to take an action
-**Then** they can access a "Floating HUD" or "Action Card" drawer to quickly access their core attacks/spells
-**And** tapping an action rolls the dice and visually executes the action without leaving the map screen.
-
-### Epic 4: Asynchronous Combat & Resolution
-
-Players receive narrative push notifications when attacked, and execute mechanical actions that resolve offline and sync automatically with conflict resolution.
-
-### Story 4.1: Offline Mechanical Action Submission
-As a Player,
-I want to submit mechanical actions (like an attack or spell) even when my device is entirely offline,
-So that I can take my turn while commuting or without a stable internet connection.
-
-**Acceptance Criteria:**
-**Given** the device has no network connection
-**When** the player executes a mechanical action targeting a visible entity
-**Then** the action is immediately recorded in the local TinyBase ledger with a precise timestamp and local resolution state
-**And** the UI reflects the action as "Pending Sync" to the user.
-
-### Story 4.2: Asynchronous Auto-Sync & Resolution
-As a Developer,
-I want the system to automatically sync and chronologically resolve offline actions into the authoritative server timeline upon reconnection,
-So that the game state remains consistent across all clients without manual intervention.
-
-**Acceptance Criteria:**
-**Given** a player reconnects to the network with pending offline actions
-**When** the SyncFacade pushes the local ledger to Nhost
-**Then** the server orders all actions chronologically based on timestamps
-**And** automatically calculates the resulting game state (e.g., deducting HP) and broadcasts the updated state to all clients.
-
-### Story 4.3: Contextual Narrative Push Notifications
-As a Player,
-I want to receive contextual mobile push notifications framed narratively when an action dictates my mandatory input (e.g., a saving throw),
-So that I am drawn back into the game organically when it's my turn.
-
-**Acceptance Criteria:**
-**Given** the player is not actively viewing the app
-**When** the server resolves an action that targets their character and requires a reaction (like a Dex Save)
-**Then** Expo Application Services (EAS) triggers a push notification to their device
-**And** the notification uses narrative phrasing (e.g., "A fireball erupts! Roll Dexterity to dodge!") rather than dry mechanical text.
-
-### Story 4.4: Auto-Rollback for State Conflicts
-As a Developer,
-I want the system to execute a rollback of the game state if a delayed offline action mechanically conflicts with the newly synced server state,
-So that invalid actions (like exploring a room while dead) do not permanently corrupt the campaign.
-
-**Acceptance Criteria:**
-**Given** the server receives an offline action that is rendered invalid by a chronologically prior action (e.g., the acting character was killed before they took the action)
-**When** the SyncFacade attempts resolution
-**Then** the Authoritative Server Rules Engine explicitly overrides the Local Rules Engine
-**And** the client is updated to the correct authoritative server state
-**And** any invalid "Ghost Tokens" are visually snapped back to their true server coordinates on the battlemap, notifying the user why their action was rejected.
-
-### Epic 5: Advanced GM Controls & Simulation
-
-GMs can simulate encounters for balance, intercept basic combatant AI actions, and forcefully trigger ability checks or saves for any character or group. Players can send dice rolls from third-party tools.
-
-### Story 5.1: Webhook Integration for Third-Party VTTs
-As a Player,
-I want to send dice roll results from third-party VTT trackers (like Roll20 or Foundry) directly to the Dungeons with Friends campaign log,
-So that I can use my preferred virtual tabletop while maintaining an accurate character sheet here.
-
-**Acceptance Criteria:**
-**Given** an active campaign
-**When** the player triggers a webhook from a supported 3rd-party tool containing a JSON payload of a dice roll
-**Then** the Nhost backend receives, authenticates, and parses the payload
-**And** the result is injected into the campaign's unified event log, updating the game state if it was a mechanical action.
-
-### Story 5.2: GM Forced Roll Triggers & Timeouts
-As a GM,
-I want the ability to trigger ability checks, saving throws, and custom rolls to individual players, the entire party, or specific enemies, and set an optional temporal limit,
-So that I can actively manage the game state and prevent the game from soft-locking if a player is offline.
-
-**Acceptance Criteria:**
-**Given** an active campaign session
-**When** the GM selects targets (individuals, group, or enemies) and chooses a specific roll type (e.g., "Dexterity Save")
-**Then** a targeted prompt is sent to the selected players' devices demanding the roll
-**And** if the GM applies a Time Limit (e.g., 5 minutes), the system will automatically roll on the player's behalf using their base stats if they fail to respond in time
-**And** the GM can see who has successfully rolled and what their results are in real-time.
-
-### Story 5.3: Headless Encounter Simulation
-As a GM,
-I want the system to conduct headless background simulations of my custom encounters using basic engine math,
-So that I can predict the probability of player victory and adjust the difficulty before the session starts.
-
-**Acceptance Criteria:**
-**Given** a fully built encounter in the Encounter Builder
-**When** the GM clicks "Simulate Balance"
-**Then** the server runs a headless simulation of the combatants using their statistical averages
-**And** the GM is presented with a success probability percentage and estimated resource drain (e.g., "Expected HP loss: 40%").
-
-### Story 5.4: Basic AI Action Interception
-As a GM,
-I want to intercept, modify, or veto any basic system-generated combatant action before it resolves,
-So that I can ensure the monsters behave logically or narratively appropriately during tactical mode.
-
-**Acceptance Criteria:**
-**Given** it is a system-controlled monster's turn in Tactical Mode
-**When** the basic AI proposes a mechanical action (e.g., "Goblin attacks Player 1")
-**Then** the GM receives a prompt showing the intended action
-**And** the GM can choose to "Enable Auto-Resolve" or manually change the target/action before continuing.
-
-### Epic 6: Full Game Automation & AI Engine
-
-Implementation of the full rules engine mapped to the map/battlemap, autonomous simulation of battles, reinforcement learning for optimized AI, auto-balancing encounters, natural language rules parsing, and catch-up summaries.
-
-### Story 6.1: Full Rules Engine & Map Integration
-As a Developer,
-I want to implement a comprehensive rules engine that understands spatial properties on the battlemap (distance, cover, line of sight),
-So that the system can automatically validate actions and apply correct mechanical outcomes during combat.
-
-**Acceptance Criteria:**
-**Given** the game is in Tactical Mode with a gridded battlemap
-**When** a player attempts an action with specific range/line-of-sight requirements
-**Then** the rules engine must provide proactive UI highlighting for valid targets *before* execution to prevent client/server spatial disagreements
-**And** either validates the action or rejects it with a specific mechanical reason (e.g., "Target is behind full cover").
-
-### Story 6.2: Local Autonomous Battle Simulation & RL Training Pipeline
-As a Developer,
-I want to build a headless simulation pipeline that uses Reinforcement Learning (RL) to play encounters millions of times locally on the user's device,
-So that the system can train highly optimized AI combatants without spinning up expensive server compute resources.
-
-**Acceptance Criteria:**
-**Given** a set of creature stat blocks and a battlemap layout
-**When** the RL training pipeline is triggered
-**Then** the engine simulates the battle iteratively using local device compute resources
-**And** generates an optimized decision-making model payload for those specific creatures
-**And** includes a strict compute timeout limit (e.g., 5 seconds max simulation time on mobile) with a fallback to basic CR math if RL fails to converge.
-
-### Story 6.3: Standalone Workstation Simulation Tool
-As a Creator or Power User,
-I want to run the headless encounter simulation pipeline as a standalone executable on a high-powered workstation,
-So that I can rapidly optimize characters or complex monster behaviors without being constrained by mobile device hardware.
-
-**Acceptance Criteria:**
-**Given** a desktop environment
-**When** the user runs the standalone simulator with a defined JSON encounter payload
-**Then** the simulator runs all imported JSON payloads through a strict baseline heuristic sanity check (Zod limits) *before* the first RL epoch begins
-**And** executes the RL pipeline iteratively using available CPU/GPU resources, outputting an optimized decision-making model.
-
-### Story 6.4: Auto-Balancing Encounters (Local)
-As a GM,
-I want to click a single button to auto-balance an encounter against my specific party composition using local compute,
-So that I don't accidentally cause a Total Party Kill (TPK) or create an overwhelmingly boring fight.
-
-**Acceptance Criteria:**
-**Given** the GM has drafted an encounter in the Builder
-**When** they select "Auto-Balance"
-**Then** the system utilizes the local RL models and headless simulation to predict the outcome
-**And** automatically adds, removes, or scales enemies until the predicted success probability matches the GM's selected difficulty threshold.
-
-### Story 6.5: Searchable Campaign Help System
+### Story 4.3: Campaign Library and Dashboard Roster
 As a Player or GM,
-I want to access a searchable help system containing all official rules and custom house rules for the current campaign,
-So that I can quickly resolve rules disputes during play and provide context grounding for AI engine tools.
+I want to browse my campaigns and see the active participant roster with public character information,
+So that I can move between campaigns and understand who is currently part of each game.
+
+**Acceptance Criteria:**
+**Given** a user belongs to one or more campaigns
+**When** they open the campaign library
+**Then** they see a list of their campaigns with key context such as campaign name, GM, and their associated character where applicable
+**And** selecting a campaign opens that campaign's dashboard.
+
+**Given** a user opens a campaign dashboard
+**When** the roster is shown
+**Then** they can view the names, avatars, and public sheet data of active players according to visibility rules
+**And** the roster reflects current membership rather than stale cached participants.
+
+### Story 4.4: Campaign Chat and Threaded Channels
+As a Player,
+I want distinct chat channels and threaded conversations within a campaign,
+So that in-character, out-of-character, and rules discussions stay organized.
 
 **Acceptance Criteria:**
 **Given** an active campaign
-**When** a user opens the Help interface and types a query (e.g., "Grappling")
-**Then** the system returns relevant excerpts from both the base system ruleset and the GM's published House Rules
-**And** the rules text is formatted cleanly for mobile and desktop reading.
+**When** a participant opens the chat experience
+**Then** they can post messages into the available campaign channels
+**And** those messages are visible to other authorized campaign members in the same channel context.
 
-### Story 6.6: Rules Engine MCP Server Integration
-As a Developer,
-I want to expose the campaign's active ruleset and specific, restricted game state actions via the Model Context Protocol (MCP),
-So that AI agents have secure, context-aware access to rules without direct state manipulation access.
+**Given** a participant wants to branch a conversation
+**When** they open or reply to a thread on a message
+**Then** the platform preserves that nested conversation structure
+**And** the threaded replies remain associated with the parent message rather than cluttering the main channel log.
 
-**Acceptance Criteria:**
-**Given** the App Backend is running
-**When** an external LLM agent attempts to interpret a rule
-**Then** the MCP Server explicitly restricts raw state variable access, forcing use of strictly typed endpoints
-**And** the MCP Server issues temporary "State Lock Tokens". If the game state ledger updates (due to async combat) before the LLM returns its payload, the MCP server rejects the payload with a `STATE_STALE` error.
-
-### Story 6.7: Natural Language Rules Translation (LLM)
+### Story 4.5: House Rules Publishing and Campaign Reference Content
 As a GM,
-I want to input plain-text hypothetical rules (e.g., "Fire magic is twice as effective here"),
-So that the system can translate my intent into the strict JSON schema required by the new Full Rules Engine.
+I want to publish house rules as campaign reference content,
+So that every participant can review campaign-specific expectations and rulings from a shared source.
 
 **Acceptance Criteria:**
-**Given** the GM is configuring Campaign Rules
-**When** they type a Natural Language rule and submit it
-**Then** an LLM uses the Rules Engine MCP Server to process the text against the existing rules schema and proposes a structured JSON modification
-**And** upon GM approval, the engine enforces this new spatial/mechanical rule globally.
+**Given** a GM is managing a campaign
+**When** they create or update the house rules document
+**Then** they can save markdown-formatted campaign guidance
+**And** players in that campaign can access the resulting document from the shared campaign surfaces.
 
-### Story 6.7: Natural Language Catch-up Summaries (LLM)
+**Given** a campaign has published house rules
+**When** a player opens the rules reference area
+**Then** the system renders the latest published version for that campaign
+**And** the player is not shown editing controls reserved for the GM.
+
+### Story 4.6: Campaign Audio and Shared Theme Presentation
+As a GM,
+I want to set campaign-wide ambience and visual presentation,
+So that the campaign has a consistent mood across its shared interfaces.
+
+**Acceptance Criteria:**
+**Given** a GM configures campaign presentation settings
+**When** they select supported audio tracks or a campaign visual theme
+**Then** those settings are stored as campaign-level presentation choices
+**And** connected participants receive the updated shared presentation within supported client surfaces.
+
+**Given** a GM starts playback of a campaign audio track
+**When** players are in the active campaign context
+**Then** the clients receive the shared audio event
+**And** players retain local controls such as volume or mute without altering the GM's selected track.
+
+### Story 4.7: Player Dismissal and Control Reassignment
+As a GM,
+I want to dismiss a player from a campaign and reassign that character to GM control when needed,
+So that I can keep the campaign manageable when participation changes.
+
+**Acceptance Criteria:**
+**Given** a GM is viewing the campaign roster
+**When** they use the dismiss action on a player membership
+**Then** the platform removes that player from the active campaign membership
+**And** the GM can choose the supported control reassignment behavior for the associated character.
+
+**Given** a dismissed player attempts to access the removed campaign afterward
+**When** they reopen their campaign library or direct entry path
+**Then** the campaign is no longer available to them as an active membership
+**And** the system does not leave duplicate or ambiguous campaign participation state behind.
+
+### Epic 5: Tactical Scenes and Encounter Play
+
+GMs can prepare scenes and encounters, while players can view maps, tokens, and turn-order interactions in tactical mode.
+
+### Story 5.1: Battlemap and Scene Asset Management
+As a GM,
+I want to upload and manage 2D scene assets for both tactical and non-tactical play,
+So that I can present the correct visual environment for exploration or combat.
+
+**Acceptance Criteria:**
+**Given** a GM is preparing encounter assets
+**When** they upload or select a 2D map or scene image
+**Then** the system stores that asset as a reusable campaign scene resource
+**And** the GM can mark whether it is intended for gridded tactical use or non-gridded presentation.
+
+**Given** a scene asset is assigned to the active encounter context
+**When** players open the scene view
+**Then** the selected image is rendered in the supported scene surface
+**And** the rendering model respects the expected performance constraints for target devices.
+
+### Story 5.2: Encounter Builder and Compendium Search
+As a GM,
+I want to build encounters from a searchable compendium of creatures and adversaries,
+So that I can assemble combat scenarios without creating every combatant from scratch.
+
+**Acceptance Criteria:**
+**Given** a GM is in the encounter builder
+**When** they search the compendium for a creature or adversary
+**Then** the system returns matching encounter-ready entries
+**And** the GM can add those entries to the current encounter definition.
+
+**Given** a GM has assembled encounter participants
+**When** they save the encounter
+**Then** the resulting encounter state preserves the selected combatants and scene association
+**And** the encounter is ready for later activation in the campaign.
+
+### Story 5.3: Tactical Map View and Token Presence
 As a Player,
-I want the system to generate a succinct, Natural Language summary of missed campaign events presented immediately upon re-entering an active campaign,
-So that I don't have to decipher hundreds of raw mechanical log entries to understand what happened.
+I want to view the active tactical scene and see my token alongside visible entities,
+So that I can understand positioning during shared encounter play.
 
 **Acceptance Criteria:**
-**Given** a player has been offline while the campaign progressed significantly
-**When** they open the campaign dashboard
-**Then** the system aggregates the raw JSON event logs and passes them to an LLM
-**And** the UI displays a short narrative paragraph summarizing the key events.
+**Given** a tactical scene is active
+**When** a player opens the map view
+**Then** they can see the active battlemap along with their token and other visible entities
+**And** the displayed positions reflect the current encounter state available to that player.
 
-### Story 6.8: Deep Rules GM Approval Gate
+**Given** an encounter has not entered strict turn order yet
+**When** the active mode allows free scene interaction
+**Then** the token presentation remains consistent with the current campaign mode
+**And** the player can clearly tell whether movement is unrestricted or being controlled by turn-based rules.
+
+### Story 5.4: Initiative Entry and Turn Order Activation
+As a GM or Player,
+I want to activate initiative and have players inject their characters into the active turn order,
+So that tactical combat can begin in a clear and shared sequence.
+
+**Acceptance Criteria:**
+**Given** a tactical encounter is ready to begin
+**When** the GM starts initiative
+**Then** the system prompts eligible participants to roll or submit initiative for their bound characters
+**And** the resulting initiative entries create a shared turn order for the encounter.
+
+**Given** a player resolves their initiative participation
+**When** the turn order is displayed
+**Then** the player can see where their character sits in the sequence
+**And** the campaign can transition from preparation state into active tactical play.
+
+### Story 5.5: Theater-of-the-Mind and Tactical Mode Switching
 As a GM,
-I want to configure the Rules Engine to pause and require my manual approval for high-stakes automated decisions (like a character dying),
-So that I can veto or alter the engine's strict mathematical outcome for narrative purposes.
+I want to toggle between theater-of-the-mind and tactical play for a campaign encounter,
+So that the group can move between narrative and position-sensitive play styles without rebuilding encounter context.
 
 **Acceptance Criteria:**
-**Given** the Full Rules Engine calculates an outcome resulting in character death
-**When** the server attempts to resolve this calculation
-**Then** the action is placed in a "Pending GM Review" queue, pausing that specific interaction
-**And** the game state resolves only after the GM explicitly Approves or Rejects/Modifies the outcome.
+**Given** a campaign supports both play styles
+**When** the GM changes the encounter mode between Theater of the Mind and Tactical
+**Then** the campaign updates the active mode without requiring a new campaign instance
+**And** the user interface surfaces the correct play model for participants.
 
-### Epic 7: The Creator Marketplace & Administration
+**Given** a tactical encounter is returned to a non-tactical state
+**When** participants reopen the shared play surface
+**Then** the experience no longer presents strict initiative-driven interaction as the active model
+**And** the campaign remains usable for continued narrative play.
 
-Creators can monetize custom sheets, users can buy them, and platform admins can moderate content, view immutable game logs, and ban malicious bots.
+### Epic 6: Asynchronous Turn Resolution
 
-### Story 7.1: Cloud Syncing & Premium Subscription Tier
+Players can act offline, receive narrative prompts, and have actions reconciled safely when the system reconnects.
+
+### Story 6.1: Offline Action Ledger and Pending State
+As a Player,
+I want to submit supported mechanical actions while offline,
+So that I can continue participating even when my device cannot reach the network.
+
+**Acceptance Criteria:**
+**Given** a player has no active network connection
+**When** they take a supported mechanical action from a playable character or encounter surface
+**Then** the action is recorded in the local action ledger with the information needed for later reconciliation
+**And** the player can see that the action is pending synchronization rather than already authoritative.
+
+**Given** multiple offline actions are created before reconnection
+**When** the player returns to the app later
+**Then** those actions remain locally available in the correct pending order
+**And** they are not silently discarded because the device was offline.
+
+### Story 6.2: Reconnection Sync and Chronological Resolution
 As a Developer,
-I want to restrict continuous background cloud syncing to users with an active premium subscription,
-So that free users rely strictly on local TinyBase data and manual JSON exports, and the platform can fund its infrastructure.
+I want locally queued actions to synchronize and resolve in chronological order after reconnection,
+So that all clients converge on a consistent authoritative campaign state.
 
 **Acceptance Criteria:**
-**Given** the SyncFacade architecture
-**When** a user's Nhost Auth token indicates they are on a "Free" tier
-**Then** automated background syncing to the Postgres backend is disabled, and only manual exports are permitted
-**And** when they have a Premium token, data synchronizes continuously across all their authenticated devices.
+**Given** a device reconnects with pending local actions
+**When** the synchronization workflow runs
+**Then** the system submits those actions into the authoritative timeline in chronological order
+**And** the resulting resolved state is propagated back to the reconnecting client and other affected clients.
 
-### Story 7.2: UGC Template Publishing & Marketplace
+**Given** synchronization completes successfully
+**When** the local client refreshes from the authoritative state
+**Then** previously pending actions move into their resolved state
+**And** the user no longer sees them represented as unresolved local-only events.
+
+### Story 6.3: Narrative Push Notifications for Required Input
+As a Player,
+I want narrative push prompts when the game needs my input,
+So that I can re-enter the campaign at the right moment without monitoring it constantly.
+
+**Acceptance Criteria:**
+**Given** a player's input becomes required because of a resolved campaign event
+**When** that player is not actively in the foreground app experience
+**Then** the system sends a contextual push notification using narrative language appropriate to the triggered event
+**And** the notification helps the player understand what kind of response is needed.
+
+**Given** a player opens the app from that notification
+**When** the relevant campaign context loads
+**Then** the app takes them toward the pending decision or required interaction surface
+**And** the prompt is tied to the correct campaign state rather than a generic notification destination.
+
+### Story 6.4: Conflict Rollback and Authoritative State Recovery
+As a Developer,
+I want invalid delayed actions to be rolled back against the authoritative campaign state,
+So that late offline activity cannot permanently corrupt the game state.
+
+**Acceptance Criteria:**
+**Given** a delayed offline action conflicts with an earlier authoritative event
+**When** the resolution workflow detects that conflict
+**Then** the server-authoritative result takes precedence over the stale local action
+**And** the affected client is updated to the corrected state with a clear explanation that the delayed action could not stand.
+
+**Given** the invalidated action affected tactical or positional state
+**When** the client receives the authoritative correction
+**Then** the visible campaign state snaps back to the correct server-approved version
+**And** the user is not left with a misleading local representation of what actually occurred.
+
+### Epic 7: Advanced Automation and External Integrations
+
+The platform supports third-party roll ingestion, encounter simulation, GM approvals, AI interception, and rules translation.
+
+### Story 7.1: Third-Party VTT Roll Ingestion
+As a Player,
+I want to send dice roll results from supported third-party tools into the campaign log,
+So that I can use external play surfaces without losing a unified record of my actions.
+
+**Acceptance Criteria:**
+**Given** a campaign supports external roll ingestion
+**When** a supported third-party tool submits a valid roll payload through the configured integration path
+**Then** the platform authenticates and parses that payload
+**And** the resulting roll is recorded in the campaign log using the expected structured format.
+
+**Given** an ingested roll represents a mechanical action
+**When** the platform processes it successfully
+**Then** the campaign can treat it as part of the shared action history
+**And** participants can see the result from within the normal campaign activity surfaces.
+
+### Story 7.2: Encounter Simulation and Balance Forecasting
+As a GM,
+I want to simulate an encounter before play,
+So that I can understand likely difficulty and adjust the encounter before the session starts.
+
+**Acceptance Criteria:**
+**Given** a GM has assembled an encounter
+**When** they run the supported simulation workflow
+**Then** the system produces balance-oriented output such as likely victory odds or projected resource strain
+**And** the GM can use that output without having to start the real encounter.
+
+**Given** a simulation completes
+**When** the GM reviews the results
+**Then** the output is understandable enough to inform encounter tuning decisions
+**And** it is clearly separated from the live campaign state so simulated outcomes do not overwrite real play data.
+
+### Story 7.3: Narrative Catch-Up Summaries
+As a Player,
+I want a concise natural-language summary of what I missed in an active campaign,
+So that I can catch up quickly after being away from the game.
+
+**Acceptance Criteria:**
+**Given** a player returns to a campaign after meaningful activity occurred while they were away
+**When** the catch-up workflow is requested
+**Then** the platform summarizes the relevant event history into a readable narrative recap
+**And** the player does not need to manually reconstruct the entire timeline from raw event records.
+
+**Given** a generated summary is shown to the user
+**When** they review it
+**Then** the summary is clearly tied to the specific campaign context it describes
+**And** the player can still navigate into the underlying detailed history if they need more precision.
+
+### Story 7.4: GM Approval Gates for High-Stakes Outcomes
+As a GM,
+I want specific automated outcomes to require my approval before they finalize,
+So that I can preserve narrative control over especially important consequences.
+
+**Acceptance Criteria:**
+**Given** the platform reaches an outcome type configured for manual review
+**When** that outcome would normally resolve automatically
+**Then** the action is paused in a pending approval state for the GM
+**And** the game does not finalize that specific consequence until the GM approves, rejects, or modifies it.
+
+**Given** a GM reviews a pending outcome
+**When** they act on the approval request
+**Then** the resulting state change follows the GM's decision
+**And** the campaign records that manual intervention as part of the event history.
+
+### Story 7.5: AI Action Interception and Override
+As a GM,
+I want to intercept AI-suggested combatant actions before they resolve,
+So that I can redirect behavior that does not fit the tactical or narrative situation.
+
+**Acceptance Criteria:**
+**Given** an AI-managed combatant has a proposed action
+**When** interception is enabled for that situation
+**Then** the GM can inspect the proposed action before it resolves
+**And** they can allow, modify, or veto it using the supported intervention controls.
+
+**Given** the GM changes or rejects the proposal
+**When** the action is finalized
+**Then** the resulting combat resolution follows the GM-approved version
+**And** the original AI suggestion does not execute in parallel with the override.
+
+### Story 7.6: Natural-Language Rules Mapping
+As a GM,
+I want to describe hypothetical or custom rules in plain language and get a structured rules proposal,
+So that I can adapt a campaign without hand-authoring every engine configuration detail myself.
+
+**Acceptance Criteria:**
+**Given** a GM enters a natural-language rules request
+**When** the translation workflow runs
+**Then** the platform proposes a structured configuration representing that request in the platform's rules model
+**And** the GM must review the proposal before it becomes an active campaign rule.
+
+**Given** a rules proposal is approved
+**When** the campaign uses the affected rules area later
+**Then** the approved structured rule is applied as part of the active rules context
+**And** the platform can distinguish approved rules from unapproved suggestions.
+
+### Epic 8: Marketplace, Cloud Sync, and Platform Governance
+
+Creators can publish and monetize templates, users can sync and acquire them, and admins can moderate and protect the ecosystem.
+
+### Story 8.1: Premium Cloud Sync and Cross-Device Availability
+As a User,
+I want premium cloud sync to keep my eligible data available across authenticated devices,
+So that I can move between devices without manually exporting and importing everything each time.
+
+**Acceptance Criteria:**
+**Given** a user has an active premium sync entitlement
+**When** they authenticate on another supported device
+**Then** eligible synced data becomes available through the connected account experience
+**And** continuous syncing is not offered as the full experience for users without that entitlement.
+
+**Given** a user does not have premium sync
+**When** they use the product across devices
+**Then** the platform does not present premium background sync as active
+**And** the user can still rely on the manual local-first workflows supported elsewhere in the product.
+
+### Story 8.2: Creator Template Publishing and Marketplace Listings
 As a Creator,
-I want to upload my custom character sheet templates and rule configurations to a public marketplace,
-So that other players can discover and use my structured game systems.
+I want to publish custom templates and rule configurations to the marketplace,
+So that other users can discover and use the systems and layouts I create.
 
 **Acceptance Criteria:**
-**Given** a Creator has built a template locally
-**When** they select "Publish to Marketplace"
-**Then** the JSON payload is uploaded to Nhost storage and a public marketplace entry is created
-**And** the entry includes a title, description, and preview image
-**And** the system automatically generates a "Read-Only Interactive Sandbox" version of the template for the marketplace.
+**Given** a creator has a completed publishable template
+**When** they use the marketplace publishing workflow
+**Then** the platform creates a marketplace listing with the template payload and the required listing metadata
+**And** the published entry is stored as marketplace content rather than only local creator data.
 
-### Story 7.3: Official System Curation (API)
+**Given** a published listing is visible in the marketplace
+**When** users browse it
+**Then** they can review marketplace-facing details such as title, description, and preview context
+**And** the listing clearly represents the published template artifact it delivers.
+
+### Story 8.3: Official System Template Curation
 As a Platform Administrator,
-I want to use an internal API to automate the publishing of official, curated System Templates based on licensing agreements,
-So that players have high-quality, authentic templates for major RPG systems immediately available.
+I want to publish official curated templates through an administrative pipeline,
+So that licensed or platform-maintained systems are clearly available as trusted marketplace options.
 
 **Acceptance Criteria:**
-**Given** the admin server environment
-**When** an administrator executes a script pointing to an official JSON schema
-**Then** the API bypasses standard UGC moderation and publishes the template directly to the marketplace with an "Official" badge.
+**Given** an administrator has an approved official template payload
+**When** they publish it through the administrative curation path
+**Then** the template enters the marketplace with the expected official status treatment
+**And** it does not rely on the same authoring flow used for normal community submissions.
 
-### Story 7.4: Premium Template Purchasing (Token Economy)
-As a Player,
-I want to purchase or unlock premium templates utilizing a platform-specific token economy,
-So that I can access high-quality creator content and compensate the designers.
+**Given** a user browses an official curated template
+**When** the marketplace displays the listing
+**Then** the listing is distinguishable from community-created content
+**And** users can identify it as an officially curated system option.
+
+### Story 8.4: Template Purchasing, Unlocking, and Campaign Licensing
+As a User or GM,
+I want to unlock premium marketplace templates and optionally grant campaign-wide access,
+So that I can use paid creator content in the way that best fits my play group.
 
 **Acceptance Criteria:**
-**Given** a marketplace entry with a set token price
-**When** a player clicks "Test Sandbox"
-**Then** they can load the interactive template into a secure, offline, read-only state to verify its functionality before purchase
-**And** when they click "Unlock" and possess sufficient tokens, the tokens are deducted from their account ledger
-**And** the full template becomes permanently available for them to load in the Character Builder
-**And** GMs have the option to purchase a "Campaign License" tier, which temporarily grants all players currently in their specific campaign access to the required templates for the duration of the campaign without spending individual tokens.
+**Given** a premium marketplace template has a platform-defined access cost
+**When** an eligible user unlocks it with the required marketplace currency or entitlement
+**Then** the template becomes available in that user's accessible template library
+**And** the unlock is recorded in a way that prevents duplicate charging for the same entitlement.
 
-### Story 7.5: Automated UGC Moderation
+**Given** a GM purchases a supported campaign-level access option
+**When** the campaign license is activated
+**Then** the players in that campaign receive the intended access scope for that template during the licensed campaign context
+**And** the campaign license does not permanently rewrite each player's separate marketplace ownership history.
+
+### Story 8.5: Automated Marketplace Moderation
 As a Developer,
-I want the system to algorithmically scan all UGC marketplace uploads (text and images) against a two-tiered filter,
-So that content violating community guidelines is flagged before it reaches public visibility, complying with App Store safety guidelines.
+I want marketplace submissions to pass through automated moderation before public release,
+So that unsafe or policy-violating community content is filtered before it spreads across the platform.
 
 **Acceptance Criteria:**
-**Given** a Creator attempts to publish a new template
-**When** the upload reaches the server
-**Then** it is processed through an automated content filter
-**And** if flagged for severe violations (e.g., hate speech), it is immediately rejected; if flagged for minor issues, it is placed in a queue for manual Admin review.
+**Given** a creator submits content to the marketplace
+**When** the submission reaches the moderation workflow
+**Then** the platform evaluates it against the automated moderation rules for the supported content types
+**And** the submission is either rejected, held for review, or cleared for publication according to the moderation result.
 
-### Story 7.6: Immutable Action Ledger for Moderation
+**Given** a submission is flagged
+**When** the moderation result is returned
+**Then** the platform preserves the moderation decision state for administrator follow-up
+**And** content that fails moderation does not quietly appear as public marketplace content.
+
+### Story 8.6: Administrative Audit Playback and Abuse Restriction
 As a Platform Administrator,
-I want to view an immutable, chronological playback of all mechanical actions, chat logs, and token expenditures within a specific campaign instance,
-So that I can accurately investigate player reports of harassment, cheating, or marketplace fraud.
+I want an audit playback of campaign and marketplace activity plus abuse restriction controls,
+So that I can investigate reports and protect the platform from misuse.
 
 **Acceptance Criteria:**
-**Given** a user report targeting a specific campaign or player
-**When** an Administrator views that campaign via the admin dashboard
-**Then** they see a strict, un-editable timeline of every event generated by the SyncFacade
-**And** they can use this ledger to verify the claims before issuing a ban or refund.
+**Given** an administrator investigates a reported campaign, transaction, or user
+**When** they open the administrative audit view
+**Then** they can review an immutable chronological record of relevant activity such as mechanical actions, chat events, and token-related marketplace events
+**And** the audit data is suitable for moderation and support decisions.
 
-### Story 7.7: Automated Bot Detection & Restriction
-As a Developer,
-I want the system to analyze connection patterns to identify and restrict accounts exhibiting automated bot-like scraping behavior,
-So that the platform's API and marketplace are protected from unauthorized bulk downloading.
-
-**Acceptance Criteria:**
-**Given** standard platform API traffic
-**When** an account or IP address exhibits rapid, non-human request patterns (e.g., attempting to download every marketplace template sequentially in milliseconds)
-**Then** the server automatically rate-limits or temporarily bans the offending IP/Token
-**And** logs the event for Administrative review
-**And** free-tier accounts have a strict hard cap on daily marketplace downloads to ensure scraping is economically unviable.
+**Given** the platform detects scraping-like or bot-like behavior
+**When** that behavior crosses configured restriction thresholds
+**Then** the system can rate-limit, restrict, or temporarily ban the offending account or source
+**And** the restriction event is recorded for later administrative review.
