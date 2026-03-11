@@ -8,11 +8,22 @@ import { componentDefinitionSchema, ComponentDefinition } from '../model/compone
 interface ComponentEditorProps {
     componentId: string;
     onClose: () => void;
+    // DI Props
+    initialComponent?: ComponentDefinition;
+    onSaveOverride?: (id: string, data: ComponentDefinition) => Promise<void>;
+    storeOverride?: any;
 }
 
-export const ComponentEditor: React.FC<ComponentEditorProps> = ({ componentId, onClose }) => {
-    const store = useStore();
-    const component = useComponentDefinition(componentId);
+export const ComponentEditor: React.FC<ComponentEditorProps> = ({ 
+    componentId, 
+    onClose,
+    initialComponent,
+    onSaveOverride,
+    storeOverride
+}) => {
+    const store = storeOverride ?? useStore();
+    const componentFromStore = useComponentDefinition(componentId);
+    const component = initialComponent ?? componentFromStore;
 
     // Form state
     const [formData, setFormData] = useState<ComponentDefinition | null>(null);
@@ -63,7 +74,9 @@ export const ComponentEditor: React.FC<ComponentEditorProps> = ({ componentId, o
         saveTimeoutRef.current = setTimeout(async () => {
             setIsSaving(true);
             try {
-                if (store) {
+                if (onSaveOverride) {
+                    await onSaveOverride(componentId, result.data);
+                } else if (store) {
                     await updateComponentDefinition(store, componentId, result.data);
                 }
             } catch (err) {
@@ -110,7 +123,12 @@ export const ComponentEditor: React.FC<ComponentEditorProps> = ({ componentId, o
         <View className="flex-1 bg-background-primary">
             <View className="flex-row justify-between items-center p-6 border-b border-border-primary">
                 <View className="flex-row items-center space-x-3">
-                    <TouchableOpacity onPress={onClose} className="p-2 bg-background-secondary rounded-lg">
+                    <TouchableOpacity 
+                        onPress={onClose} 
+                        testID="close-button"
+                        accessibilityRole="button"
+                        className="p-2 bg-background-secondary rounded-lg"
+                    >
                         {React.createElement(X as any, { size: 20, color: "var(--color-typography-primary)" })}
                     </TouchableOpacity>
                     <Text className="text-xl text-typography-primary font-bold" style={{ fontFamily: 'Cinzel' }}>

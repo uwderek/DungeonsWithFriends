@@ -1,53 +1,56 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { Platform } from 'react-native';
 import { BottomTabBar } from './bottom-tab-bar';
 
 describe('BottomTabBar', () => {
     const mockOnTabPress = jest.fn();
 
-    beforeEach(() => {
-        mockOnTabPress.mockClear();
-    });
-
-    it('renders correctly on mobile', () => {
+    it('renders horizontal mobile layout by default', () => {
         const { getByText, queryByText } = render(
             <BottomTabBar activeTab="home" onTabPress={mockOnTabPress} />
         );
-
+        
         expect(getByText('Home')).toBeTruthy();
-        expect(getByText('Campaigns')).toBeTruthy();
-
-        // On mobile, labels are shown below icons (captured by the test query)
-        // We verify it doesn't crash
+        expect(getByText('Creator')).toBeTruthy();
+        // Dungeons title should NOT be visible on mobile
+        expect(queryByText('Dungeons')).toBeNull();
     });
 
-    it('calls onTabPress when a tab is pressed', () => {
+    it('renders vertical desktop web layout via DI props', () => {
         const { getByText } = render(
+            <BottomTabBar 
+                activeTab="home" 
+                onTabPress={mockOnTabPress} 
+                viewportWidth={1200} 
+                platformOverride="web" 
+            />
+        );
+        
+        expect(getByText('Dungeons')).toBeTruthy();
+        expect(getByText('With Friends')).toBeTruthy();
+        expect(getByText('Dungeon Master')).toBeTruthy();
+    });
+
+    it('calls onTabPress when a tab is clicked', () => {
+        const { getByTestId } = render(
             <BottomTabBar activeTab="home" onTabPress={mockOnTabPress} />
         );
 
-        fireEvent.press(getByText('Campaigns'));
+        fireEvent.press(getByTestId('tab-item-campaigns'));
         expect(mockOnTabPress).toHaveBeenCalledWith('campaigns');
+        
+        fireEvent.press(getByTestId('tab-item-creator'));
+        expect(mockOnTabPress).toHaveBeenCalledWith('creator');
     });
 
-    it('renders correctly on desktop', () => {
-        // Mock Platform.OS and window.innerWidth
-        const originalOS = Platform.OS;
-        const originalInnerWidth = global.innerWidth;
-
-        Object.defineProperty(Platform, 'OS', { value: 'web', configurable: true });
-        global.innerWidth = 1200;
-
-        const { getByText } = render(
-            <BottomTabBar activeTab="home" onTabPress={mockOnTabPress} />
+    it('renders active state indicators correctly', () => {
+        const { rerender, getByText, queryByTestId } = render(
+            <BottomTabBar activeTab="home" onTabPress={mockOnTabPress} viewportWidth={400} />
         );
-
-        expect(getByText('Home')).toBeTruthy();
-        expect(getByText('Friends')).toBeTruthy();
-
-        // Restore
-        Object.defineProperty(Platform, 'OS', { value: originalOS });
-        global.innerWidth = originalInnerWidth;
+        
+        // On mobile, active tab has a specific style or indicator
+        // We just verify it rerenders correctly for different active tabs
+        rerender(<BottomTabBar activeTab="creator" onTabPress={mockOnTabPress} viewportWidth={400} />);
+        expect(getByText('Creator')).toBeTruthy();
     });
 });

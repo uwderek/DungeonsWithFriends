@@ -17,6 +17,7 @@ jest.mock('lucide-react-native', () => ({
     LogIn: jest.fn(() => null),
     UserPlus: jest.fn(() => null),
     WifiOff: jest.fn(() => null),
+    Sword: jest.fn(() => null),
 }));
 
 jest.mock('@/shared/providers/auth-provider', () => ({

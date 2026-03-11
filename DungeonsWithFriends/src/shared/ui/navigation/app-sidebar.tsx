@@ -13,15 +13,45 @@ const navItems = [
   { id: "rules", title: "Rules Help", icon: HelpCircle, url: "/rules" }
 ];
 
+interface Friend {
+  name: string;
+  avatar: string;
+  online: boolean;
+}
+
+interface NavItem {
+  id: string;
+  title: string;
+  icon: any;
+  url: string;
+}
+
 interface AppSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   activeId?: string;
   onNavigate?: (id: string) => void;
+  friends?: Friend[];
+  items?: NavItem[];
+  viewportWidth?: number;
 }
 
-export const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose, activeId, onNavigate }) => {
-  const { width } = useWindowDimensions();
+export const AppSidebar: React.FC<AppSidebarProps> = ({ 
+  isOpen, 
+  onClose, 
+  activeId, 
+  onNavigate,
+  friends = [
+    { name: 'Ravenna', avatar: 'R', online: true },
+    { name: 'Thorin', avatar: 'T', online: true },
+    { name: 'Lyria', avatar: 'L', online: false },
+    { name: 'Gareth', avatar: 'G', online: true }
+  ],
+  items = navItems,
+  viewportWidth
+}) => {
+  const { width: measuredWidth } = useWindowDimensions();
+  const width = viewportWidth ?? measuredWidth;
   const isDesktop = width >= 768;
 
   // Mobile animation hooks - must be called before any conditional returns
@@ -84,11 +114,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose, activeI
 
       {/* Navigation */}
       <ScrollView style={{ flex: 1, paddingHorizontal: 12, paddingTop: 16 }}>
-        {navItems.map((item) => {
+        {items.map((item) => {
           const isActive = activeId === item.id;
           return (
             <TouchableOpacity
-              key={item.title}
+              key={item.id}
+              testID={`nav-item-${item.id}`}
               onPress={() => {
                 if (onNavigate) {
                   onNavigate(item.id);
@@ -124,12 +155,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose, activeI
           Friends
         </Text>
         <View style={{ gap: 8 }}>
-          {[
-            { name: 'Ravenna', avatar: 'R', online: true },
-            { name: 'Thorin', avatar: 'T', online: true },
-            { name: 'Lyria', avatar: 'L', online: false },
-            { name: 'Gareth', avatar: 'G', online: true }
-          ].map((friend) => (
+          {friends.map((friend) => (
             <TouchableOpacity
               key={friend.name}
               onPress={() => console.log('Friend clicked:', friend.name)}
@@ -226,6 +252,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose, activeI
       {/* Backdrop */}
       {isOpen && (
         <TouchableOpacity
+          testID="sidebar-backdrop"
           style={{
             position: 'absolute',
             top: 0,
@@ -258,7 +285,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isOpen, onClose, activeI
 };
 
 export const HamburgerButton: React.FC<{ onPress: () => void }> = ({ onPress }) => (
-  <TouchableOpacity onPress={onPress} style={{ padding: 8 }}>
+  <TouchableOpacity 
+    onPress={onPress} 
+    style={{ padding: 8 }}
+    accessibilityRole="button"
+    testID="hamburger-button"
+  >
     <Menu size={24} color="#FFFFFF" />
   </TouchableOpacity>
 );

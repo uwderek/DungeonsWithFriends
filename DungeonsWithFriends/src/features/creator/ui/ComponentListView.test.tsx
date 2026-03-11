@@ -95,7 +95,9 @@ describe('ComponentListView', () => {
             <ComponentListView onCreate={mockOnCreate} onEdit={mockOnEdit} onDelete={mockOnDelete} />
         );
 
-        fireEvent.press(getByTestId('delete-button-1'));
+        fireEvent.press(getByTestId('delete-button-1'), {
+            stopPropagation: jest.fn(),
+        });
         expect(deleteComponentDefinition).toHaveBeenCalledWith(mockStore, '1');
         expect(mockOnDelete).toHaveBeenCalledWith('1');
     });

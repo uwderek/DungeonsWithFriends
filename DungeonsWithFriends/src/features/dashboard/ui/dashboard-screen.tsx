@@ -16,9 +16,14 @@ const activeCampaignNames = myCampaigns
   .map(c => c.name);
 const activeCharacters = characters.filter(c => activeCampaignNames.includes(c.campaignName));
 
-export const DashboardScreen: React.FC<{ onNavigate?: (id: string) => void }> = ({ onNavigate }) => {
+export const DashboardScreen: React.FC<{ 
+  onNavigate?: (id: string) => void;
+  onSettingsPress?: () => void;
+  viewportWidth?: number;
+}> = ({ onNavigate, onSettingsPress, viewportWidth }) => {
   const { logout } = useAuth();
-  const { width } = useWindowDimensions();
+  const { width: measuredWidth } = useWindowDimensions();
+  const width = viewportWidth ?? measuredWidth;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isDesktop = width >= 768;
@@ -49,7 +54,10 @@ export const DashboardScreen: React.FC<{ onNavigate?: (id: string) => void }> = 
 
             <View className="flex-row gap-3">
               <TouchableOpacity
-                onPress={() => console.log('Settings clicked')}
+                onPress={() => onSettingsPress ? onSettingsPress() : console.log('Settings clicked')}
+                testID="settings-button"
+                accessibilityLabel="Open settings"
+                accessibilityRole="button"
                 className="h-10 w-10 rounded-full bg-indigo-950/50 items-center justify-center border border-indigo-900 shadow-sm"
               >
                 <Settings size={20} color="#9CA3AF" />
@@ -57,6 +65,9 @@ export const DashboardScreen: React.FC<{ onNavigate?: (id: string) => void }> = 
 
               <TouchableOpacity
                 onPress={logout}
+                testID="logout-button"
+                accessibilityLabel="Log out"
+                accessibilityRole="button"
                 className="h-10 w-10 rounded-full bg-indigo-950/50 items-center justify-center border border-indigo-900 shadow-sm"
               >
                 <LogOut size={18} color="#DC2626" />

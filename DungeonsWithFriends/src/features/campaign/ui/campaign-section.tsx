@@ -10,13 +10,17 @@ interface CampaignSectionProps {
   campaigns: Campaign[];
   friends: Friend[];
   showJoinButton?: boolean;
+  onCampaignPress?: (campaignId: string) => void;
+  onJoinPress?: (campaignId: string) => void;
 }
 
 export const CampaignSection: React.FC<CampaignSectionProps> = ({
   title,
   campaigns,
   friends,
-  showJoinButton = false
+  showJoinButton = false,
+  onCampaignPress,
+  onJoinPress
 }) => {
   const sorted = [...campaigns].sort((a, b) => b.friendsJoined.length - a.friendsJoined.length);
 
@@ -38,7 +42,13 @@ export const CampaignSection: React.FC<CampaignSectionProps> = ({
         {sorted.map((campaign) => (
           <TouchableOpacity
             key={campaign.id}
-            onPress={() => console.log('Campaign clicked:', campaign.id)}
+            onPress={() => {
+              if (onCampaignPress) {
+                onCampaignPress(campaign.id);
+              } else {
+                console.log('Campaign clicked:', campaign.id);
+              }
+            }}
             activeOpacity={0.7}
             className={`bg-background-secondary rounded-xl p-4 border border-border-primary`}
           >
@@ -93,7 +103,13 @@ export const CampaignSection: React.FC<CampaignSectionProps> = ({
 
               {showJoinButton && (
                 <TouchableOpacity
-                  onPress={() => console.log('Join clicked for campaign:', campaign.id)}
+                  onPress={() => {
+                    if (onJoinPress) {
+                      onJoinPress(campaign.id);
+                    } else {
+                      console.log('Join clicked for campaign:', campaign.id);
+                    }
+                  }}
                   activeOpacity={0.7}
                   className="px-4 py-2 rounded-lg border border-accent-secondary self-start sm:self-center"
                 >

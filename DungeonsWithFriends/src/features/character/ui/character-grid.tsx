@@ -7,9 +7,10 @@ import type { Character } from '@/features/dashboard/ui/mock-data';
 interface CharacterGridProps {
   characters: Character[];
   title?: string;
+  onCharacterPress?: (id: string) => void;
 }
 
-export const CharacterGrid: React.FC<CharacterGridProps> = ({ characters, title = "Characters" }) => {
+export const CharacterGrid: React.FC<CharacterGridProps> = ({ characters, title = "Characters", onCharacterPress }) => {
   return (
     <View>
       <Text
@@ -31,7 +32,13 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ characters, title 
               race={item.race}
               charClass={item.class}
               level={item.level}
-              onPress={() => console.log('Character clicked:', item.id)}
+              onPress={() => {
+                if (onCharacterPress) {
+                  onCharacterPress(item.id);
+                } else {
+                  console.log('Character clicked:', item.id);
+                }
+              }}
             />
           </View>
         ))}

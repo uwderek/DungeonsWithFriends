@@ -17,6 +17,35 @@ afterEach(() => {
     }
 });
 
+// Mock localStorage
+const localStorageMock = (function() {
+    let store = {};
+    return {
+        getItem: function(key) {
+            return store[key] || null;
+        },
+        setItem: function(key, value) {
+            store[key] = value.toString();
+        },
+        removeItem: function(key) {
+            delete store[key];
+        },
+        clear: function() {
+            store = {};
+        }
+    };
+})();
+
+Object.defineProperty(global, 'localStorage', {
+    value: localStorageMock
+});
+
+if (typeof window !== 'undefined') {
+    Object.defineProperty(window, 'localStorage', {
+        value: localStorageMock
+    });
+}
+
 jest.mock('react-native-safe-area-context', () => {
     const React = require('react');
     const inset = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -37,6 +66,7 @@ jest.mock('lucide-react-native', () => {
     return {
         Home: icon,
         Swords: icon,
+        Sword: icon,
         Users: icon,
         Users2: icon,
         Settings: icon,
@@ -45,6 +75,7 @@ jest.mock('lucide-react-native', () => {
         UserPlus: icon,
         WifiOff: icon,
         ChevronRight: icon,
+        ChevronLeft: icon,
         Plus: icon,
         Database: icon,
         FileCode: icon,
@@ -53,6 +84,18 @@ jest.mock('lucide-react-native', () => {
         Save: icon,
         AlertCircle: icon,
         Info: icon,
+        Clock: icon,
+        LayoutDashboard: icon,
+        User: icon,
+        Library: icon,
+        MessageSquare: icon,
+        Map: icon,
+        CalendarDays: icon,
+        BookOpen: icon,
+        HelpCircle: icon,
+        Menu: icon,
+        Database: icon,
+        Sparkles: icon,
     };
 });
 

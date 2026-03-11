@@ -8,11 +8,16 @@ import { CharacterGrid } from './character-grid';
 import { FriendsList } from '@/features/friends/ui/friends-list';
 import { characters, friends } from '@/features/dashboard/ui/mock-data';
 
-export const CharactersScreen: React.FC<{ onNavigate?: (id: string) => void }> = ({ onNavigate }) => {
+export const CharactersScreen: React.FC<{ 
+  onNavigate?: (id: string) => void;
+  onSettingsPress?: () => void;
+  viewportWidth?: number;
+}> = ({ onNavigate, onSettingsPress, viewportWidth }) => {
   const { logout } = useAuth();
-  const { width } = useWindowDimensions();
+  const { width: measuredWidth } = useWindowDimensions();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const width = viewportWidth ?? measuredWidth;
   const isDesktop = width >= 768;
 
   return (
@@ -51,7 +56,15 @@ export const CharactersScreen: React.FC<{ onNavigate?: (id: string) => void }> =
 
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <TouchableOpacity
-                onPress={() => console.log('Settings clicked')}
+                testID="settings-button"
+                accessibilityRole="button"
+                onPress={() => {
+                  if (onSettingsPress) {
+                    onSettingsPress();
+                  } else {
+                    console.log('Settings clicked');
+                  }
+                }}
                 style={{
                   height: 40,
                   width: 40,
@@ -67,6 +80,8 @@ export const CharactersScreen: React.FC<{ onNavigate?: (id: string) => void }> =
               </TouchableOpacity>
 
               <TouchableOpacity
+                testID="logout-button"
+                accessibilityRole="button"
                 onPress={logout}
                 style={{
                   height: 40,

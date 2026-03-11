@@ -5,11 +5,18 @@ import { Home, Swords, Users, Users2, Database, Settings } from 'lucide-react-na
 interface BottomTabBarProps {
     activeTab: 'home' | 'campaigns' | 'characters' | 'friends' | 'creator' | 'settings';
     onTabPress: (tab: any) => void;
+    viewportWidth?: number;
+    platformOverride?: typeof Platform.OS;
 }
 
 const DESKTOP_BREAKPOINT = 1024;
 
-export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPress }) => {
+export const BottomTabBar: React.FC<BottomTabBarProps> = ({ 
+    activeTab, 
+    onTabPress,
+    viewportWidth,
+    platformOverride
+}) => {
     const tabs = [
         { id: 'home', label: 'Home', Icon: Home },
         { id: 'campaigns', label: 'Campaigns', Icon: Swords },
@@ -19,8 +26,10 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
         { id: 'settings', label: 'Settings', Icon: Settings },
     ] as const;
 
-    const { width } = useWindowDimensions();
-    const isDesktop = Platform.OS === 'web' && width >= DESKTOP_BREAKPOINT;
+    const { width: measuredWidth } = useWindowDimensions();
+    const width = viewportWidth ?? measuredWidth;
+    const platform = platformOverride ?? Platform.OS;
+    const isDesktop = platform === 'web' && width >= DESKTOP_BREAKPOINT;
 
     const containerStyle = isDesktop
         ? "absolute left-0 top-0 bottom-0 w-64 bg-background-tertiary border-r border-border-primary pt-8 flex-col"
@@ -46,6 +55,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, onTabPres
                         <TouchableOpacity
                             key={id}
                             onPress={() => onTabPress(id)}
+                            testID={`tab-item-${id}`}
                             className={`items-center justify-center ${isDesktop ? 'flex-row justify-start px-6 py-4 mx-2 rounded-2xl' : 'flex-1 h-full'}`}
                             activeOpacity={0.7}
                             style={isDesktop && isActive ? { backgroundColor: 'var(--color-background-secondary)' } : {}}

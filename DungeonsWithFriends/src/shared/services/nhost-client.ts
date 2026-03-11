@@ -31,8 +31,18 @@ const mockNhostClient: NhostClientLike = { auth: mockAuth };
  * Creates a NhostClient instance, safely handling ESM/CJS interop issues
  * in Expo Web bundles. Falls back to a typed mock if the real client
  * cannot be instantiated, rather than crashing the app.
+ *
+ * @param config Subdomain and region for Nhost
+ * @param ClientClassOverride Optional constructor override for dependency injection in tests
  */
-export function createNhostClient(config: { subdomain: string; region: string }): NhostClientLike {
+export function createNhostClient(
+    config: { subdomain: string; region: string },
+    ClientClassOverride?: new (config: any) => NhostClientLike
+): NhostClientLike {
+    if (ClientClassOverride) {
+        return new ClientClassOverride(config);
+    }
+
     try {
         // Dynamic require avoids build-time errors while still working in Metro
         // eslint-disable-next-line @typescript-eslint/no-var-requires

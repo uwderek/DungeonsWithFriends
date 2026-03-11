@@ -4,9 +4,10 @@ import type { Friend } from '@/features/dashboard/ui/mock-data';
 
 interface FriendsListProps {
   friends: Friend[];
+  onFriendPress?: (id: string) => void;
 }
 
-export const FriendsList: React.FC<FriendsListProps> = ({ friends }) => {
+export const FriendsList: React.FC<FriendsListProps> = ({ friends, onFriendPress }) => {
   const sortedFriends = [...friends].sort((a, b) => (b.online ? 1 : 0) - (a.online ? 1 : 0));
 
   return (
@@ -27,7 +28,8 @@ export const FriendsList: React.FC<FriendsListProps> = ({ friends }) => {
         {sortedFriends.map((friend) => (
           <TouchableOpacity
             key={friend.id}
-            onPress={() => console.log('Friend clicked:', friend.id)}
+            onPress={() => onFriendPress ? onFriendPress(friend.id) : console.log('Friend clicked:', friend.id)}
+            testID={`friend-item-${friend.id}`}
             activeOpacity={0.7}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
           >

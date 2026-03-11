@@ -41,7 +41,7 @@ story_location: "c:\\Development\\DungeonsWithFriends\\_bmad-output\\implementat
 
 development_status:
   epic-1: in-progress
-  1-1-creator-workspace-shell: ready-for-dev
+  1-1-creator-workspace-shell: review
   1-2-system-template-selection-and-custom-json-binding: backlog
   1-3-general-purpose-component-registry-and-binding-contract: backlog
   1-4-grid-canvas-drag-and-drop-placement-snapping-and-alignment: backlog

@@ -23,6 +23,7 @@ describe('ComponentEditor', () => {
         display_label: 'Test Label',
         data_type: 'text' as const,
         is_required: false,
+        sort_order: 0,
         created_at: '2026-03-08T00:00:00.000Z',
         updated_at: '2026-03-08T00:00:00.000Z',
     };
@@ -313,5 +314,57 @@ describe('ComponentEditor', () => {
                 })
             );
         });
+    });
+
+    it('calls onClose when close button is pressed', () => {
+        (useComponentDefinition as jest.Mock).mockReturnValue(mockComponent);
+        const { getByTestId } = render(
+            <ComponentEditor componentId={componentId} onClose={mockOnClose} />
+        );
+
+        fireEvent.press(getByTestId('close-button'));
+        expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    it('uses initialComponent prop for DI', () => {
+        const { getByDisplayValue } = render(
+            <ComponentEditor 
+                componentId={componentId} 
+                onClose={mockOnClose} 
+                initialComponent={mockComponent} 
+            />
+        );
+
+        expect(getByDisplayValue('Test Label')).toBeTruthy();
+        // useComponentDefinition is still called because hooks must be unconditional
+        expect(useComponentDefinition).toHaveBeenCalledWith(componentId);
+    });
+
+    it('uses onSaveOverride and handles errors', async () => {
+        const onSaveOverride = jest.fn().mockRejectedValue(new Error('Save failed'));
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        const { getByPlaceholderText } = render(
+            <ComponentEditor 
+                componentId={componentId} 
+                onClose={mockOnClose} 
+                initialComponent={mockComponent}
+                onSaveOverride={onSaveOverride}
+            />
+        );
+
+        const input = getByPlaceholderText(/Enter display label/i);
+        fireEvent.changeText(input, 'Error Label');
+
+        act(() => {
+            jest.advanceTimersByTime(350);
+        });
+
+        await waitFor(() => {
+            expect(onSaveOverride).toHaveBeenCalled();
+            expect(consoleSpy).toHaveBeenCalledWith("Auto-save failed:", expect.any(Error));
+        });
+
+        consoleSpy.mockRestore();
     });
 });

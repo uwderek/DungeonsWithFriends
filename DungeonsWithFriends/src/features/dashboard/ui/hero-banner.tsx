@@ -4,10 +4,12 @@ import type { HeroData } from './mock-data';
 
 interface HeroBannerProps {
   data: HeroData;
+  viewportWidth?: number;
 }
 
-export const HeroBanner: React.FC<HeroBannerProps> = ({ data }) => {
-  const { width } = useWindowDimensions();
+export const HeroBanner: React.FC<HeroBannerProps> = ({ data, viewportWidth }) => {
+  const { width: measuredWidth } = useWindowDimensions();
+  const width = viewportWidth ?? measuredWidth;
   const isDesktop = width >= 768;
 
   return (
