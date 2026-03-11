@@ -39,7 +39,7 @@ FR21: Users can join an active campaign via an invite link and seamlessly select
 FR22: GMs can create and publish a static set of "House Rules" visible to all players within the campaign dashboard.
 FR23: Users can view the names, avatars, and public character sheet data of all other active players within their joined campaign.
 FR24: Users can communicate via distinct text channels and organize extended RP conversations via nested threads.
-FR25: GMs can upload, manage, and assign a library of 2D Battlemaps and static imagery to specific encounters.
+FR25: GMs can upload, manage, and assign a library of 2D battlemaps, static imagery, and compatible scene assets to specific encounters.
 FR26: GMs can upload or select audio tracks and trigger streaming battle music/ambience for all connected players.
 FR27: GMs can toggle specific campaign mechanics between "Theater of the Mind" and "Tactical".
 FR27b: GMs can apply distinct visual themes to a campaign instance, changing the global UI styling for all participating players.
@@ -47,7 +47,7 @@ FR28: Users can submit mechanical actions while entirely offline.
 FR29: The system can automatically sync and chronologically resolve offline actions into the authoritative server timeline upon reconnection.
 FR30: Users can receive contextual mobile push notifications framed narratively when an action dictates their mandatory input.
 FR31: Users can execute an "Initiative Roll" to inject their character into a formal turn order when the GM starts tactical combat mode.
-FR32: Players can view the active 2D battlemap, including the real-time or async coordinates of their character token and visible adversaries.
+FR32: Players can view the active tactical scene in 2D or another compatible supported projection, including the real-time or async coordinates of their character token and visible adversaries.
 FR33: Players can send dice roll results from third-party VTT trackers directly to the Dungeons with Friends campaign log via webhook ingest or native extension.
 FR34: The system can parse user-inputted dice notation natively (e.g., 2d6+4) and mathematically resolve the outcome.
 FR35: GMs can manually build encounters by searching a Compendium database and adding pre-configured monsters to the game state.
@@ -58,16 +58,20 @@ FR39: GMs can intercept, modify, or veto any AI-generated combatant action.
 FR40: GMs can input plain-text hypothetical rules, which the system can map to valid underlying engine configurations.
 FR41: Auto-Rollback: The system can execute a rollback of the game state if a delayed offline action mechanically conflicts with the server state.
 FR42: GMs can forcefully dismiss a player from a campaign, seamlessly assigning their character to either GM or AI control.
+FR48: Party leaders or GMs can present a player-safe shared display showing the active tactical scene, shared audio, and encounter state on a room display while players continue using their own devices as inputs.
 FR43: Creators can upload custom character sheet templates and rule configurations to a public marketplace.
 FR44: Platform Administrators can automatically curate and publish official System Templates via API based on licensing agreements.
 FR45: Users can purchase or access premium templates utilizing a platform-specific token economy.
 FR46: The system can algorithmically scan all UGC marketplace uploads to flag content violating community guidelines.
 FR47: Platform Administrators can view an immutable, chronological playback of all mechanical actions, chat logs, and token expenditures within a specific campaign instance.
 FR49: The system can identify and restrict accounts exhibiting automated bot-like scraping behavior.
+FR50: Supported groups can participate in internet-backed room sessions first, with the architecture preserving a future LAN-capable synchronization mode for local play when internet connectivity is unavailable or undesirable.
+FR51: Users can view compatible 3D tactical scenes in a native VR client, including tabletop room-scale presentation and supported character-perspective zoom for compatible encounters.
+FR52: Single-player users can continue supported campaigns fully offline with on-device AI assistance for narrative responses, character guidance, and supported decision support.
 
 ### NonFunctional Requirements
 
-NFR1: Rendering of 2D Battlemaps (via Canvas/Three.js) must maintain a minimum of 30fps consistently on hardware representing the 80th percentile of active mobile devices.
+NFR1: Rendering of supported tactical scenes in 2D or compatible 3D projections must maintain a minimum of 30fps on hardware representing the top 50th percentile of active mobile devices, with graceful degradation across the broader supported 80th percentile.
 NFR2: Offline-to-Online state synchronization (merging the local TinyBase ledger with the server ledger) must complete background resolution in under 3 seconds upon network reconnection without blocking the user interface.
 NFR3: The native dice math-parser component must calculate and display results in under 200ms.
 NFR4: The architecture must structurally enforce hard processing caps on LLM API token utilization per user/campaign to prevent asymmetrical financial abuse.
@@ -76,6 +80,7 @@ NFR6: The authoritative Server Event Ledger must support concurrent write action
 NFR7: The core mobile VTT application must be fully navigable and semantically parsable by native iOS (VoiceOver) and Android (TalkBack) screen readers.
 NFR8: The Desktop Web application experience must support 100% keyboard-only navigation for all core gameplay actions to satisfy WCAG 2.1 AA compliance standards.
 NFR9: The system must expose stable, authenticated incoming webhook endpoints capable of accepting and parsing standard JSON payloads from major 3rd-party VTT tracker tools.
+NFR10: Previously loaded characters, rules, tactical scenes, and required assets must remain usable offline on supported native and web clients without forcing a blocking sync before a player can review the current state and queue a supported turn decision.
 
 ### Additional Requirements
 
@@ -84,13 +89,15 @@ NFR9: The system must expose stable, authenticated incoming webhook endpoints ca
 - **Authentication:** Formally decoupled Nhost Auth (Nhost JS SDK v4.5+) abstract `AuthProvider` interface context.
 - **API Communication & State Syncing:** GraphQL Subscriptions via SyncFacade interacting synchronously with local TinyBase store.
 - **Frontend Architecture:** Feature-Sliced Design (FSD) with a Global "Shared" UI Layer.
-- **Infrastructure:** Deploy complex "Creator" desktop web app via Vercel (Web), mobile apps natively with Expo Application Services (Native).
+- **Simulation and Scene Core:** Separate deterministic `game_core` rules processing from renderer-agnostic `scene_core` presentation contracts so tactical scenes, shared displays, and future VR can reuse the same encounter state.
+- **Infrastructure:** Deploy desktop creator, desktop web play, and shared-display surfaces via Vercel (Web), mobile apps natively with Expo Application Services (Native), and preserve a future native VR delivery path.
 - **Core Platform UI:** The "Action-Card" interface to bubble up the 3 most relevant actions based on game state.
 - **Layout Approach:** "Floating HUD" over map background on mobile, contextual action drawer on the bottom ("Thumb Zone"), with full WYSIWYG sheet builder purely disabled on mobile UI.
 - **Sync Protocol:** The "Rewind & Redirect" Sync Protocol.
-- **Design System:** Hybrid Headless Approach (Tailwind CSS + shadcn/ui + DnD Kit). Dynamic Campaign theming via CSS variable injection.
+- **Creator Design System:** Use a hybrid desktop-web creator approach (Tailwind CSS + shadcn/ui + DnD Kit or equivalent targeted desktop tooling) without forcing those desktop-only assumptions into mobile play surfaces.
 - **General-Purpose Creator Model:** Sheet elements must be reusable, system-agnostic UI primitives bound to underlying structured game data rather than hard-coded game-specific controls.
 - **System Binding Strategy:** When defining a sheet, the creator must choose a supported game system template or upload custom system JSON so layout elements can bind to that schema and generate placeholder game-specific JSON where required.
+- **Offline Everywhere:** Previously loaded characters, tactical scenes, rules, and required assets must remain available on native and web clients for offline review and deferred turn submission.
 
 ### FR Coverage Map
 
@@ -137,12 +144,16 @@ FR39: Epic 7 - AI action interception
 FR40: Epic 7 - Natural-language rules mapping
 FR41: Epic 6 - Rollback/conflict handling
 FR42: Epic 4 - Dismiss player and transfer control
+FR48: Epic 9 - Shared display and room presentation
 FR43: Epic 8 - Publish creator templates
 FR44: Epic 8 - Official template publishing
 FR45: Epic 8 - Template purchases/access
 FR46: Epic 8 - UGC moderation
 FR47: Epic 8 - Immutable playback/admin review
 FR49: Epic 8 - Bot restriction and abuse control
+FR50: Epic 9 - Internet-backed room sessions with future LAN compatibility
+FR51: Epic 9 - Native immersive tactical scene presentation
+FR52: Epic 7 - Offline single-player AI assistance
 
 ## Epic List
 
@@ -163,7 +174,7 @@ GMs and players can create campaigns, join them, bind characters, communicate, p
 **FRs covered:** FR19, FR20, FR21, FR22, FR23, FR24, FR26, FR27b, FR42
 
 ### Epic 5: Tactical Scenes and Encounter Play
-GMs can prepare scenes and encounters, while players can view maps, tokens, and turn-order interactions in tactical mode.
+GMs can prepare scenes and encounters, while players can view maps, tokens, and turn-order interactions in compatible tactical scene modes.
 **FRs covered:** FR25, FR27, FR31, FR32, FR35
 
 ### Epic 6: Asynchronous Turn Resolution
@@ -171,18 +182,29 @@ Players can act offline, receive narrative prompts, and have actions reconciled 
 **FRs covered:** FR28, FR29, FR30, FR41
 
 ### Epic 7: Advanced Automation and External Integrations
-The platform supports third-party roll ingestion, encounter simulation, GM approvals, AI interception, and rules translation.
-**FRs covered:** FR33, FR36, FR37, FR38, FR39, FR40
+The platform supports third-party roll ingestion, encounter simulation, GM approvals, AI interception, rules translation, and offline-capable AI assistance for supported solo experiences.
+**FRs covered:** FR33, FR36, FR37, FR38, FR39, FR40, FR52
 
 ### Epic 8: Marketplace, Cloud Sync, and Platform Governance
 Creators can publish and monetize templates, users can sync and acquire them, and admins can moderate and protect the ecosystem.
 **FRs covered:** FR4, FR43, FR44, FR45, FR46, FR47, FR49
+
+### Epic 9: Shared Display, Room Sessions, and Immersive Surfaces
+Groups can project player-safe tactical scenes to a shared room display today while the platform preserves a path toward LAN-backed room play and future native VR tactical experiences.
+**FRs covered:** FR48, FR50, FR51
 
 <!-- Repeat for each epic in epics_list (N = 1, 2, 3...) -->
 
 ### Epic 1: System-Agnostic Sheet Creator Foundation
 
 Creators can define reusable layout primitives, bind them to a selected or uploaded game-system JSON schema, and build fully custom sheet templates for any TTRPG without requiring game-specific component types.
+
+**Implementation Clarifications:**
+- Epic 1 is a **desktop-web-first creator track**. It is not the implementation track for tactical rendering, shared display presentation, LAN session transport, or future VR clients.
+- The Epic 1 "canvas" always refers to a **sheet-authoring layout canvas**. It is not the tactical encounter scene canvas and must not be treated as an early version of the battle-map renderer.
+- Epic 1 stories should produce reusable template layout metadata, schema bindings, and authoring workflows that later play surfaces can consume. They should **not** define `game_core`, `scene_core`, encounter simulation state, or tactical renderer behavior.
+- Shared contracts may eventually consume creator output, but creator stories must avoid introducing premature abstractions that try to unify creator editing with runtime scene rendering.
+- Desktop-oriented interaction patterns, denser controls, and richer authoring ergonomics are acceptable within Epic 1 because this surface does not need to mirror the mobile play experience.
 
 ### Story 1.1: Creator Workspace Shell
 As a Creator,
@@ -219,6 +241,11 @@ So that I can begin building system-agnostic character sheet templates in a stru
 **When** they move through the creator shell
 **Then** all primary workspace regions, pane toggles, and focusable controls are reachable in a logical order
 **And** visible focus treatment is preserved for desktop accessibility requirements.
+
+**Implementation Clarifications:**
+- This story establishes only the **creator workspace shell**. It must not introduce battle-map rendering concepts, shared-display presentation logic, or runtime scene abstractions.
+- The left palette, center canvas, and right properties panel are creator-authoring regions only. They should use creator-specific naming and state rather than tactical terms such as encounter, battle scene, public display, or simulation board.
+- Placeholder seams are acceptable where later creator stories will fill in binding or drag-and-drop behavior, but Story 1.1 must remain independent from the later tactical scene stack.
 
 ### Story 1.2: System Template Selection and Custom JSON Binding
 As a Creator,
@@ -261,6 +288,10 @@ So that every layout element can bind to a structured data model without requiri
 **Then** the system binding flow completes without requiring a network request
 **And** the selected binding context is saved locally with the sheet draft.
 
+**Implementation Clarifications:**
+- System bindings created here are for **sheet-template authoring** and downstream play-surface consumption. They are not the same as tactical encounter scene definitions.
+- Validation and generated defaults should stay schema-oriented and system-agnostic. This story should not define battle scene compatibility, 3D asset metadata, or runtime visibility rules.
+
 ### Story 1.3: General-Purpose Component Registry and Binding Contract
 As a Creator,
 I want a registry of reusable, system-agnostic sheet components with a consistent data-binding contract,
@@ -301,6 +332,10 @@ So that I can build layouts once and bind them to different game systems without
 **When** the component is inserted into the new layout
 **Then** its reusable layout and presentation configuration is preserved
 **And** its binding can either be remapped to the new system context or reattached to a compatible existing schema path.
+
+**Implementation Clarifications:**
+- The registry defined here is a **creator/template component registry**, not the tactical scene entity registry used later by encounter rendering.
+- Component metadata should stay centered on sheet layout, display, and interaction contracts rather than tactical map semantics such as token movement, lighting, or fog-of-war behavior.
 
 ### Story 1.4: Grid Canvas, Drag-and-Drop Placement, Snapping, and Alignment
 As a Creator,
@@ -343,6 +378,10 @@ So that I can place sheet elements quickly and produce clean, readable layouts w
 **Then** the canvas maintains clear selection state and visible placement boundaries
 **And** the interaction model does not require later stories to understand where elements currently live on the page.
 
+**Implementation Clarifications:**
+- Drag-and-drop here is for **sheet layout composition**, not for tactical token movement or runtime scene manipulation.
+- Grid, snapping, and alignment logic should optimize authoring quality for templates and must not assume reuse as the battle-map movement or positioning system.
+
 ### Story 1.5: Responsive Viewports, Zoom, and Custom Display Dimensions
 As a Creator,
 I want to preview and edit my sheet in mobile, tablet, desktop, and custom-size viewport modes with zoom controls,
@@ -384,6 +423,10 @@ So that I can design layouts that remain usable and readable across the actual s
 **Then** all viewport toggles, custom dimension inputs, and zoom commands are reachable and operable
 **And** the preview system remains usable under desktop accessibility expectations.
 
+**Implementation Clarifications:**
+- Viewport and zoom controls in this story preview how **sheet templates** behave across player devices. They do not define tactical scene cameras, immersive presentation modes, or shared-display framing.
+- Custom display dimensions should help creators reason about play-surface consumption later without requiring this story to implement those play surfaces directly.
+
 ### Story 1.6: Card and Group Container Composition
 As a Creator,
 I want to create reusable card and group containers that can hold nested sheet elements and decorative frame assets,
@@ -424,6 +467,10 @@ So that I can compose visually coherent sections like saving throws, inventory b
 **When** the grouped section is saved in the sheet draft
 **Then** the container preserves its nested composition, shared visual settings, and child element relationships
 **And** the grouped structure can be reused later in other templates as a composable layout pattern.
+
+**Implementation Clarifications:**
+- Card and group containers are template-layout containers, not tactical scene nodes or immersive-world containers.
+- Decorative assets and nested composition should remain focused on sheet presentation rather than 3D scene composition, shared-display overlays, or encounter-space geometry.
 
 ### Story 1.7: Text Labels, Typography Presets, and Separators
 As a Creator,
@@ -972,23 +1019,32 @@ So that I can keep the campaign manageable when participation changes.
 
 ### Epic 5: Tactical Scenes and Encounter Play
 
-GMs can prepare scenes and encounters, while players can view maps, tokens, and turn-order interactions in tactical mode.
+GMs can prepare scenes and encounters, while players can view maps, tokens, and turn-order interactions across compatible tactical scene modes.
+
+**Implementation Clarifications:**
+- Epic 5 is the first tactical runtime track. It consumes later shared runtime contracts and must remain distinct from the creator layout canvas introduced in Epic 1.
+- The scene model used here represents encounter presentation and interaction state. It should not be backfilled into the creator authoring stories as though both surfaces use the same canvas abstraction.
+- When Epic 5 refers to view modes, it means runtime tactical presentation modes over compatible scene data, not creator preview modes.
 
 ### Story 5.1: Battlemap and Scene Asset Management
 As a GM,
-I want to upload and manage 2D scene assets for both tactical and non-tactical play,
+I want to upload and manage 2D scene assets plus compatible scene metadata for both tactical and non-tactical play,
 So that I can present the correct visual environment for exploration or combat.
 
 **Acceptance Criteria:**
 **Given** a GM is preparing encounter assets
-**When** they upload or select a 2D map or scene image
+**When** they upload or select a 2D map, scene image, or compatible scene resource
 **Then** the system stores that asset as a reusable campaign scene resource
-**And** the GM can mark whether it is intended for gridded tactical use or non-gridded presentation.
+**And** the GM can mark whether it is intended for gridded tactical use, non-gridded presentation, or a future compatible 3D-capable projection path.
 
 **Given** a scene asset is assigned to the active encounter context
 **When** players open the scene view
 **Then** the selected image is rendered in the supported scene surface
 **And** the rendering model respects the expected performance constraints for target devices.
+
+**Implementation Clarifications:**
+- This story defines runtime scene assets for encounters, not creator-template layout assets.
+- Any 3D-capable metadata introduced here should describe compatibility with runtime tactical presentation, not sheet-builder authoring behavior.
 
 ### Story 5.2: Encounter Builder and Compendium Search
 As a GM,
@@ -1008,19 +1064,24 @@ So that I can assemble combat scenarios without creating every combatant from sc
 
 ### Story 5.3: Tactical Map View and Token Presence
 As a Player,
-I want to view the active tactical scene and see my token alongside visible entities,
+I want to view the active tactical scene and see my token alongside visible entities in a supported projection mode,
 So that I can understand positioning during shared encounter play.
 
 **Acceptance Criteria:**
 **Given** a tactical scene is active
 **When** a player opens the map view
-**Then** they can see the active battlemap along with their token and other visible entities
+**Then** they can see the active tactical scene along with their token and other visible entities
 **And** the displayed positions reflect the current encounter state available to that player.
 
 **Given** an encounter has not entered strict turn order yet
 **When** the active mode allows free scene interaction
 **Then** the token presentation remains consistent with the current campaign mode
 **And** the player can clearly tell whether movement is unrestricted or being controlled by turn-based rules.
+
+**Given** a tactical scene supports more than one compatible presentation mode
+**When** a player changes between the supported 2D, isometric, or 3D view options
+**Then** the scene continues to represent the same underlying encounter state
+**And** the client only exposes view modes that are compatible with the active scene resources.
 
 ### Story 5.4: Initiative Entry and Turn Order Activation
 As a GM or Player,
@@ -1053,6 +1114,26 @@ So that the group can move between narrative and position-sensitive play styles 
 **When** participants reopen the shared play surface
 **Then** the experience no longer presents strict initiative-driven interaction as the active model
 **And** the campaign remains usable for continued narrative play.
+
+### Story 5.6: Compatible 2D and 3D Tactical Scene Presentation
+As a Player,
+I want supported encounters to switch between compatible tactical scene presentation modes,
+So that I can use a view that fits my device and play context without changing the encounter rules.
+
+**Acceptance Criteria:**
+**Given** a tactical scene has a compatible 3D representation
+**When** a supported client switches from a 2D view into a compatible 3D view
+**Then** the client reuses the same encounter and visibility state
+**And** the scene camera, lighting, and fog presentation adapt without forking the underlying rules state.
+
+**Given** a tactical scene does not have a compatible 3D representation
+**When** a user attempts to select an unsupported presentation mode
+**Then** the platform blocks that mode switch gracefully
+**And** the user is clearly informed which scene representations are currently available.
+
+**Implementation Clarifications:**
+- This story assumes a shared runtime scene contract and must not require pixel-perfect parity across clients.
+- Mode switching here applies to runtime tactical views only. It does not change creator preview behavior or retroactively redefine Epic 1 viewport stories.
 
 ### Epic 6: Asynchronous Turn Resolution
 
@@ -1122,9 +1203,33 @@ So that late offline activity cannot permanently corrupt the game state.
 **Then** the visible campaign state snaps back to the correct server-approved version
 **And** the user is not left with a misleading local representation of what actually occurred.
 
+### Story 6.5: Offline Re-entry with Cached Scene and Character Data
+As a Player,
+I want previously loaded characters, rules context, and tactical scenes to remain available while offline,
+So that I can review the current state and decide my turn even if connectivity drops after I receive a prompt to act.
+
+**Acceptance Criteria:**
+**Given** a player previously loaded a character, campaign state, and required scene assets
+**When** they lose connectivity before reopening the app
+**Then** the client restores the cached character and encounter context without requiring a blocking sync
+**And** the player can inspect the current battle scene and available decisions from local data.
+
+**Given** a player makes a supported turn decision while offline after re-entering from a cached state
+**When** the action is submitted locally
+**Then** the client records it as pending synchronization
+**And** the eventual network reconnection is not required before the player can complete that local decision flow.
+
+**Implementation Clarifications:**
+- Cached scene data here refers to runtime play data needed to continue or review a turn, not creator workspace state.
+- This story should use the shared offline/runtime storage strategy and must not couple player re-entry behavior to creator-template editing flows.
+
 ### Epic 7: Advanced Automation and External Integrations
 
-The platform supports third-party roll ingestion, encounter simulation, GM approvals, AI interception, and rules translation.
+The platform supports third-party roll ingestion, encounter simulation, GM approvals, AI interception, rules translation, and offline-capable AI assistance for supported solo experiences.
+
+**Implementation Clarifications:**
+- Epic 7 consumes the shared rules/runtime foundation and should not reshape creator story contracts to fit automation needs.
+- Simulation, AI assistance, and rules translation must operate on the canonical rules/runtime model rather than on tactical renderer objects or creator-layout state.
 
 ### Story 7.1: Third-Party VTT Roll Ingestion
 As a Player,
@@ -1221,6 +1326,26 @@ So that I can adapt a campaign without hand-authoring every engine configuration
 **When** the campaign uses the affected rules area later
 **Then** the approved structured rule is applied as part of the active rules context
 **And** the platform can distinguish approved rules from unapproved suggestions.
+
+### Story 7.7: Offline Single-Player AI Assistance
+As a Single-Player User,
+I want supported campaigns to provide on-device AI assistance while offline,
+So that I can continue solo play with narrative responses and decision support even when no network connection is available.
+
+**Acceptance Criteria:**
+**Given** a supported single-player mode is active and the required local model assets are available
+**When** the user is offline
+**Then** the platform can generate supported AI responses or guidance without contacting the remote AI service
+**And** the user is not blocked from continuing solo play because the network is unavailable.
+
+**Given** a user returns to connectivity after an offline single-player session
+**When** the app syncs any supported deferred state
+**Then** the local single-player progression remains consistent with the saved campaign history
+**And** the offline AI assistance workflow does not corrupt the authoritative data contracts used elsewhere in the product.
+
+**Implementation Clarifications:**
+- On-device AI assistance here belongs to single-player runtime behavior only. It should not leak into creator authoring workflows or redefine the creator data model.
+- Any model inputs or outputs must remain compatible with the shared rules/runtime contracts so later multiplayer, shared-display, and immersive clients can trust the same state shape.
 
 ### Epic 8: Marketplace, Cloud Sync, and Platform Governance
 
@@ -1321,3 +1446,71 @@ So that I can investigate reports and protect the platform from misuse.
 **When** that behavior crosses configured restriction thresholds
 **Then** the system can rate-limit, restrict, or temporarily ban the offending account or source
 **And** the restriction event is recorded for later administrative review.
+
+### Epic 9: Shared Display, Room Sessions, and Immersive Surfaces
+
+Groups can project player-safe tactical scenes to a shared room display today while the platform preserves a path toward LAN-backed room play and future native VR tactical experiences.
+
+**Implementation Clarifications:**
+- Epic 9 is a runtime presentation track layered on top of the shared tactical/runtime model. It must not be implemented by stretching the creator desktop surface into a pseudo-display client.
+- Shared-display and immersive clients are allowed to reuse shared contracts and selective UI primitives, but they should remain separate surfaces with their own presentation responsibilities and privacy rules.
+
+### Story 9.1: Shared Display and Party-Leader Presentation Mode
+As a Party Leader or GM,
+I want to present a player-safe tactical scene on a shared room display,
+So that the group can follow the battle together while still using personal devices as their input surfaces.
+
+**Acceptance Criteria:**
+**Given** a campaign is in a supported tactical scene
+**When** the party leader or GM opens the shared display mode
+**Then** the room display shows the active public-facing battle scene, shared audio context, and encounter state
+**And** private or GM-only information is excluded from that display.
+
+**Given** players continue interacting from their own devices while the shared display is active
+**When** the encounter state changes
+**Then** the shared display updates to reflect the latest public scene state
+**And** the personal device controls remain the primary input mechanism for supported actions.
+
+**Implementation Clarifications:**
+- The shared display is a player-safe runtime presentation surface, not a mirror of the creator workspace or an authoring mode.
+- Reuse should focus on shared contracts and safe presentation primitives, not on forcing the creator shell to double as the shared display client.
+
+### Story 9.2: Internet-Backed Room Sessions with Future LAN Compatibility
+As a Developer,
+I want shared-room sessions to work through the internet-backed sync model first while preserving a future LAN-compatible transport seam,
+So that in-room play can ship early without locking the platform out of local-first room sessions later.
+
+**Acceptance Criteria:**
+**Given** a supported room session is active under the standard connected experience
+**When** participant devices and the shared display join the same campaign session
+**Then** they synchronize through the authoritative online model
+**And** the client/session architecture keeps transport-specific assumptions behind a replaceable boundary.
+
+**Given** the long-term roadmap introduces local room transport
+**When** a LAN-capable mode is later implemented
+**Then** the existing gameplay, scene, and visibility contracts remain reusable
+**And** the platform does not require a separate tactical rules implementation for local-room play.
+
+**Implementation Clarifications:**
+- The transport seam preserved here is for runtime play/session coordination. It should not change creator-story storage or workspace assumptions.
+- Internet-backed first remains the implementation path; LAN compatibility is an architectural seam to preserve, not an MVP requirement for unrelated earlier stories.
+
+### Story 9.3: Native VR Tactical Tabletop Presentation
+As a VR User,
+I want compatible tactical scenes to appear as an immersive tabletop experience,
+So that I can view the encounter spatially and optionally zoom toward a supported character-perspective view.
+
+**Acceptance Criteria:**
+**Given** a tactical scene is flagged as compatible with immersive presentation
+**When** a supported native VR client opens that encounter
+**Then** the scene renders as a room-scale tabletop or other supported immersive presentation
+**And** the client uses the same underlying game and scene state as the non-VR clients.
+
+**Given** a user is viewing a compatible immersive tactical scene
+**When** they switch between tabletop overview and a supported character-perspective zoom
+**Then** the immersive client updates the camera or presentation mode without changing the canonical encounter state
+**And** unsupported scenes do not expose immersive-only controls they cannot satisfy.
+
+**Implementation Clarifications:**
+- VR here is a future runtime client consuming shared tactical contracts. It should not cause Epic 1 creator stories to introduce immersive or 3D-editing responsibilities.
+- Scene compatibility and camera behavior for VR must remain downstream of the runtime scene model rather than being authored as one-off logic in creator shell stories.

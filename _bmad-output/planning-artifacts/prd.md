@@ -60,23 +60,26 @@ The architecture successfully supports true offline-first capability and real-ti
 - **Engagement:** Turn-resolution latency (time between receiving a notification and submitting an action) averages under 2 hours for active campaigns.
 
 ## 3. Product Scope
-**Strategy:** The "Tooling" MVP (Fastest to Market/Platform Foundation). Launch focuses on value-creation through utility via a best-in-class, offline-capable visual character sheet builder and dice roller to bootstrap a user base. This validates the core React/Expo UI architecture, establishes data models, and tests early monetization (cloud syncing) before investing in complex VTT multiplayer networking or AI generation.
+**Strategy:** The "Tooling + Shared Play Foundation" MVP. Launch focuses on value-creation through utility via an offline-capable visual character sheet builder, playable character sheets, and a shared simulation/scene architecture that can grow into asynchronous multiplayer, tactical scene rendering, public room displays, and future immersive clients. This validates the core Expo application shell, shared offline data model, and battle-scene contracts before expanding into the heaviest networking, automation, and AI surfaces.
 
-### Phase 1: MVP (The Builder)
+### Phase 1: MVP (The Builder and Shared Core)
 **Must-Have Capabilities:**
-- **Visual Character Sheet Builder:** Powered by a customized GrapesJS WYSIWYG editor allowing manual drag-and-drop of game-specific controls, strictly mapped to underlying JSON structures.
+- **Visual Character Sheet Builder:** A desktop-web-first creator workspace for building system-agnostic sheet templates from reusable primitives and schema bindings, strictly mapped to underlying JSON structures.
 - **Tiered Storage:** Universal Event Ledger utilizing TinyBase for local-only saving, exportable backups to Google Drive, and premium cloud-syncing across devices via Nhost subscriptions.
+- **Shared Runtime Contracts:** A deterministic game-state core and renderer-agnostic scene model that allow play surfaces to share rules, cached content, and encounter state across mobile, web, and future display clients.
 - **Internal System Templates:** Pre-built, platform-curated templates for major systems (D&D 5e, Pathfinder, Shadowdark) to instantly onboard users.
 
 ### Phase 2: Growth (The Asynchronous VTT & Marketplace)
 - **Asynchronous Engine:** "Play-by-Post" notification engine, campaign chat interface, and multiplayer synchronization utilizing the authoritative server Event Ledger.
+- **Shared Room Play:** Browser and native play surfaces can participate in synchronized tactical scenes, including player-safe shared TV/display presentation for in-room sessions.
 - **Community Marketplace:** A separate SEO-optimized web platform for discovering, sharing, and monetizing custom sheet templates and homebrew content. Official SRD templates published automatically based on licensing.
 
 ### Phase 3: Vision/Expansion (The AI Co-GM & Tactical Flow)
 - **Intelligent Adversaries & Optimization:** Reinforcement Learning drives highly intelligent, adaptive enemy behavior during combat, and powers optimal mechanical character configurations for players.
 - **AI Encounter Builder:** Headless Monte Carlo simulations for predictive encounter balancing.
 - **Componentized AI Rules Translation:** Natural Language Logic Parser tied to valid JSON engine configurations.
-- **Tactical Maps:** Procedural grid generation and high-performance tactical 2D battle maps (WebGL/Three.js).
+- **Tactical Maps:** Procedural grid generation and high-performance tactical scenes that support 2D, isometric, and compatible 3D presentation modes.
+- **Immersive Play Surfaces:** Native VR clients can present supported 3D tactical scenes as tabletop room experiences with optional character-perspective zoom for compatible encounters.
 
 ### Risk Mitigation
 - **Technical Risks:** Mobile builder UI clutter. *Mitigation:* Enforce smart defaults and standardized "Weight Classifications" for touch-friendly snapping.
@@ -126,7 +129,8 @@ The architecture successfully supports true offline-first capability and real-ti
 **Competitive Differentiator:** By hybridizing play-by-post momentum with VTT mechanical rigidity, the platform serves the "Schedule-Starved Player," competing against casual mobile games rather than just other VTTs.
 
 ## 7. Project-Type Requirements
-- **Unified SPA Strategy:** Built as a React-based Single Page Application (SPA) deployed cross-platform utilizing Expo. Ensures maximum code-reuse between web, iOS, and Android clients without sacrificing native-feeling mobile UX.
+- **Multi-Surface Client Strategy:** Built as a shared product platform with native mobile clients, mobile/desktop web clients, shared-display surfaces, and future immersive clients. Shared domain and scene contracts maximize code reuse while allowing platform-specific interaction models where needed.
+- **Shared Simulation and Scene Strategy:** The canonical game state must remain deterministic and renderer-agnostic, while a separate scene model drives 2D, isometric, 3D, shared-display, and future VR presentation modes for compatible encounters.
 - **Decoupled SEO Strategy:** The core VTT app is an authenticated, non-indexable SPA. The Community Marketplace will be built as a separate, fully SEO-optimized platform. The core app integrates via API for content ingestion.
 
 ## 8. Functional Requirements
@@ -168,7 +172,7 @@ Platform Admins or authorized creators can define new component definitions (att
 - **FR22:** GMs can create and publish a static set of "House Rules" visible to all players within the campaign dashboard.
 - **FR23:** Users can view the names, avatars, and public character sheet data of all other active players within their joined campaign.
 - **FR24:** Users can communicate via distinct text channels (e.g., Out-of-Character, In-Character) and organize extended RP conversations via nested threads (e.g., a "Long Rest" dialogue).
-- **FR25:** GMs can upload, manage, and assign a library of 2D Battlemaps and static imagery (e.g., NPC portraits, scenic vistas) to specific encounters.
+- **FR25:** GMs can upload, manage, and assign a library of 2D battlemaps, static imagery, and compatible scene assets to specific encounters.
 - **FR26:** GMs can upload or select audio tracks and trigger streaming battle music/ambience for all connected players.
 - **FR27:** GMs can toggle specific campaign mechanics between "Theater of the Mind" (narrative/image-based) and "Tactical" (Battlemap/Grid-based).
 - **FR27b:** GMs can apply distinct visual themes (e.g., Gritty B&W for Shadowdark, Vibrant for Pathfinder, Anime-styled) to a campaign instance, changing the global UI styling for all participating players.
@@ -179,7 +183,7 @@ Platform Admins or authorized creators can define new component definitions (att
 - **FR29:** The system can automatically sync and chronologically resolve offline actions into the authoritative server timeline upon reconnection.
 - **FR30:** Users can receive contextual mobile push notifications framed narratively (e.g., "The Goblin lunges at you, what do you do?") when an action dictates their mandatory input.
 - **FR31:** Users can execute an "Initiative Roll" to inject their character into a formal turn order when the GM starts tactical combat mode.
-- **FR32:** Players can view the active 2D battlemap, including the real-time or async coordinates of their character token and visible adversaries.
+- **FR32:** Players can view the active tactical scene in 2D or another compatible supported projection, including the real-time or async coordinates of their character token and visible adversaries.
 - **FR33:** Players can send dice roll results from third-party VTT trackers (e.g., Beyond20) directly to the Dungeons with Friends campaign log via webhook ingest or native extension.
 - **FR34:** The system can parse user-inputted dice notation natively (e.g., 2d6+4) and mathematically resolve the outcome.
 - **FR35:** GMs can manually build encounters by searching a Compendium database and adding pre-configured monsters to the game state.
@@ -192,6 +196,7 @@ Platform Admins or authorized creators can define new component definitions (att
 - **FR40:** GMs can input plain-text hypothetical rules, which the system can map to valid underlying engine configurations.
 - **FR41:** Auto-Rollback: The system can execute a rollback of the game state if a delayed offline action mechanically conflicts with the server state, presenting a differential conflict report to the user.
 - **FR42:** GMs can forcefully dismiss a player from a campaign, seamlessly assigning their character to either GM or AI control.
+- **FR48:** Party leaders or GMs can present a player-safe shared display showing the active tactical scene, shared audio, and encounter state on a room display while players continue using their own devices as inputs.
 
 ### 5. Marketplace & Community Content
 - **FR43:** Creators can upload custom character sheet templates and rule configurations to a public marketplace.
@@ -203,12 +208,18 @@ Platform Admins or authorized creators can define new component definitions (att
 - **FR47:** Platform Administrators can view an immutable, chronological playback of all mechanical actions, chat logs, and token expenditures within a specific campaign instance.
 - **FR49:** The system can identify and restrict accounts exhibiting automated bot-like scraping behavior.
 
+### 7. Shared-Surface, Offline, and Immersive Expansion
+- **FR50:** Supported groups can participate in internet-backed room sessions first, with the architecture preserving a future LAN-capable synchronization mode for local play when internet connectivity is unavailable or undesirable.
+- **FR51:** Users can view compatible 3D tactical scenes in a native VR client, including tabletop room-scale presentation and supported character-perspective zoom for compatible encounters.
+- **FR52:** Single-player users can continue supported campaigns fully offline with on-device AI assistance for narrative responses, character guidance, and supported decision support.
+
 ## 9. Non-Functional Requirements
 
 ### Performance & Reliability
-- **NFR1:** Rendering of 2D Battlemaps (via Canvas/Three.js) must maintain a minimum of 30fps consistently on hardware representing the 80th percentile of active mobile devices.
+- **NFR1:** Rendering of supported tactical scenes in 2D or compatible 3D projections must maintain a minimum of 30fps on hardware representing the top 50th percentile of active mobile devices, with graceful degradation across the broader supported 80th percentile.
 - **NFR2:** Offline-to-Online state synchronization (merging the local TinyBase ledger with the server ledger) must complete background resolution in under 3 seconds upon network reconnection without blocking the user interface.
 - **NFR3:** The native dice math-parser component must calculate and display results in under 200ms.
+- **NFR10:** Previously loaded characters, rules, tactical scenes, and required assets must remain usable offline on supported native and web clients without forcing a blocking sync before a player can review the current state and queue a supported turn decision.
 
 ### Security
 - **NFR4:** The architecture must structurally enforce hard processing caps on LLM API token utilization per user/campaign to prevent asymmetrical financial abuse.

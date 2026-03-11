@@ -105,17 +105,26 @@ Standard Expo file-based routing (`expo-router`) or standard App entry point, wi
 - Data Validation Strategy (Zod Schema Validation)
 - Authentication/API Provider Abstraction (Facade Pattern over Nhost)
 - Frontend Component Architecture (Feature-Sliced Design with Shared UI)
+- Simulation and Scene Architecture (`game_core` + `scene_core`)
+- Tactical Rendering and Display Architecture (Path A)
 
 **Important Decisions (Shape Architecture):**
 - Deployment Strategy (Vercel Web + Expo Application Services for Native)
+- Transport Strategy (Internet-backed first with future LAN-compatible adapters)
 
 **Deferred Decisions (Post-MVP):**
-- Detailed Battlemap/WebGL 3D Physics logic (Post-MVP, pending successful 2D integration and hardware profiling).
+- LAN/local-room session topology specifics after the internet-backed experience stabilizes
+- Native VR interaction patterns and target-device-specific control schemes
 
 ### Data Architecture
 
 **Decision:** Client-Side Zod Schema Validation (Zod v3.x)
 **Rationale:** Due to the system-agnostic requirement of the Character Builder (where users can define custom data shapes via JSON), we cannot rely solely on Postgres schema definitions. Zod ensures that all data entering the local TinyBase instance and subsequently syncing to the authoritative server matches strict, type-safe run-time contracts, preventing sync corruption.
+
+### Simulation and Scene Architecture
+
+**Decision:** Deterministic `game_core` plus renderer-agnostic `scene_core`
+**Rationale:** The platform must support thousands of encounter simulations, offline turn decisions, 2D/isometric/3D tactical projections, shared-display presentation, and future native VR clients. A small deterministic `game_core` keeps rules processing fast and portable, while a separate `scene_core` describes cameras, geometry, lighting, fog, and visual compatibility without turning renderer objects into the source of truth.
 
 ### Authentication & Security
 
@@ -125,31 +134,225 @@ Standard Expo file-based routing (`expo-router`) or standard App entry point, wi
 ### API & Communication Patterns
 
 **Decision:** GraphQL Subscriptions via SyncFacade
-**Rationale:** The TinyBase synchronizer will communicate with the Nhost Hasura endpoint via GraphQL. Similar to the Auth decision, this will be strictly hidden behind a `SyncProvider` facade. The application will interact with the local TinyBase store synchronously; the `SyncProvider` handles the background resolution and GraphQL mutations without leaking network layer logic into the game domain.
+**Rationale:** The TinyBase synchronizer will communicate with the Nhost Hasura endpoint via GraphQL. Similar to the Auth decision, this will be strictly hidden behind a `SyncProvider` facade. The application will interact with the local TinyBase store synchronously; the `SyncProvider` handles the background resolution and GraphQL mutations without leaking network layer logic into the game domain. This same facade boundary preserves room for future LAN/local-room transport adapters without rewriting feature-level gameplay logic.
+
+### Rendering and Display Architecture
+
+**Decision:** Path A web-capable 3D-first tactical renderer
+**Rationale:** Tactical scenes, shared TV displays, desktop web play, and future VR all benefit from a Three.js-compatible rendering ecosystem. The battlemap/display subsystem will therefore be treated as a specialized rendering product with shared scene contracts, while the broader application shell remains Expo/React Native-first for notifications, accessibility, account flows, and offline shell behavior.
 
 ### Frontend Architecture
 
-**Decision:** Feature-Sliced Design (FSD) with a Global "Shared" UI Layer
-**Rationale:** To support shipping the "Character Builder" completely independent of the "Asynchronous VTT" features, the monorepo will be structured by feature domain (e.g., `features/builder`, `features/combat`). However, to maintain high visual consistency and rapidly build complex interfaces, a robust `shared/ui` directory containing all generic, themed Gluestack UI components will sit beneath the feature slices, consumed universally.
+**Decision:** Feature-Sliced Design (FSD) with shared platform contracts and multiple client surfaces
+**Rationale:** To support shipping the "Character Builder," play clients, shared display surfaces, and future immersive clients independently, the product must separate shared contracts (`game_core`, `scene_core`, sync/content models) from surface-specific interaction shells. Within each client surface, Feature-Sliced Design remains the organizing principle, while `shared/ui` continues to provide generic themed components for non-renderer interfaces.
 
 ### Infrastructure & Deployment
 
-**Decision:** Vercel (Web) + Expo Application Services (Native)
-**Rationale:** The complex "Creator" desktop web app will deploy via Vercel for high-performance static delivery and seamless preview deployments. The iOS/Android native client applications will utilize EAS Build and Submit to manage certificates, continuous delivery distributions, and over-the-air (OTA) updates. This aligns optimally with the `test-orchestrator` and Playwright automated E2E pipelines.
+**Decision:** Vercel (Web play, creator, shared display) + Expo Application Services (Native mobile) + future native VR distribution
+**Rationale:** The desktop creator, desktop web play client, and shared-display web surfaces will deploy via Vercel for high-performance delivery and preview environments. The iOS/Android native client applications will utilize EAS Build and Submit to manage certificates, continuous delivery distributions, and over-the-air (OTA) updates. Future VR clients will consume the same shared contracts but ship through their native platform distribution path when that roadmap phase begins.
 
 ### Decision Impact Analysis
 
 **Implementation Sequence:**
 1. Scaffold Expo/Gluestack/Nativewind architecture (Starter Template).
-2. Implement global `shared/ui` component foundations.
-3. Build the abstract `AuthProvider` and `SyncProvider` facades.
-4. Implement TinyBase and the core Zod validation schemas.
-5. Wire the Nhost adapters into the Provider facades.
-6. Begin `features/builder` implementation.
+2. Establish `game_core` and `scene_core` contracts before feature-level battlemap work begins.
+3. Implement global `shared/ui` component foundations and storage abstractions for native/web offline support.
+4. Build the abstract `AuthProvider` and `SyncProvider` facades.
+5. Implement TinyBase-backed persistence, offline asset manifests, and the core Zod validation schemas.
+6. Wire the Nhost adapters into the Provider facades and preserve future LAN transport seams.
+7. Begin `features/builder`, play-client, and tactical-scene implementation.
 
 **Cross-Component Dependencies:**
 - The `SyncProvider` is highly dependent on the `AuthProvider` state to initiate authenticated GraphQL subscriptions to Nhost.
 - Every `feature/*` directory is strictly dependent on the Zod validation schemas to execute mutations against the local TinyBase ledger.
+- Tactical renderers, shared displays, and future immersive clients must consume `scene_core` and may not directly mutate `game_core`.
+- Offline asset availability depends on shared content manifests and storage adapters that work across native and web surfaces.
+
+## Application Boundary Model
+
+### Why These Boundaries Exist
+
+The product now spans multiple first-class surfaces with different interaction models, performance characteristics, and privacy needs. These boundaries exist to keep future sprint work from collapsing creator tooling, runtime play, rendering, synchronization, and immersive presentation into a single brittle code path.
+
+The separation is intentional for five reasons:
+
+1. **Creator authoring and runtime play solve different problems.**
+   The creator surface optimizes for dense desktop authoring, template composition, and schema binding. Runtime play surfaces optimize for turn resolution, tactical scene interaction, and player-safe presentation.
+
+2. **Canonical game rules must remain independent from rendering.**
+   Thousands of simulations, offline turn decisions, server reconciliation, and future AI workflows all require a deterministic rules model that does not depend on UI trees or renderer objects.
+
+3. **Scene presentation must remain independent from any single client shell.**
+   Tactical scenes must support mobile native, mobile web, desktop web, shared-display, and future VR clients without requiring pixel-perfect parity or separate gameplay implementations.
+
+4. **Offline behavior varies by platform even when the user experience is aligned.**
+   Native and web clients share offline-first expectations, but storage adapters, caching mechanics, and transport details differ enough that those responsibilities must stay abstracted.
+
+5. **Future LAN and VR support require preserved seams now.**
+   Even before those features ship, architecture must prevent sprint work from hardcoding cloud-only assumptions or screen-flat rendering assumptions into the product core.
+
+### Surface Responsibilities
+
+#### Creator Surface
+
+**Primary role:** Desktop-web-first authoring of system-agnostic sheet templates, bindings, and reusable layout primitives.
+
+**Owns:**
+- creator workspace shell
+- template layout metadata
+- component registry for sheet authoring
+- system-template selection and custom JSON binding
+- creator preview behavior for sheet consumption across device sizes
+
+**Does not own:**
+- tactical encounter rendering
+- battle-map scene state
+- shared-display presentation
+- immersive/VR presentation
+- multiplayer session transport
+
+#### Play Surfaces
+
+**Primary role:** Interactive campaign participation across native mobile, mobile web, and desktop web.
+
+**Owns:**
+- player-facing campaign flows
+- character usage during play
+- runtime action submission
+- runtime tactical-scene consumption
+- offline review and deferred turn decisions
+
+**Does not own:**
+- creator authoring workflows
+- marketplace administration
+- direct mutation of canonical renderer-independent contracts outside approved facades
+
+#### Shared Display Surface
+
+**Primary role:** Player-safe room presentation of runtime tactical scenes and shared audio context.
+
+**Owns:**
+- public display presentation
+- room-safe scene framing
+- display-specific camera/layout behavior
+
+**Does not own:**
+- private player controls
+- GM-only data exposure
+- creator authoring behavior
+- separate tactical rules logic
+
+#### Immersive Surface
+
+**Primary role:** Future native VR client for compatible tactical scenes.
+
+**Owns:**
+- immersive scene presentation
+- supported spatial camera modes
+- tabletop and character-perspective viewing for compatible encounters
+
+**Does not own:**
+- creator editing
+- a separate gameplay rules model
+- one-off scene data contracts that bypass shared runtime state
+
+### Shared Core Responsibilities
+
+#### `game_core`
+
+**Primary role:** Canonical deterministic rules and simulation state.
+
+**Owns:**
+- encounter state
+- action resolution
+- turn order
+- player/actor state
+- simulation inputs and outputs
+- authoritative rule-driven outcomes
+
+**Does not own:**
+- UI layout state
+- renderer object graphs
+- scene-specific camera presentation
+- platform shell concerns
+
+#### `scene_core`
+
+**Primary role:** Canonical renderer-agnostic presentation model for runtime tactical scenes.
+
+**Owns:**
+- scene geometry metadata
+- tactical presentation metadata
+- visibility/fog/light descriptors
+- compatible 2D/isometric/3D view information
+- scene compatibility for shared display and future immersive clients
+
+**Does not own:**
+- creator template layout authoring
+- game rule resolution
+- network transport logic
+- client-specific HUD chrome
+
+#### Sync, Storage, and Content Layers
+
+**Primary role:** Keep the product local-first, synchronized, and content-driven across surfaces.
+
+**Owns:**
+- offline persistence abstractions
+- sync queues and reconciliation workflows
+- content manifests and asset availability
+- account-linked cloud synchronization through provider facades
+
+**Does not own:**
+- creator workspace UX
+- tactical renderer behavior
+- direct business-rule mutation outside approved state flows
+
+### Allowed Dependency Directions
+
+- Creator stories may produce template metadata and schema-aligned content that later play surfaces consume.
+- Play surfaces may consume `game_core`, `scene_core`, sync abstractions, and shared presentation primitives.
+- Shared-display and immersive clients may consume `game_core`, `scene_core`, and selective shared UI primitives where privacy and presentation rules allow.
+- Automation, simulation, and AI layers may consume canonical rules/runtime data, but they must not depend on renderer objects or creator-only UI state.
+
+### Forbidden Couplings
+
+- Do not treat the creator layout canvas as an early tactical scene canvas.
+- Do not make renderer objects the source of truth for gameplay or synchronization.
+- Do not make shared-display presentation a variation of the creator desktop shell.
+- Do not force creator interaction models onto mobile/native play surfaces.
+- Do not allow tactical epics to redefine creator data contracts without updating the creator track explicitly.
+- Do not hardcode cloud-only transport assumptions into gameplay flows that must later support local-room compatibility seams.
+
+### Data Flow Across Layers
+
+1. **Creator authoring flow**
+   Creator stories define template metadata, bindings, and presentation intent for sheet consumption.
+
+2. **Shared content flow**
+   Validated creator output and platform-curated content become inputs to runtime-capable content models.
+
+3. **Runtime rules flow**
+   `game_core` resolves encounter state, actions, and simulation outcomes without depending on rendering.
+
+4. **Runtime scene flow**
+   `scene_core` expresses runtime tactical presentation derived from canonical runtime state and scene assets.
+
+5. **Client presentation flow**
+   Play, shared-display, and future immersive surfaces render or present the runtime scene according to their own responsibilities without rewriting gameplay rules.
+
+6. **Sync and offline flow**
+   Local-first persistence and sync adapters store, cache, replay, and reconcile state across native and web surfaces without blocking the active user experience.
+
+### Sprint Implementation Rules
+
+Future sprint work should follow these rules:
+
+- If a story seems to touch both creator authoring and runtime tactical behavior, stop and confirm whether the work belongs in shared contracts or in only one surface.
+- If a change seems to require a new shared abstraction, prefer shared contracts such as `game_core`, `scene_core`, sync/storage interfaces, or content manifests over ad hoc UI-level sharing.
+- If a story can be completed entirely inside one surface, keep it there and do not generalize prematurely.
+- If a runtime story needs data produced by the creator track, consume the creator output through validated content contracts rather than by importing creator UI code or creator-local state.
+- If a future feature mentions LAN, shared display, or VR, preserve the seam now but do not drag those responsibilities into unrelated earlier stories.
 
 ## Implementation Patterns & Consistency Rules
 
@@ -203,47 +406,50 @@ Standard Expo file-based routing (`expo-router`) or standard App entry point, wi
 ### Coherence Validation ✅
 
 **Decision Compatibility:**
-All major technology choices (Expo, NativeWind, Gluestack, TinyBase, Nhost, Zod, Zustand) are highly compatible. NativeWind and Gluestack are explicitly designed to work together in Expo. TinyBase's reactive model pairs perfectly with Zustand for UI state, and both can be synced externally to Nhost Postgres.
+All major technology choices (Expo, NativeWind, Gluestack, TinyBase-style offline storage, Nhost, Zod, Zustand, and a Three.js-compatible scene stack) are compatible when they are kept in their proper architectural lanes. NativeWind and Gluestack are explicitly designed to work together in Expo, while the tactical renderer remains isolated behind `scene_core` contracts rather than leaking renderer concerns into the app shell.
 
 **Pattern Consistency:**
-The mandated patterns strictly enforce the constraints of the technology stack. Implementing a structural facade (SyncProvider/AuthProvider) perfectly mitigates the risk of tightly coupling Nhost into the Expo generic UI, maintaining the desired "System-Agnostic" philosophy.
+The mandated patterns strictly enforce the constraints of the technology stack. Implementing structural facades (`SyncProvider`, `AuthProvider`, storage adapters, and scene adapters) mitigates the risk of tightly coupling Nhost, renderer details, or platform-specific transport logic into generic UI and domain code.
 
 **Structure Alignment:**
-Feature-Sliced Design (FSD) provides the clearest, most scalable boundary for decoupling the Phase 1 "Offline Character Builder" from the Phase 2 "Asynchronous VTT." It fully supports the implementation patterns.
+Feature-Sliced Design (FSD) plus explicit shared-core boundaries provides the clearest, most scalable model for decoupling the Phase 1 creator/tooling investment from the later asynchronous VTT, shared display, and immersive surfaces. It fully supports the implementation patterns.
 
 ### Requirements Coverage Validation ✅
 
 **Epic/Feature Coverage:**
-The architecture thoroughly supports the core epics (Sheet Builder, Asynchronous VTT, AI Narrator) by providing dedicated UI structures, offline-first persistence (TinyBase), and secure backend execution (Nhost Serverless Functions).
+The architecture thoroughly supports the core epics (Sheet Builder, Asynchronous VTT, Tactical Scenes, Shared Display, AI Narrator, and future immersive clients) by providing dedicated UI structures, offline-first persistence, shared simulation/scene contracts, and secure backend execution boundaries.
 
 **Functional Requirements Coverage:**
-The strict Zod validation requirement ensures FRs related to custom, user-generated JSON rule systems are handled safely without corrupting the authoritative server.
+The strict Zod validation requirement ensures FRs related to custom, user-generated JSON rule systems are handled safely without corrupting the authoritative server, while the `game_core`/`scene_core` split supports shared-display, offline-web, and future VR-oriented requirements without forking the domain model.
 
 **Non-Functional Requirements Coverage:**
-- Performance (30fps): Addressed strategically by deferring WebGL integration until the 2D UI foundation is proven and decoupling React state from the render loop.
+- Performance (30fps): Addressed by adopting a decoupled Three.js-compatible rendering subsystem from the start, preserving projection-mode compatibility while allowing graceful degradation on weaker devices.
 - Security (AI Billing): Addressed by strictly walling OpenRouter API calls behind Nhost Serverless functions in the `SyncProvider`.
 
 ### Implementation Readiness Validation ✅
 
 **Decision Completeness:**
-Critical foundational decisions (Data, Auth, API, Structure, Patterns) are locked with specific v-next library versions verified for stability. 
+Critical foundational decisions (Data, Auth, API, Structure, Simulation/Scene separation, Rendering, and Patterns) are locked with specific v-next library versions verified for stability. 
 
 **Structure Completeness:**
 The specific filesystem tree provides unambiguous guidance for AI agents regarding where to put routes, UI components, Zod schemas, tests, and configuration files.
 
 **Pattern Completeness:**
-Explicit anti-patterns (e.g., blocking UI for sync, camelCase Postgres mapping) have been documented to prevent the most common AI implementation errors.
+Explicit anti-patterns (e.g., blocking UI for sync, camelCase Postgres mapping, mutating game state from renderer objects) have been documented to prevent the most common AI implementation errors.
 
 ### Gap Analysis Results
 
 **Important Gaps (To be addressed during Epic Planning):**
 - **Conflict Resolution Algorithm:** While the architecture mandates "graceful async conflict resolution," the exact mathematical implementation (e.g., Lamport timestamps vs. Vector Clocks) within the TinyBase synchronizer is deferred to the VTT networking epic.
-- **WebGL Fallback Implementation:** The technical mechanics of dropping from Three.js to 2D Canvas on low-end Android hardware require specific component-level prototyping.
+- **Offline Web Storage Adapter:** The exact persistence adapter and asset prefetch policy for full offline web support require implementation-level validation.
+- **Room Session Transport:** Internet-backed play is defined first, but the future LAN/local-room mode still requires a specific transport and discovery design.
+- **Native VR Delivery Path:** The target VR runtime and its native distribution strategy require a later implementation decision once immersive work begins.
 
 ### Validation Issues Addressed
 
 - Re-aligned the codebase to use strict `snake_case` on the data boundaries to prevent AI agents from generating flawed frontend-to-backend data mapping layers, a common point of failure.
 - Mandated optimistic UI updates to ensure the Offline-First NFR is not violated by standard web-development "loading spinner" patterns.
+- Separated canonical simulation and scene models so tactical rendering, shared displays, and future immersive clients can evolve without rewriting the game rules core.
 
 ### Architecture Completeness Checklist
 
@@ -275,16 +481,17 @@ Explicit anti-patterns (e.g., blocking UI for sync, camelCase Postgres mapping) 
 
 **Overall Status:** READY FOR IMPLEMENTATION
 
-**Confidence Level:** High. The combination of established BaaS (Nhost) with local-first tooling (TinyBase) wrapped in an accessible UI framework (Gluestack/Expo) directly targets the core risks of the product.
+**Confidence Level:** High. The combination of established BaaS (Nhost), local-first tooling, a shared simulation/scene model, and an explicit multi-surface client strategy directly targets the core risks of the product.
 
 **Key Strengths:**
 - Strict decoupling of domain logic from network sync.
 - "Offline-first" built into the lowest levels of state management.
 - Heavy focus on type safety and schema validation for user-generated content.
+- Tactical scenes, shared display, and future immersive clients are now accounted for without forcing pixel-perfect parity across surfaces.
 
 **Areas for Future Enhancement:**
-- Exploration of specialized conflict-free replicated data types (CRDTs) for complex VTT battlemap state.
-- Deep performance profiling of the Gluestack/Nativewind v4 engine on low-end Android hardware.
+- Exploration of specialized conflict-free replicated data types (CRDTs) for complex VTT battlemap state and future LAN modes.
+- Deep performance profiling of the tactical renderer across low-end Android hardware, mobile web browsers, and shared-display scenarios.
 
 ### Implementation Handoff
 
@@ -295,4 +502,4 @@ Explicit anti-patterns (e.g., blocking UI for sync, camelCase Postgres mapping) 
 - Refer to this document for all architectural questions.
 
 **First Implementation Priority:**
-Initialize the Expo project using the Gluestack v4 Nativewind template, and scaffold the foundational `shared/ui` and `shared/providers` boundaries.
+Initialize the Expo project using the Gluestack v4 Nativewind template, then scaffold the foundational `shared/ui`, `shared/providers`, `game_core`, and `scene_core` boundaries before feature-level tactical rendering begins.
