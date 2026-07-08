@@ -6,19 +6,16 @@ import { SyncProvider, useSync } from './sync-provider';
 // Mock tinybase to avoid real store initialization complexity in tests
 jest.mock('tinybase/ui-react', () => ({
     Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    useCreateStore: jest.fn(() => ({})),
-}));
-
-jest.mock('tinybase', () => ({
-    createStore: jest.fn(() => ({})),
+    useCreateStore: jest.fn((factory: () => unknown) => factory()),
 }));
 
 function SyncConsumer() {
-    const { isSyncing, lastSyncTime, triggerManualSync } = useSync();
+    const { isSyncing, lastSyncTime, lastPersistenceError, triggerManualSync } = useSync();
     return (
         <>
             <Text testID="isSyncing">{String(isSyncing)}</Text>
             <Text testID="lastSyncTime">{lastSyncTime === null ? 'null' : String(lastSyncTime)}</Text>
+            <Text testID="lastPersistenceError">{lastPersistenceError ?? 'null'}</Text>
             <Text testID="trigger" onPress={triggerManualSync}>trigger</Text>
         </>
     );
@@ -45,6 +42,7 @@ describe('SyncProvider', () => {
 
         expect(getByTestId('isSyncing').props.children).toBe('false');
         expect(getByTestId('lastSyncTime').props.children).toBe('null');
+        expect(getByTestId('lastPersistenceError').props.children).toBe('null');
     });
 
     it('triggerManualSync sets isSyncing to true then resets', async () => {

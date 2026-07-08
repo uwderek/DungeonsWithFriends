@@ -9,7 +9,7 @@ DungeonsWithFriends is a local-first, asynchronous tabletop role-playing platfor
 
 ## Current Direction
 
-The March 2026 planning artifacts are no longer fully authoritative. They are useful product background, but their implementation sequencing and provider assumptions must be repaired before new development stories are executed.
+The March 2026 planning artifacts have been repaired into a local-first baseline. Older provider assumptions remain useful background only when they do not conflict with the current roadmap and ADR-0059.
 
 Current binding constraints:
 
@@ -29,7 +29,7 @@ Current binding constraints:
 ## Repository Shape
 
 - `DungeonsWithFriends/` contains the current Expo/React Native app and remains the primary UI surface.
-- `_bmad-output/planning-artifacts/` contains PRD, UX, architecture, epics, readiness reports, and new course-correction artifacts.
+- `_bmad-output/planning-artifacts/` contains the repaired PRD, UX, architecture, epics, readiness reports, and course-correction artifacts.
 - `_bmad-output/implementation-artifacts/` contains sprint status and prepared stories.
 - `docs/archive/` contains older product/roadmap/architecture background.
 - `docs/decisions/` contains imported ADRs plus DungeonsWithFriends-specific ADRs added during the 2026-07-07 re-evaluation.
@@ -41,7 +41,7 @@ The implementation currently includes:
 
 - Login-free local app entry.
 - Dashboard, character, campaign, friends, and story-card UI slices.
-- Shared UI atoms, navigation, theme provider, and local TinyBase sync provider.
+- Shared UI atoms, navigation, theme provider, local TinyBase sync provider, and local store persistence/export seams.
 - Creator tooling with component schemas, component store, component editor/list views, and Story 1.1 workspace shell files.
 - Co-located tests for most implemented files.
 
@@ -62,10 +62,8 @@ This implementation is useful product evidence. The Expo/Gluestack/Tailwind/Tiny
 
 Before the next development story:
 
-1. Read `_bmad-output/planning-artifacts/sprint-change-proposal-2026-07-07.md`.
-2. Read `_bmad-output/planning-artifacts/architecture-realignment-2026-07-07.md`.
-3. Read `docs/decisions/ADR-0059-dwf-platform-baseline-typescript-tauri-cloudflare-workos.md`.
-4. Read relevant cleaned ADRs in `docs/decisions/`; each file carries its own DWF application block.
-5. Read `docs/roadmap/index.md`.
-6. Read `_bmad-output/planning-artifacts/documentation-repair-plan-2026-07-07.md`.
-7. Regenerate or update PRD, UX, architecture, epics, and sprint stories against the accepted course correction.
+1. Read `docs/decisions/ADR-0059-dwf-platform-baseline-typescript-tauri-cloudflare-workos.md`.
+2. Read `_bmad-output/planning-artifacts/prd.md`, `architecture.md`, `ux-design-specification.md`, and `epics.md`.
+3. Read `docs/data/local-store-contracts.md`, `docs/data/template-binding-contracts.md`, and `docs/data/export-import-format.md`.
+4. Read `_bmad-output/implementation-artifacts/sprint-status.yaml`.
+5. Start with `_bmad-output/implementation-artifacts/1-2-system-template-selection-and-custom-json-binding.md`.

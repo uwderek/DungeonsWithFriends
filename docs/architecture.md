@@ -15,7 +15,7 @@ The app under `DungeonsWithFriends/` is the primary Expo/React Native UI app wit
 - `src/features/character` owns character library UI.
 - `src/features/creator` owns creator tooling, component schemas, TinyBase-backed component storage, and the Story 1.1 workspace shell.
 - `src/features/campaign`, `src/features/friends`, and `src/features/story` contain early UI slices.
-- `src/shared` contains the local TinyBase sync provider, theme, navigation, UI atoms, and Gluestack provider scaffolding.
+- `src/shared` contains the local TinyBase sync provider, local store persistence/export seams, theme, navigation, UI atoms, and Gluestack provider scaffolding.
 
 ## Superseded Assumptions
 

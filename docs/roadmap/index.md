@@ -14,9 +14,9 @@ This file owns feature priority and sequencing. The lane files describe scope bo
 
 | Priority | Feature | Lane | Status | Notes |
 | --- | --- | --- | --- | --- |
-| P0 | Documentation repair and BMAD rebaseline | Now | Open | Repair PRD, architecture, UX, epics, story templates, and sprint status before the next implementation story. |
-| P1 | Login-free local app flow | Now | Open | The app must open into useful local functionality without account creation, hosted sync, or WorkOS. |
-| P2 | TinyBase local data foundation | Now | Open | Define local stores, migrations, export/import, and test coverage for creator and playable-sheet data. |
+| P0 | Documentation repair and BMAD rebaseline | Now | Done | PRD, architecture, UX, epics, story templates, and sprint status now reflect the local-first baseline. |
+| P1 | Login-free local app flow | Now | Done | The app opens into useful local functionality without account creation, hosted sync, or WorkOS. |
+| P2 | TinyBase local data foundation | Now | In Progress | Define local stores, migrations, export/import, and test coverage for creator and playable-sheet data. |
 | P3 | Creator workspace continuation | Now | Open | Continue the Expo creator shell from Story 1.1 after doc repair confirms the local-first target. |
 | P4 | System template and custom JSON binding | Now | Open | Bind visible components to structured system/template JSON without hardcoded game-system assumptions. |
 | P5 | Local playable sheet runtime | Next | Open | Use TinyBase-backed local character data and headless rules/dice contracts before server sync. |

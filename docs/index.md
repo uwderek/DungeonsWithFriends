@@ -5,11 +5,20 @@ Last updated: 2026-07-07
 ## Current Authority
 
 - [Project Context](./project-context.md)
+- [Product Requirements](../_bmad-output/planning-artifacts/prd.md)
 - [Current Codebase Architecture](./architecture.md)
+- [Technical Architecture](../_bmad-output/planning-artifacts/architecture.md)
+- [UX Design Specification](../_bmad-output/planning-artifacts/ux-design-specification.md)
+- [Epics and Stories](../_bmad-output/planning-artifacts/epics.md)
+- [Sprint Status](../_bmad-output/implementation-artifacts/sprint-status.yaml)
 - [Roadmap Priority Index](./roadmap/index.md)
 - [Roadmap Now](./roadmap/now.md)
 - [Roadmap Next](./roadmap/next.md)
 - [Roadmap Later](./roadmap/later.md)
+- [Testing Strategy](./testing/strategy.md)
+- [Local Store Contracts](./data/local-store-contracts.md)
+- [Template Binding Contracts](./data/template-binding-contracts.md)
+- [Export and Import Format](./data/export-import-format.md)
 - [DWF Platform Baseline ADR](./decisions/ADR-0059-dwf-platform-baseline-typescript-tauri-cloudflare-workos.md)
 - Cleaned ADR corpus: individual files in `docs/decisions/` carry DWF disposition and roadmap lane metadata.
 - [Sprint Change Proposal](../_bmad-output/planning-artifacts/sprint-change-proposal-2026-07-07.md)
@@ -18,13 +27,7 @@ Last updated: 2026-07-07
 
 ## Legacy Planning Background
 
-These files remain useful as product intent, but their implementation sequencing and provider assumptions are superseded by the 2026-07-07 correction until they are fully repaired:
-
-- [PRD](../_bmad-output/planning-artifacts/prd.md)
-- [Architecture](../_bmad-output/planning-artifacts/architecture.md)
-- [UX Design Specification](../_bmad-output/planning-artifacts/ux-design-specification.md)
-- [Epics](../_bmad-output/planning-artifacts/epics.md)
-- [Sprint Status](../_bmad-output/implementation-artifacts/sprint-status.yaml)
+The repaired active planning artifacts above supersede the March 2026 provider assumptions. Older source material remains in archive/background files only.
 
 ## Existing Background
 
