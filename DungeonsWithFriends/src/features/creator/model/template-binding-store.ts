@@ -1,6 +1,6 @@
 import { Store } from 'tinybase';
 import { TABLES } from '@/shared/store/local-store';
-import { ComponentDefinition } from './component-schemas';
+import { ComponentDefinition, componentDefinitionSchema } from './component-schemas';
 import { SystemTemplate } from './system-template-schema';
 import { TemplateBinding, findStaleBindingIds, templateBindingSchema } from './template-binding-schema';
 import { tryParseSystemTemplateRow } from './system-template-store';
@@ -27,25 +27,62 @@ type TemplateBindingRow = {
     updated_at?: string;
 };
 
-const parseBindingRow = (bindingId: string, row: TemplateBindingRow): TemplateBinding => {
-    const transform = typeof row.transform === 'string' && row.transform.length > 0
-        ? JSON.parse(row.transform)
-        : undefined;
-
-    return templateBindingSchema.parse({
-        binding_id: bindingId,
-        component_id: row.component_id,
-        system_template_id: row.system_template_id,
-        field_id: row.field_id,
-        transform,
-        created_at: row.created_at,
-        updated_at: row.updated_at,
-    });
+type ComponentDefinitionRow = Partial<ComponentDefinition> & {
+    validation_rules?: unknown;
 };
+
+const tryParseComponentDefinitionRow = (
+    componentId: string,
+    row: ComponentDefinitionRow
+): ComponentDefinition | null => {
+    try {
+        const validationRules = typeof row.validation_rules === 'string'
+            ? JSON.parse(row.validation_rules)
+            : row.validation_rules;
+
+        return componentDefinitionSchema.parse({
+            ...row,
+            component_id: componentId,
+            validation_rules: validationRules,
+        });
+    } catch {
+        return null;
+    }
+};
+
+const tryParseBindingRow = (bindingId: string, row: TemplateBindingRow): TemplateBinding | null => {
+    try {
+        const transform = typeof row.transform === 'string' && row.transform.length > 0
+            ? JSON.parse(row.transform)
+            : undefined;
+
+        return templateBindingSchema.parse({
+            binding_id: bindingId,
+            component_id: row.component_id,
+            system_template_id: row.system_template_id,
+            field_id: row.field_id,
+            transform,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+        });
+    } catch {
+        return null;
+    }
+};
+
+const serializeBinding = (binding: TemplateBinding) => ({
+    component_id: binding.component_id,
+    system_template_id: binding.system_template_id,
+    field_id: binding.field_id,
+    transform: binding.transform ? JSON.stringify(binding.transform) : '',
+    created_at: binding.created_at,
+    updated_at: binding.updated_at,
+});
 
 export const getTemplateBindings = (store: Store): TemplateBinding[] => (
     store.getRowIds(TABLES.templateBindings)
-        .map((id) => parseBindingRow(id, store.getRow(TABLES.templateBindings, id) as TemplateBindingRow))
+        .map((id) => tryParseBindingRow(id, store.getRow(TABLES.templateBindings, id) as TemplateBindingRow))
+        .filter((binding): binding is TemplateBinding => binding !== null)
 );
 
 export const getBindingsForTemplate = (
@@ -64,9 +101,14 @@ export const createTemplateBinding = (
         transform?: TemplateBinding['transform'];
     }
 ): TemplateBinding => {
-    const componentRow = store.getRow(TABLES.componentDefinitions, input.component_id) as Partial<ComponentDefinition>;
+    const componentRow = store.getRow(TABLES.componentDefinitions, input.component_id) as ComponentDefinitionRow;
     if (!componentRow || Object.keys(componentRow).length === 0) {
         throw new TemplateBindingError('missing_component', `Component ${input.component_id} was not found.`);
+    }
+
+    const component = tryParseComponentDefinitionRow(input.component_id, componentRow);
+    if (!component) {
+        throw new TemplateBindingError('missing_component', `Component ${input.component_id} is invalid.`);
     }
 
     const templateRow = store.getRow(TABLES.systemTemplates, input.system_template_id);
@@ -107,14 +149,7 @@ export const createTemplateBinding = (
         throw new TemplateBindingError('invalid_binding', 'Template binding is invalid.', parsed.error);
     }
 
-    store.setRow(TABLES.templateBindings, parsed.data.binding_id, {
-        component_id: parsed.data.component_id,
-        system_template_id: parsed.data.system_template_id,
-        field_id: parsed.data.field_id,
-        transform: parsed.data.transform ? JSON.stringify(parsed.data.transform) : '',
-        created_at: parsed.data.created_at,
-        updated_at: parsed.data.updated_at,
-    });
+    store.setRow(TABLES.templateBindings, parsed.data.binding_id, serializeBinding(parsed.data));
 
     return parsed.data;
 };

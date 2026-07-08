@@ -76,7 +76,7 @@ context:
 - `npx tsc --noEmit` from `DungeonsWithFriends/` -- passed.
 - Legacy provider/auth-screen `rg` scan across active code/story docs -- passed with no matches.
 - `git diff --check` -- passed; Git printed Windows CRLF normalization warnings only.
-- Sprint status duplicate-key check -- passed with 28 unique status keys.
+- Sprint status duplicate-key check -- passed with 26 unique status keys.
 - Test Orchestrator MCP lookup -- unavailable in this session; direct Jest/Playwright commands were not run because package scripts intentionally block them.
 
 ## Review Notes
@@ -84,6 +84,15 @@ context:
 - Blind Hunter and Edge Case Hunter review passes were run in-process because subagent tooling is present but disallows spawning unless the user explicitly asks for subagents.
 - Patch finding fixed: malformed selected system-template rows imported through the generic snapshot path could throw during render; selected template reads now safe-parse and return empty state on invalid rows.
 - Patch finding fixed: repeated binding on the same template field could accumulate duplicate binding rows; binding creation now updates the existing field binding idempotently.
+- Patch finding fixed during final Epic 1 review: malformed persisted `template_bindings` rows could throw while rendering binding summaries; binding reads now safe-parse and skip invalid imported rows.
+- Patch finding fixed during final Epic 1 review: binding creation only checked for the presence of a component row; it now validates the component row against `componentDefinitionSchema` before writing.
+
+## Review Acceptance
+
+- Stories 1.1, 1.2, 1.3, and 1.4 were accepted on 2026-07-08 after the final review patch.
+- Epic 1 was marked done in `sprint-status.yaml`.
+- Epic 1 retrospective was completed and saved as `epic-1-retro-2026-07-08.md`.
+- Remaining risk is verification tooling, not accepted behavior: Test Orchestrator MCP was unavailable, so direct Jest/Playwright verification remains deferred until that tool path is restored.
 
 ## Suggested Review Order
 

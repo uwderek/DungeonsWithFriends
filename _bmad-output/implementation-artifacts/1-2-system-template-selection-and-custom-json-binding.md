@@ -1,6 +1,6 @@
 # Story 1.2: System Template Selection And Custom JSON Binding
 
-Status: review
+Status: done
 
 ## Story
 
@@ -33,3 +33,9 @@ so that creator components can bind to structured local metadata without hardcod
 - Added `system-template-store.ts` with built-in Fantasy d20 selection, custom JSON import, TinyBase persistence, selected-template marking, and typed recoverable import errors.
 - Extended the creator workspace empty state with built-in selection and custom JSON import controls.
 - Covered valid import, malformed JSON, invalid schema, and non-mutation on failure in co-located tests.
+
+## Review Closeout
+
+- Accepted on 2026-07-08 as part of the Epic 1 implementation review.
+- Review confirmed selected-template reads are safe against malformed imported rows and preserve the local-first, login-free boundary.
+- Final Epic 1 review verification used TypeScript, architecture-regression scans, and diff hygiene checks; Test Orchestrator remained unavailable in this session.

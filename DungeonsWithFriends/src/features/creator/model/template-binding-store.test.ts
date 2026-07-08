@@ -40,6 +40,25 @@ describe('template-binding-store', () => {
         expect(store.getRowIds(TABLES.templateBindings)).toEqual([]);
     });
 
+    it('rejects invalid component rows without writing a binding', () => {
+        const store = createStore();
+        saveSystemTemplate(store, FANTASY_D20_TEMPLATE, { select: true });
+        store.setRow(TABLES.componentDefinitions, 'bad-component', {
+            component_name: 'bad_component',
+            display_label: '',
+            data_type: 'number',
+            validation_rules: '{bad',
+        });
+
+        expect(() => createTemplateBinding(store, {
+            component_id: 'bad-component',
+            system_template_id: FANTASY_D20_TEMPLATE.system_template_id,
+            field_id: 'strength',
+        })).toThrow(TemplateBindingError);
+
+        expect(store.getRowIds(TABLES.templateBindings)).toEqual([]);
+    });
+
     it('reports stale binding ids without deleting user work', () => {
         const store = createStore();
         saveSystemTemplate(store, FANTASY_D20_TEMPLATE, { select: true });
@@ -79,6 +98,20 @@ describe('template-binding-store', () => {
         expect(secondBinding.binding_id).toBe(firstBinding.binding_id);
         expect(store.getRowIds(TABLES.templateBindings)).toEqual([firstBinding.binding_id]);
         expect(store.getCell(TABLES.templateBindings, firstBinding.binding_id, 'component_id')).toBe(secondComponentId);
+    });
+
+    it('ignores malformed persisted binding rows instead of throwing', () => {
+        const store = createStore();
+        store.setRow(TABLES.templateBindings, 'bad-binding', {
+            component_id: 'component-1',
+            system_template_id: FANTASY_D20_TEMPLATE.system_template_id,
+            field_id: 'strength',
+            transform: '{bad',
+            created_at: '2026-07-08T00:00:00.000Z',
+            updated_at: '2026-07-08T00:00:00.000Z',
+        });
+
+        expect(getBindingsForTemplate(store, FANTASY_D20_TEMPLATE.system_template_id)).toEqual([]);
     });
 
     it('includes bindings in the versioned local export envelope', () => {
