@@ -49,10 +49,10 @@ development_status:
   1-4-local-save-load-preview-export-import: done
   epic-1-retrospective: done
 
-  epic-2: backlog
-  2-1-local-character-library-and-manual-export: backlog
-  2-2-playable-sheet-data-binding: backlog
-  2-3-native-dice-notation-and-local-roll-resolution: backlog
+  epic-2: done
+  2-1-local-character-library-and-manual-export: done
+  2-2-playable-sheet-data-binding: done
+  2-3-native-dice-notation-and-local-roll-resolution: done
   epic-2-retrospective: optional
 
   epic-3: backlog

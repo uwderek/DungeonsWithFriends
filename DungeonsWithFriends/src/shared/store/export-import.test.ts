@@ -67,14 +67,31 @@ const expectInvalidDomainData = (action: () => void): void => {
 describe('export-import', () => {
     it('exports and imports a versioned local envelope', () => {
         const store = createStore();
-        store.setRow(TABLES.characterSheets, 'sheet-1', { character_name: 'Ada' });
+        store.setRow(TABLES.systemTemplates, systemTemplateId, {
+            system_name: 'Fantasy d20',
+            system_version: '1.0.0',
+            field_definitions: JSON.stringify([
+                { field_id: 'strength', field_label: 'Strength', data_type: 'number' },
+            ]),
+            created_at: exportedAt,
+            updated_at: exportedAt,
+            is_selected: true,
+        });
+        store.setRow(TABLES.characterSheets, '44444444-4444-4444-8444-444444444444', {
+            character_name: 'Ada',
+            system_template_id: systemTemplateId,
+            template_version: '1.0.0',
+            field_values: JSON.stringify({ strength: 10 }),
+            created_at: exportedAt,
+            updated_at: exportedAt,
+        });
 
         const exported = exportStoreToJson(store);
         const target = createStore();
         importStoreFromJson(target, exported);
 
         expect(JSON.parse(exported).schema_version).toBe(1);
-        expect(target.getCell(TABLES.characterSheets, 'sheet-1', 'character_name')).toBe('Ada');
+        expect(target.getCell(TABLES.characterSheets, '44444444-4444-4444-8444-444444444444', 'character_name')).toBe('Ada');
     });
 
     it('does not mutate the target store on invalid import', () => {
@@ -97,7 +114,7 @@ describe('export-import', () => {
     it('rejects malformed serialized domain rows without mutating the target store', () => {
         const target = createStore();
         target.setRow(TABLES.characterSheets, 'sheet-1', { character_name: 'Ada' });
-        const snapshot = createCreatorSnapshot();
+        const snapshot = createCreatorSnapshot() as any;
         snapshot.tables[TABLES.systemTemplates][systemTemplateId].field_definitions = '{bad';
 
         expectInvalidDomainData(() => importStoreFromJson(target, JSON.stringify(snapshot)));
@@ -109,12 +126,102 @@ describe('export-import', () => {
     it('rejects bindings that reference missing template fields before mutating the target store', () => {
         const target = createStore();
         target.setRow(TABLES.characterSheets, 'sheet-1', { character_name: 'Ada' });
-        const snapshot = createCreatorSnapshot();
+        const snapshot = createCreatorSnapshot() as any;
         snapshot.tables[TABLES.templateBindings][bindingId].field_id = 'dexterity';
 
         expectInvalidDomainData(() => importStoreFromJson(target, JSON.stringify(snapshot)));
 
         expect(target.getCell(TABLES.characterSheets, 'sheet-1', 'character_name')).toBe('Ada');
         expect(target.getRowIds(TABLES.templateBindings)).toEqual([]);
+    });
+
+    it('rejects malformed character sheet rows before mutating the target store', () => {
+        const target = createStore();
+        target.setRow(TABLES.characterSheets, 'existing-sheet', { character_name: 'Ada' });
+        const snapshot = {
+            ...createCreatorSnapshot(),
+            tables: {
+                ...createCreatorSnapshot().tables,
+                [TABLES.characterSheets]: {
+                    '44444444-4444-4444-8444-444444444444': {
+                        character_name: 'Ada',
+                        system_template_id: systemTemplateId,
+                        template_version: '1.0.0',
+                        field_values: '{bad',
+                        created_at: exportedAt,
+                        updated_at: exportedAt,
+                    },
+                },
+            },
+        };
+
+        expectInvalidDomainData(() => importStoreFromJson(target, JSON.stringify(snapshot)));
+
+        expect(target.getCell(TABLES.characterSheets, 'existing-sheet', 'character_name')).toBe('Ada');
+        expect(target.getRowIds(TABLES.systemTemplates)).toEqual([]);
+    });
+
+    it('rejects malformed dice roll rows before mutating the target store', () => {
+        const target = createStore();
+        target.setRow(TABLES.characterSheets, 'existing-sheet', { character_name: 'Ada' });
+        const characterSheetId = '44444444-4444-4444-8444-444444444444';
+        const rollId = '55555555-5555-4555-8555-555555555555';
+        const snapshot = createCreatorSnapshot() as any;
+        snapshot.tables[TABLES.characterSheets] = {
+            [characterSheetId]: {
+                character_name: 'Ada',
+                system_template_id: systemTemplateId,
+                template_version: '1.0.0',
+                field_values: JSON.stringify({ strength: 10 }),
+                created_at: exportedAt,
+                updated_at: exportedAt,
+            },
+        };
+        snapshot.tables[TABLES.diceRolls] = {
+            [rollId]: {
+                character_sheet_id: characterSheetId,
+                notation: '1d20',
+                total: 20,
+                detail: '{bad',
+                rolled_at: exportedAt,
+            },
+        };
+
+        expectInvalidDomainData(() => importStoreFromJson(target, JSON.stringify(snapshot)));
+
+        expect(target.getCell(TABLES.characterSheets, 'existing-sheet', 'character_name')).toBe('Ada');
+        expect(target.getRowIds(TABLES.diceRolls)).toEqual([]);
+    });
+
+    it('rejects internally inconsistent dice roll rows before mutating the target store', () => {
+        const target = createStore();
+        target.setRow(TABLES.characterSheets, 'existing-sheet', { character_name: 'Ada' });
+        const characterSheetId = '44444444-4444-4444-8444-444444444444';
+        const rollId = '55555555-5555-4555-8555-555555555555';
+        const snapshot = createCreatorSnapshot() as any;
+        snapshot.tables[TABLES.characterSheets] = {
+            [characterSheetId]: {
+                character_name: 'Ada',
+                system_template_id: systemTemplateId,
+                template_version: '1.0.0',
+                field_values: JSON.stringify({ strength: 10 }),
+                created_at: exportedAt,
+                updated_at: exportedAt,
+            },
+        };
+        snapshot.tables[TABLES.diceRolls] = {
+            [rollId]: {
+                character_sheet_id: characterSheetId,
+                notation: '2d6+3',
+                total: 999,
+                detail: JSON.stringify({ rolls: [1, 1], modifier: 3 }),
+                rolled_at: exportedAt,
+            },
+        };
+
+        expectInvalidDomainData(() => importStoreFromJson(target, JSON.stringify(snapshot)));
+
+        expect(target.getCell(TABLES.characterSheets, 'existing-sheet', 'character_name')).toBe('Ada');
+        expect(target.getRowIds(TABLES.diceRolls)).toEqual([]);
     });
 });

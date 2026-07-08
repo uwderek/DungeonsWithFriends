@@ -6,7 +6,25 @@ describe('persistence', () => {
     it('saves and reloads a local snapshot', () => {
         const storage = createMemoryStorage();
         const store = createStore();
-        store.setRow(TABLES.characterSheets, 'sheet-1', { character_name: 'Ada' });
+        const systemTemplateId = '11111111-1111-4111-8111-111111111111';
+        const characterSheetId = '44444444-4444-4444-8444-444444444444';
+        store.setRow(TABLES.systemTemplates, systemTemplateId, {
+            system_name: 'Fantasy d20',
+            system_version: '1.0.0',
+            field_definitions: JSON.stringify([
+                { field_id: 'strength', field_label: 'Strength', data_type: 'number' },
+            ]),
+            created_at: '2026-07-08T00:00:00.000Z',
+            updated_at: '2026-07-08T00:00:00.000Z',
+        });
+        store.setRow(TABLES.characterSheets, characterSheetId, {
+            character_name: 'Ada',
+            system_template_id: systemTemplateId,
+            template_version: '1.0.0',
+            field_values: JSON.stringify({ strength: 10 }),
+            created_at: '2026-07-08T00:00:00.000Z',
+            updated_at: '2026-07-08T00:00:00.000Z',
+        });
 
         saveStoreToPersistence(store, storage);
 
@@ -14,7 +32,7 @@ describe('persistence', () => {
         const result = hydrateStoreFromPersistence(target, storage);
 
         expect(result.error).toBeNull();
-        expect(target.getCell(TABLES.characterSheets, 'sheet-1', 'character_name')).toBe('Ada');
+        expect(target.getCell(TABLES.characterSheets, characterSheetId, 'character_name')).toBe('Ada');
     });
 
     it('recovers from corrupt local data', () => {

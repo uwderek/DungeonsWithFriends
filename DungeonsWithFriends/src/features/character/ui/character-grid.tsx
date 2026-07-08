@@ -1,11 +1,19 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, useWindowDimensions } from 'react-native';
-import { Shield, Heart } from 'lucide-react-native';
+import { View, Text } from 'react-native';
 import { CharacterCard } from './character-card';
-import type { Character } from '@/features/dashboard/ui/mock-data';
+
+export interface CharacterGridItem {
+  id: string;
+  name: string;
+  race?: string;
+  class?: string;
+  level?: number;
+  subtitle?: string;
+  detail?: string;
+}
 
 interface CharacterGridProps {
-  characters: Character[];
+  characters: CharacterGridItem[];
   title?: string;
   onCharacterPress?: (id: string) => void;
 }
@@ -32,6 +40,8 @@ export const CharacterGrid: React.FC<CharacterGridProps> = ({ characters, title 
               race={item.race}
               charClass={item.class}
               level={item.level}
+              subtitle={item.subtitle}
+              detail={item.detail}
               onPress={() => {
                 if (onCharacterPress) {
                   onCharacterPress(item.id);

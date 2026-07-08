@@ -37,6 +37,7 @@ Local snapshots use this shape:
 - `system_templates`: local game-system metadata. Rows store `field_definitions` as JSON text and may mark the active creator system with `is_selected`.
 - `template_bindings`: mapping between creator components and system fields.
 - `character_sheets`: local playable sheet records.
+- `dice_rolls`: local roll records for character sheets. Rows store roll detail as JSON text.
 
 TinyBase omits empty tables from `getTables()`. An empty store or export therefore uses `"tables": {}` until rows are written; the table names above are the allowed contract, not required empty keys.
 

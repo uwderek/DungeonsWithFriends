@@ -14,10 +14,12 @@ describe('local-store', () => {
         store.setRow(TABLES.componentDefinitions, 'component-1', { ready: true });
         store.setRow(TABLES.systemTemplates, 'template-1', { ready: true });
         store.setRow(TABLES.templateBindings, 'binding-1', { ready: true });
+        store.setRow(TABLES.diceRolls, 'roll-1', { ready: true });
 
         expect(Object.keys(store.getTables()).sort()).toEqual([
             TABLES.characterSheets,
             TABLES.componentDefinitions,
+            TABLES.diceRolls,
             TABLES.systemTemplates,
             TABLES.templateBindings,
         ].sort());

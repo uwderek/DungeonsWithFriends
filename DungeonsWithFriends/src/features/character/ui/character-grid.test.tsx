@@ -18,6 +18,19 @@ describe('CharacterGrid', () => {
     expect(getByText('Thorin')).toBeTruthy();
   });
 
+  it('renders local character sheet summaries', () => {
+    const localCharacters = [
+      { id: 'sheet-1', name: 'Ada', subtitle: 'Fantasy d20', detail: '8 local fields' },
+    ];
+
+    const { getByText } = render(
+      <CharacterGrid title="Local Characters" characters={localCharacters} />
+    );
+
+    expect(getByText('Ada')).toBeTruthy();
+    expect(getByText('Fantasy d20')).toBeTruthy();
+  });
+
   it('calls onCharacterPress when a character is clicked', () => {
     const onCharacterPress = jest.fn();
     const { getByText } = render(

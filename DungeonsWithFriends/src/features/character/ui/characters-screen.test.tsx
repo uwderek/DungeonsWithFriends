@@ -2,6 +2,7 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { CharactersScreen } from './characters-screen';
 import { useWindowDimensions } from 'react-native';
+import { createDwfStore } from '@/shared/store/local-store';
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
   default: jest.fn().mockReturnValue({ width: 375, height: 812, scale: 2, fontScale: 1 }),
@@ -34,14 +35,15 @@ describe('CharactersScreen', () => {
   });
 
   it('renders correctly on desktop', () => {
-    const { getByText, queryByTestId } = render(<CharactersScreen viewportWidth={1024} />);
+    const { getByText, queryByTestId } = render(<CharactersScreen viewportWidth={1024} store={createDwfStore()} />);
     
     expect(getByText('All Characters')).toBeTruthy();
+    expect(getByText('No local characters yet')).toBeTruthy();
     expect(queryByTestId('hamburger')).toBeNull();
   });
 
   it('renders correctly on mobile and handles sidebar toggle', () => {
-    const { getByText, getByTestId } = render(<CharactersScreen viewportWidth={375} />);
+    const { getByText, getByTestId } = render(<CharactersScreen viewportWidth={375} store={createDwfStore()} />);
     
     expect(getByText('All Characters')).toBeTruthy();
     const hamburger = getByTestId('hamburger');
@@ -53,7 +55,7 @@ describe('CharactersScreen', () => {
   it('calls onSettingsPress when settings button is pressed', () => {
     const onSettingsPress = jest.fn();
     const { getByTestId } = render(
-      <CharactersScreen viewportWidth={1024} onSettingsPress={onSettingsPress} />
+      <CharactersScreen viewportWidth={1024} onSettingsPress={onSettingsPress} store={createDwfStore()} />
     );
     
     fireEvent.press(getByTestId('settings-button'));
@@ -62,7 +64,7 @@ describe('CharactersScreen', () => {
 
   it('falls back to console.log when onSettingsPress is not provided', () => {
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-    const { getByTestId } = render(<CharactersScreen viewportWidth={1024} />);
+    const { getByTestId } = render(<CharactersScreen viewportWidth={1024} store={createDwfStore()} />);
     
     fireEvent.press(getByTestId('settings-button'));
     expect(consoleSpy).toHaveBeenCalledWith('Settings clicked');
@@ -70,7 +72,7 @@ describe('CharactersScreen', () => {
   });
 
   it('calls onClose when sidebar onClose is triggered', () => {
-    const { getByTestId, queryByTestId } = render(<CharactersScreen viewportWidth={375} />);
+    const { getByTestId, queryByTestId } = render(<CharactersScreen viewportWidth={375} store={createDwfStore()} />);
     
     // Open sidebar
     fireEvent.press(getByTestId('hamburger'));
@@ -84,9 +86,37 @@ describe('CharactersScreen', () => {
 
   it('uses measured width when viewportWidth is not provided', () => {
     (useWindowDimensions as jest.Mock).mockReturnValue({ width: 500 });
-    const { getByTestId } = render(<CharactersScreen />);
+    const { getByTestId } = render(<CharactersScreen store={createDwfStore()} />);
     
     // In mobile (500 < 768), hamburger should be visible
     expect(getByTestId('hamburger')).toBeTruthy();
+  });
+
+  it('creates local characters instead of rendering dashboard mock characters', () => {
+    const store = createDwfStore();
+    const { getByTestId, getByText, queryByText } = render(
+      <CharactersScreen viewportWidth={1024} store={store} />
+    );
+
+    expect(queryByText('Kaelith Darkbane')).toBeNull();
+
+    fireEvent.press(getByTestId('create-character-button'));
+
+    expect(getByText('Local Hero 1')).toBeTruthy();
+    expect(getByText('Playable Sheet')).toBeTruthy();
+    expect(queryByText('No local characters yet')).toBeNull();
+  });
+
+  it('shows a manual export preview for local character data', () => {
+    const store = createDwfStore();
+    const { getByTestId } = render(
+      <CharactersScreen viewportWidth={1024} store={store} />
+    );
+
+    fireEvent.press(getByTestId('create-character-button'));
+    fireEvent.press(getByTestId('export-characters-button'));
+
+    expect(getByTestId('export-preview').props.children).toContain('character_sheets');
+    expect(getByTestId('export-preview').props.children).toContain('Local Hero 1');
   });
 });

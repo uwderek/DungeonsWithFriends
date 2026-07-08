@@ -1,5 +1,7 @@
 import { Tables } from 'tinybase';
 import { componentDefinitionSchema } from '../../features/creator/model/component-schemas';
+import { characterSheetSchema } from '../../features/character/model/character-sheet-schema';
+import { diceRollSchema } from '../../features/character/model/dice-roll-store';
 import { systemTemplateSchema, SystemTemplate } from '../../features/creator/model/system-template-schema';
 import { templateBindingSchema } from '../../features/creator/model/template-binding-schema';
 import { DwfStoreSnapshot, TABLES } from './local-store';
@@ -90,6 +92,35 @@ export const validateSnapshotDomainData = (snapshot: DwfStoreSnapshot): void => 
 
             if (!template.field_definitions.some((field) => field.field_id === binding.field_id)) {
                 throw new Error(`Binding ${bindingId} references missing field ${binding.field_id}.`);
+            }
+        });
+
+        const characterSheets = new Set<string>();
+        Object.entries(getTable(snapshot.tables, TABLES.characterSheets)).forEach(([characterSheetId, row]) => {
+            assertMatchingRowId(row, characterSheetId, 'character_sheet_id', TABLES.characterSheets);
+            const sheet = characterSheetSchema.parse({
+                ...row,
+                character_sheet_id: characterSheetId,
+                field_values: parseJsonCell(row.field_values),
+            });
+
+            if (!templates.has(sheet.system_template_id)) {
+                throw new Error(`Character sheet ${characterSheetId} references missing system template ${sheet.system_template_id}.`);
+            }
+
+            characterSheets.add(characterSheetId);
+        });
+
+        Object.entries(getTable(snapshot.tables, TABLES.diceRolls)).forEach(([rollId, row]) => {
+            assertMatchingRowId(row, rollId, 'roll_id', TABLES.diceRolls);
+            const roll = diceRollSchema.parse({
+                ...row,
+                roll_id: rollId,
+                detail: parseJsonCell(row.detail),
+            });
+
+            if (!characterSheets.has(roll.character_sheet_id)) {
+                throw new Error(`Dice roll ${rollId} references missing character sheet ${roll.character_sheet_id}.`);
             }
         });
     } catch (error) {

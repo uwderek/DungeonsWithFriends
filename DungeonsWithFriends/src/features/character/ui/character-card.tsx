@@ -4,13 +4,21 @@ import { BaseCard } from '@/shared/ui/atoms/base-card';
 
 interface CharacterCardProps {
     name: string;
-    race: string;
-    charClass: string;
-    level: number;
+    race?: string;
+    charClass?: string;
+    level?: number;
+    subtitle?: string;
+    detail?: string;
     onPress?: () => void;
 }
 
-export const CharacterCard: React.FC<CharacterCardProps> = ({ name, race, charClass, level, onPress }) => {
+export const CharacterCard: React.FC<CharacterCardProps> = ({ name, race, charClass, level, subtitle, detail, onPress }) => {
+    const summary = subtitle ?? (
+        level !== undefined && race && charClass
+            ? `Level ${level} ${race} ${charClass}`
+            : 'Local character'
+    );
+
     return (
         <BaseCard
             onPress={onPress}
@@ -27,8 +35,13 @@ export const CharacterCard: React.FC<CharacterCardProps> = ({ name, race, charCl
                     {name}
                 </Text>
                 <Text className="text-xs text-typography-secondary" numberOfLines={2}>
-                    Level {level} {race} {charClass}
+                    {summary}
                 </Text>
+                {detail && (
+                    <Text className="text-xs text-typography-secondary mt-1" numberOfLines={1}>
+                        {detail}
+                    </Text>
+                )}
             </View>
         </BaseCard>
     );

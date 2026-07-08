@@ -9,6 +9,7 @@ export const TABLES = {
     systemTemplates: 'system_templates',
     templateBindings: 'template_bindings',
     characterSheets: 'character_sheets',
+    diceRolls: 'dice_rolls',
 } as const;
 
 export type DwfStoreSnapshot = {
