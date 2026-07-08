@@ -2,11 +2,6 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { CharactersScreen } from './characters-screen';
 import { useWindowDimensions } from 'react-native';
-import { useAuth } from '@/shared/providers/auth-provider';
-
-jest.mock('@/shared/providers/auth-provider', () => ({
-  useAuth: jest.fn(),
-}));
 
 jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
   default: jest.fn().mockReturnValue({ width: 375, height: 812, scale: 2, fontScale: 1 }),
@@ -34,13 +29,8 @@ jest.mock('@/shared/ui/navigation/app-sidebar', () => {
 });
 
 describe('CharactersScreen', () => {
-  const mockLogout = jest.fn();
-
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAuth as jest.Mock).mockReturnValue({
-      logout: mockLogout,
-    });
   });
 
   it('renders correctly on desktop', () => {
@@ -58,13 +48,6 @@ describe('CharactersScreen', () => {
     fireEvent.press(hamburger);
     // Sidebar should be open but we mock AppSidebar so we just check it renders
     expect(getByTestId('sidebar')).toBeTruthy();
-  });
-
-  it('calls logout when logout button is pressed', () => {
-    const { getByTestId } = render(<CharactersScreen viewportWidth={1024} />);
-    
-    fireEvent.press(getByTestId('logout-button'));
-    expect(mockLogout).toHaveBeenCalled();
   });
 
   it('calls onSettingsPress when settings button is pressed', () => {

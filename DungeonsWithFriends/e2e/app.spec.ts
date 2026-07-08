@@ -9,10 +9,9 @@ test('App should load without crashing', async ({ page }) => {
     console.log('[E2E:App] Navigating to index route...');
     await page.goto('/');
 
-    console.log('[E2E:App] Asserting default welcome text visibility...');
-    // Updated to match actual WelcomeScreen content
-    await expect(page.locator('text=DUNGEONS')).toBeVisible();
-    await expect(page.locator('text=With Friends')).toBeVisible();
+    console.log('[E2E:App] Asserting default local dashboard visibility...');
+    await expect(page.locator('text=Dashboard').first()).toBeVisible();
+    await expect(page.locator('text=Characters').first()).toBeVisible();
 
     console.log('[E2E:App] Load confirmed successful.');
 });

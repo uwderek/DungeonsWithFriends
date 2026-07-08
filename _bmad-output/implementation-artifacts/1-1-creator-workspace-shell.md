@@ -96,7 +96,6 @@ so that I can begin building system-agnostic character sheet templates in a stru
   - `src/features/creator/ui/ComponentListView.tsx`
   - `src/features/creator/ui/ComponentEditor.tsx`
 - Existing cross-cutting foundations to preserve:
-  - `src/shared/providers/auth-provider.tsx`
   - `src/shared/providers/sync-provider.tsx`
   - `src/shared/theme/theme-provider.tsx`
   - `src/shared/ui/navigation/app-sidebar.tsx`
@@ -170,8 +169,6 @@ Reusable code that may be consumed but should not be relocated:
 - `DungeonsWithFriends/src/features/creator/ui/ComponentEditor.tsx`
 - `DungeonsWithFriends/src/shared/ui/navigation/app-sidebar.tsx`
 - `DungeonsWithFriends/src/shared/providers/sync-provider.tsx`
-- `DungeonsWithFriends/src/shared/providers/auth-provider.tsx`
-
 ### Testing Requirements
 
 - Keep tests co-located with the source files they validate.
@@ -229,8 +226,8 @@ Planning alignment verified against the current platform direction:
 
 ### Project Context Reference
 
-- No `project-context.md` file was found in the repository search paths configured by the workflow.
-- The authoritative planning context for this story comes from `epics.md`, `architecture.md`, the archived implementation artifacts, and the current codebase.
+- Read `docs/project-context.md`, `docs/architecture.md`, and `docs/decisions/ADR-0059-dwf-platform-baseline-typescript-tauri-cloudflare-workos.md` before implementing follow-up work.
+- The authoritative planning context for this story comes from the cleaned ADRs, current roadmap files, active architecture docs, and the current codebase.
 
 ### References
 

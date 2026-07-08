@@ -17,7 +17,7 @@ Current binding constraints:
 - Gluestack plus Tailwind/NativeWind remains the primary component and styling framework.
 - Behavior should stay headless where practical through TypeScript state, schema, hook, and domain modules.
 - TinyBase remains the local-first product store for now.
-- Now-roadmap work is fully local and must not require login, hosted sync, WorkOS, Cloudflare, Neon/Postgres, Nhost, or Tauri.
+- Now-roadmap work is fully local and must not require login, hosted sync, WorkOS, Cloudflare, Neon/Postgres, or Tauri.
 - TypeScript is the default implementation language for UI, domain contracts, tests, tooling, and later hosted/server code.
 - Tauri/Rust is reserved for OS-specific downloaded-app functionality or local/server process wrappers when Expo cannot own the concern safely.
 - Later server sync targets Neon/Postgres stores behind explicit sync ports.
@@ -39,13 +39,13 @@ Current binding constraints:
 
 The implementation currently includes:
 
-- Offline welcome plus legacy login and register screens.
+- Login-free local app entry.
 - Dashboard, character, campaign, friends, and story-card UI slices.
-- Shared UI atoms, navigation, theme provider, auth provider, sync provider, and Nhost client scaffolding.
+- Shared UI atoms, navigation, theme provider, and local TinyBase sync provider.
 - Creator tooling with component schemas, component store, component editor/list views, and Story 1.1 workspace shell files.
 - Co-located tests for most implemented files.
 
-This implementation is useful product evidence. The Expo/Gluestack/Tailwind/TinyBase direction is current; Nhost, login-gated flows, and hosted sync assumptions are legacy or later placeholders.
+This implementation is useful product evidence. The Expo/Gluestack/Tailwind/TinyBase direction is current; login-gated flows and hosted sync assumptions are later roadmap concerns.
 
 ## Development Guardrails
 

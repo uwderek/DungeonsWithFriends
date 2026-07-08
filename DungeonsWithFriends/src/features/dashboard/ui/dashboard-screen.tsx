@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Settings, LogOut } from 'lucide-react-native';
-import { useAuth } from '@/shared/providers/auth-provider';
+import { Settings } from 'lucide-react-native';
 import { AppSidebar, HamburgerButton } from '@/shared/ui/navigation/app-sidebar';
 import { HeroBanner } from './hero-banner';
 import { CharacterGrid } from '@/features/character/ui/character-grid';
@@ -21,7 +20,6 @@ export const DashboardScreen: React.FC<{
   onSettingsPress?: () => void;
   viewportWidth?: number;
 }> = ({ onNavigate, onSettingsPress, viewportWidth }) => {
-  const { logout } = useAuth();
   const { width: measuredWidth } = useWindowDimensions();
   const width = viewportWidth ?? measuredWidth;
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -61,16 +59,6 @@ export const DashboardScreen: React.FC<{
                 className="h-10 w-10 rounded-full bg-indigo-950/50 items-center justify-center border border-indigo-900 shadow-sm"
               >
                 <Settings size={20} color="#9CA3AF" />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={logout}
-                testID="logout-button"
-                accessibilityLabel="Log out"
-                accessibilityRole="button"
-                className="h-10 w-10 rounded-full bg-indigo-950/50 items-center justify-center border border-indigo-900 shadow-sm"
-              >
-                <LogOut size={18} color="#DC2626" />
               </TouchableOpacity>
             </View>
           </View>

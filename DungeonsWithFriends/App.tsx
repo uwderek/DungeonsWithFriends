@@ -2,7 +2,6 @@ import "./global.css";
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { View, Text } from "react-native";
-import { AuthProvider, useAuth } from "@/shared/providers/auth-provider";
 import { SyncProvider } from "@/shared/providers/sync-provider";
 import { ThemeProvider } from "@/shared/theme/theme-provider";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -32,84 +31,39 @@ if (Platform.OS === 'web') {
   setupGlobalErrorHandlers();
 }
 
-import { useWindowDimensions } from 'react-native';
-
 // Features
-import { WelcomeScreen } from "@/features/auth/ui/welcome-screen";
-import { LoginScreen } from "@/features/auth/ui/login-screen";
-import { RegisterScreen } from "@/features/auth/ui/register-screen";
 import { DashboardScreen } from "@/features/dashboard/ui/dashboard-screen";
 import { CharactersScreen } from "@/features/character/ui/characters-screen";
 import { CreatorToolsScreen } from "@/features/creator/ui/CreatorToolsScreen";
 
-// Shared UI
-import { BottomTabBar } from "@/shared/ui/navigation/bottom-tab-bar";
+type AppTab = 'home' | 'campaigns' | 'characters' | 'friends' | 'creator' | 'settings';
 
 function AppContent() {
-  const { isAuthenticated, offlineMode, isLoading, continueOffline } = useAuth();
-  const [authScreen, setAuthScreen] = useState<'welcome' | 'login' | 'register'>('welcome');
-  const [activeTab, setActiveTab] = useState<'home' | 'campaigns' | 'characters' | 'friends' | 'creator' | 'settings'>('home');
+  const [activeTab, setActiveTab] = useState<AppTab>('home');
+
   const handleNavigate = (id: string) => {
-    setActiveTab(id as any);
+    setActiveTab(id as AppTab);
   };
-  const { width } = useWindowDimensions();
-  const isDesktop = width >= 768;
 
-  if (isLoading) {
-    return (
-      <View className="flex-1 bg-background-primary items-center justify-center" />
-    );
-  }
-
-  // authenticated or offline-first access
-  if (isAuthenticated || offlineMode) {
-    return (
+  return (
+    <View className="flex-1">
       <View className="flex-1">
-        <View className="flex-1">
-          {activeTab === 'home' && <DashboardScreen onNavigate={handleNavigate} />}
-          {activeTab === 'characters' && <CharactersScreen onNavigate={handleNavigate} />}
-          {activeTab === 'creator' && <CreatorToolsScreen onNavigate={handleNavigate} />}
-          {/* Other screens for campaigns, characters, etc. would go here */}
-          {(activeTab !== 'home' && activeTab !== 'characters' && activeTab !== 'creator') && (
-            <View className="flex-1 items-center justify-center bg-background-primary p-8">
-              <Text className="text-2xl text-typography-primary font-bold mb-2" style={{ fontFamily: 'Cinzel' }}>
-                Coming Soon
-              </Text>
-              <Text className="text-typography-secondary text-center">
-                This feature is under development. Check back in a future update!
-              </Text>
-            </View>
-          )}
-        </View>
+        {activeTab === 'home' && <DashboardScreen onNavigate={handleNavigate} />}
+        {activeTab === 'characters' && <CharactersScreen onNavigate={handleNavigate} />}
+        {activeTab === 'creator' && <CreatorToolsScreen onNavigate={handleNavigate} />}
+        {(activeTab !== 'home' && activeTab !== 'characters' && activeTab !== 'creator') && (
+          <View className="flex-1 items-center justify-center bg-background-primary p-8">
+            <Text className="text-2xl text-typography-primary font-bold mb-2" style={{ fontFamily: 'Cinzel' }}>
+              Coming Soon
+            </Text>
+            <Text className="text-typography-secondary text-center">
+              This feature is under development. Check back in a future update!
+            </Text>
+          </View>
+        )}
       </View>
-    );
-  }
-
-  // Auth Stack
-  switch (authScreen) {
-    case 'login':
-      return (
-        <LoginScreen
-          onBack={() => setAuthScreen('welcome')}
-          onForgotPassword={() => console.log('Forgot password')}
-        />
-      );
-    case 'register':
-      return (
-        <RegisterScreen
-          onBack={() => setAuthScreen('welcome')}
-        />
-      );
-    case 'welcome':
-    default:
-      return (
-        <WelcomeScreen
-          onLogin={() => setAuthScreen('login')}
-          onRegister={() => setAuthScreen('register')}
-          onContinueOffline={continueOffline}
-        />
-      );
-  }
+    </View>
+  );
 }
 
 class GlobalErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: any }> {
@@ -145,10 +99,8 @@ export default function App() {
       <GlobalErrorBoundary>
         <SyncProvider>
           <ThemeProvider>
-            <AuthProvider>
-              <AppContent />
-              <StatusBar style="light" />
-            </AuthProvider>
+            <AppContent />
+            <StatusBar style="light" />
           </ThemeProvider>
         </SyncProvider>
       </GlobalErrorBoundary>

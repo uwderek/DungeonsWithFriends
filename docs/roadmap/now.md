@@ -12,7 +12,7 @@ Establish a fully local, login-free Expo app foundation that can keep developmen
 - Gluestack plus Tailwind/NativeWind remain the primary component and styling framework.
 - Behavior should stay headless where practical through TypeScript state, schema, hook, and domain modules.
 - TinyBase is the local-first store for now.
-- No login, account creation, WorkOS, Nhost, Cloudflare, Neon/Postgres, or hosted sync is required for now-roadmap features.
+- No login, account creation, WorkOS, Cloudflare, Neon/Postgres, or hosted sync is required for now-roadmap features.
 - Product code should remain TypeScript-first and avoid Python.
 
 ## Now Features
@@ -30,4 +30,4 @@ Establish a fully local, login-free Expo app foundation that can keep developmen
 - PRD, architecture, UX, epics, stories, sprint status, and ADR references agree on the same local-first baseline.
 - A user can open the app without login and perform useful creator or sheet work locally.
 - TinyBase persistence is covered by tests and does not depend on hosted services.
-- Nhost/auth scaffolding does not gate any now-roadmap feature.
+- Account/auth scaffolding does not gate any now-roadmap feature.

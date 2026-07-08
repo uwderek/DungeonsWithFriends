@@ -1,16 +1,5 @@
 import React from 'react';
-import { render, act } from '@testing-library/react-native';
-import { Text } from 'react-native';
-
-// Mock all native deps that the full provider tree needs
-jest.mock('@nhost/nhost-js', () => ({
-    NhostClient: jest.fn().mockImplementation(() => ({
-        auth: {
-            getSession: jest.fn(() => null),
-            onAuthStateChanged: jest.fn(() => () => { }),
-        },
-    })),
-}));
+import { render, fireEvent } from '@testing-library/react-native';
 
 jest.mock('tinybase/ui-react', () => ({
     Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -45,102 +34,58 @@ jest.mock('@/shared/theme/theme-provider', () => ({
     useTheme: () => ({ isLoaded: true }),
 }));
 
-// Mock AuthProvider and useAuth
-jest.mock('@/shared/providers/auth-provider', () => {
-    const React = require('react');
-    const actual = jest.requireActual('@/shared/providers/auth-provider');
-    return {
-        ...actual,
-        useAuth: jest.fn(() => ({
-            isAuthenticated: false,
-            isLoading: false,
-            user: null,
-            offlineMode: false,
-            login: jest.fn(),
-            logout: jest.fn(),
-            continueOffline: jest.fn(),
-        })),
-    };
-});
-
 // Mock feature screens to avoid deep rendering in App tests
-jest.mock('@/features/auth/ui/welcome-screen', () => ({
-    WelcomeScreen: () => {
-        const { Text } = require('react-native');
-        return <Text testID="welcome-screen">Welcome Screen</Text>;
-    },
-}));
-jest.mock('@/features/auth/ui/login-screen', () => ({
-    LoginScreen: () => {
-        const { Text } = require('react-native');
-        return <Text testID="login-screen">Login Screen</Text>;
-    },
-}));
-jest.mock('@/features/auth/ui/register-screen', () => ({
-    RegisterScreen: () => {
-        const { Text } = require('react-native');
-        return <Text testID="register-screen">Register Screen</Text>;
-    },
-}));
 jest.mock('@/features/dashboard/ui/dashboard-screen', () => ({
-    DashboardScreen: () => {
+    DashboardScreen: ({ onNavigate }: { onNavigate?: (id: string) => void }) => {
+        const { Text, TouchableOpacity, View } = require('react-native');
+        return (
+            <View>
+                <Text testID="dashboard-screen">Dashboard Screen</Text>
+                <TouchableOpacity testID="go-characters" onPress={() => onNavigate?.('characters')}>
+                    <Text>Go Characters</Text>
+                </TouchableOpacity>
+                <TouchableOpacity testID="go-creator" onPress={() => onNavigate?.('creator')}>
+                    <Text>Go Creator</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    },
+}));
+jest.mock('@/features/character/ui/characters-screen', () => ({
+    CharactersScreen: () => {
         const { Text } = require('react-native');
-        return <Text testID="dashboard-screen">Dashboard Screen</Text>;
+        return <Text testID="characters-screen">Characters Screen</Text>;
+    },
+}));
+jest.mock('@/features/creator/ui/CreatorToolsScreen', () => ({
+    CreatorToolsScreen: () => {
+        const { Text } = require('react-native');
+        return <Text testID="creator-screen">Creator Screen</Text>;
     },
 }));
 
 // Import App AFTER all mocks are set up
 import App from './App';
-import { useAuth } from '@/shared/providers/auth-provider';
 
 describe('App Routing', () => {
-    const mockUseAuth = useAuth as jest.Mock;
-
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('renders WelcomeScreen by default when not authenticated', () => {
-        mockUseAuth.mockReturnValue({
-            isAuthenticated: false,
-            isLoading: false,
-            offlineMode: false,
-        });
-
-        const { getByTestId } = render(<App />);
-        expect(getByTestId('welcome-screen')).toBeTruthy();
-    });
-
-    it('renders DashboardScreen when authenticated', () => {
-        mockUseAuth.mockReturnValue({
-            isAuthenticated: true,
-            isLoading: false,
-            offlineMode: false,
-        });
-
+    it('renders the local dashboard by default', () => {
         const { getByTestId } = render(<App />);
         expect(getByTestId('dashboard-screen')).toBeTruthy();
     });
 
-    it('renders DashboardScreen when in offline mode', () => {
-        mockUseAuth.mockReturnValue({
-            isAuthenticated: false,
-            isLoading: false,
-            offlineMode: true,
-        });
-
+    it('navigates to the local characters screen', () => {
         const { getByTestId } = render(<App />);
-        expect(getByTestId('dashboard-screen')).toBeTruthy();
+        fireEvent.press(getByTestId('go-characters'));
+        expect(getByTestId('characters-screen')).toBeTruthy();
     });
 
-    it('navigates to LoginScreen from WelcomeScreen', async () => {
-        mockUseAuth.mockReturnValue({
-            isAuthenticated: false,
-            isLoading: false,
-            offlineMode: false,
-        });
-
+    it('navigates to the local creator screen', () => {
         const { getByTestId } = render(<App />);
-        expect(getByTestId('welcome-screen')).toBeTruthy();
+        fireEvent.press(getByTestId('go-creator'));
+        expect(getByTestId('creator-screen')).toBeTruthy();
     });
 });

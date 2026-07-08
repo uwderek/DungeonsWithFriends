@@ -27,7 +27,7 @@ Repair the current BMAD documentation so development can continue from one coher
 
 3. PRD rewrite
    - Preserve the product vision: asynchronous tabletop play, creator tooling, local-first resilience, and future AI assistance.
-   - Remove Nhost, login-required flows, hosted sync, WorkOS, Cloudflare, Neon/Postgres, and Tauri from now-roadmap requirements.
+   - Remove login-required flows, hosted sync, WorkOS, Cloudflare, Neon/Postgres, and Tauri from now-roadmap requirements.
    - Define MVP around local creator workspace, local playable sheets, TinyBase persistence, export/import, and local action/event contracts.
    - Move account/auth, hosted sync, marketplace, AI, and native OS-specific features to later roadmap sections.
 
@@ -35,7 +35,7 @@ Repair the current BMAD documentation so development can continue from one coher
    - Make Expo/Gluestack/Tailwind/TinyBase the now architecture.
    - Keep behavior headless in TypeScript modules, hooks, schemas, state machines, and domain contracts.
    - Define later provider ports for Neon/Postgres sync, Cloudflare hosting, WorkOS auth, and Tauri/Rust OS-specific capabilities.
-   - Remove Nhost as a target architecture decision.
+   - Remove hosted auth/sync providers as target now-roadmap architecture decisions.
 
 5. UX rewrite
    - Make the primary now journey local and login-free.

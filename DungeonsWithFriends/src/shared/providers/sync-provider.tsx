@@ -15,25 +15,39 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const store = useCreateStore(() => createStore());
 
     const [isSyncing, setIsSyncing] = React.useState(false);
+    const [lastSyncTime, setLastSyncTime] = React.useState<number | null>(null);
+    const syncTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
-        console.log('[SyncProvider] Initializing TinyBase synchronizer layer');
-        // Initialize Nhost GraphQL subscriptions and TinyBase synchronizer logic here
+        console.log('[SyncProvider] Initializing local TinyBase store');
     }, [store]);
 
+    useEffect(() => {
+        return () => {
+            if (syncTimerRef.current !== null) {
+                clearTimeout(syncTimerRef.current);
+            }
+        };
+    }, []);
+
     const triggerManualSync = () => {
-        console.log('[SyncProvider] Manual sync triggered');
+        console.log('[SyncProvider] Manual local persistence checkpoint triggered');
+        if (syncTimerRef.current !== null) {
+            clearTimeout(syncTimerRef.current);
+        }
         setIsSyncing(true);
-        // Implementation for manual push/pull
-        setTimeout(() => setIsSyncing(false), 500);
+        syncTimerRef.current = setTimeout(() => {
+            setLastSyncTime(Date.now());
+            setIsSyncing(false);
+            syncTimerRef.current = null;
+        }, 500);
     };
 
     return (
         <TinyBaseProvider store={store}>
             <SyncContext.Provider value={{
                 isSyncing,
-                // TODO: Update lastSyncTime when real Nhost sync is implemented; currently always null
-                lastSyncTime: null,
+                lastSyncTime,
                 triggerManualSync
             }}>
                 {children}

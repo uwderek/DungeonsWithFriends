@@ -10,23 +10,22 @@ This document describes what is currently in the repository and how it should be
 
 The app under `DungeonsWithFriends/` is the primary Expo/React Native UI app with Feature-Sliced Design tendencies:
 
-- `App.tsx` composes providers, auth/offline entry, navigation state, and feature screens.
-- `src/features/auth` owns welcome, login, register, and auth schemas.
+- `App.tsx` composes providers and opens directly into the local dashboard shell with in-app navigation state.
 - `src/features/dashboard` owns the current landing/dashboard view.
 - `src/features/character` owns character library UI.
 - `src/features/creator` owns creator tooling, component schemas, TinyBase-backed component storage, and the Story 1.1 workspace shell.
 - `src/features/campaign`, `src/features/friends`, and `src/features/story` contain early UI slices.
-- `src/shared` contains providers, services, theme, navigation, UI atoms, and Gluestack provider scaffolding.
+- `src/shared` contains the local TinyBase sync provider, theme, navigation, UI atoms, and Gluestack provider scaffolding.
 
 ## Superseded Assumptions
 
-The current app still contains older assumptions:
+The current app has been aligned away from older assumptions:
 
-- Nhost client and auth/sync scaffolding.
-- Login-gated flows before the local product foundation is useful.
-- Hosted sync before TinyBase local persistence, export, import, and migration contracts are stable.
+- No login gate blocks the local product foundation.
+- Hosted sync waits until TinyBase local persistence, export, import, and migration contracts are stable.
+- Future provider code must remain behind ports instead of feature UI imports.
 
-These assumptions are no longer accepted for now-roadmap work. Expo/React Native, Gluestack/Tailwind, and TinyBase remain current baseline decisions.
+The older assumptions remain excluded from now-roadmap work. Expo/React Native, Gluestack/Tailwind, and TinyBase remain current baseline decisions.
 
 ## Target Direction
 
@@ -47,7 +46,7 @@ Reference links:
 
 ## Boundary Rules
 
-- Now-roadmap product/domain code must not require login, Nhost, WorkOS, Cloudflare, Neon/Postgres, hosted sync, or Tauri.
+- Now-roadmap product/domain code must not require login, WorkOS, Cloudflare, Neon/Postgres, hosted sync, or Tauri.
 - Future provider code must not be imported directly from feature UI. Use provider facades and ports.
 - Tauri/Rust capabilities belong behind commands or plugins only when OS-specific downloaded-app behavior or local/server process wrappers are required.
 - TinyBase is the current local store. Later Neon/Postgres sync must attach through explicit sync ports rather than bypass local contracts.

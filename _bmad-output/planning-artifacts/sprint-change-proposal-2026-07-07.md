@@ -49,7 +49,7 @@ New or rewritten foundation stories are needed for:
 
 - login-free local app flow,
 - TinyBase local storage, migrations, export, and import,
-- replacement or isolation of Nhost/login scaffolding from now-roadmap paths,
+- removal of account/login scaffolding from now-roadmap paths,
 - TypeScript shared domain contracts,
 - system template and custom JSON binding,
 - local action/event envelopes for later sync,
@@ -57,16 +57,16 @@ New or rewritten foundation stories are needed for:
 
 ### Artifact Conflicts
 
-- `prd.md` references TinyBase and Nhost in product scope and journeys.
-- `architecture.md` selects Expo/Gluestack/NativeWind plus TinyBase/Nhost as the target foundation; preserve Expo/Gluestack/Tailwind/TinyBase while removing Nhost/login/cloud-sync from now work.
+- `prd.md` references hosted sync in product scope and journeys.
+- `architecture.md` selects Expo/Gluestack/NativeWind plus TinyBase and hosted sync as the target foundation; preserve Expo/Gluestack/Tailwind/TinyBase while removing login/cloud-sync from now work.
 - `ux-design-specification.md` assumes older auth/sync sequencing and should make local/no-login the primary now journey.
-- `epics.md` includes Nhost/TinyBase additional requirements and story sequencing based on the old architecture.
+- `epics.md` includes hosted-sync/TinyBase additional requirements and story sequencing based on the old architecture.
 - `sprint-status.yaml` was also incomplete relative to current `epics.md`; it has been refreshed but remains blocked by the documentation repair action item.
 
 ### Technical Impact
 
 - Existing Expo implementation remains the primary UI direction, not merely throwaway prototype code.
-- Nhost client/provider code should be isolated behind an adapter or removed through migration stories.
+- Legacy account and hosted-sync code should be removed from now-roadmap paths or isolated behind later provider adapters.
 - Future Cloudflare, WorkOS, Neon/Postgres, and Tauri provider code must not leak into feature UI.
 - Tauri/Rust introduces Rust tests, Tauri command tests, and local migration/update safety work only when OS-specific downloaded-app or local/server process needs are approved.
 - Python helper scripts in `_bmad/scripts` are BMAD tooling, not product code; replacing them is separate.
@@ -91,7 +91,7 @@ Risk: High if development continues against old stories; medium if rebaseline is
 
 Old target:
 
-- TinyBase/Nhost synchronization and Expo-oriented app assumptions.
+- TinyBase synchronization and Expo-oriented app assumptions.
 
 New target:
 
@@ -102,7 +102,7 @@ New target:
 
 Old target:
 
-- Expo/Gluestack/NativeWind starter, TinyBase local persistence, Nhost auth/sync.
+- Expo/Gluestack/NativeWind starter, TinyBase local persistence, and hosted auth/sync assumptions.
 
 New target:
 
@@ -139,7 +139,7 @@ New target:
   - documentation repair and roadmap authority,
   - login-free local app flow,
   - TinyBase storage/export/import/migrations,
-  - Nhost/auth isolation from now paths,
+  - account/auth isolation from now paths,
   - TypeScript shared contracts,
   - system template/custom JSON binding,
   - ADR compliance.
@@ -158,7 +158,7 @@ Handoff recipients:
 
 Success criteria:
 
-- No now-roadmap story requires login, hosted sync, Nhost, WorkOS, Cloudflare, Neon/Postgres, or Tauri.
+- No now-roadmap story requires login, hosted sync, WorkOS, Cloudflare, Neon/Postgres, or Tauri.
 - Expo/Gluestack/Tailwind/TinyBase decisions are captured as current now-roadmap baseline.
 - WorkOS/Cloudflare/Neon/Tauri decisions are captured as later or boundary decisions.
 - Imported ADRs each carry their own DWF disposition, status, and roadmap lane.

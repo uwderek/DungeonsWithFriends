@@ -5,7 +5,7 @@ created: 2026-07-07
 updated: 2026-07-07
 supersedes:
   - architecture.md platform assumptions from 2026-03-06
-  - Nhost as target auth/sync provider
+  - legacy managed auth/sync provider assumptions
   - login-required MVP assumptions
   - hosted sync before local persistence is stable
 ---
@@ -36,7 +36,7 @@ supersedes:
 - Headless TypeScript modules own schema validation, local state rules, migrations, bindings, dice/contracts, and domain behavior.
 - TinyBase owns the current local-first store.
 - Local export/import and migrations protect user data before hosted sync exists.
-- No login, WorkOS, Cloudflare, Neon/Postgres, Nhost, or Tauri dependency is required for now-roadmap features.
+- No login, WorkOS, Cloudflare, Neon/Postgres, or Tauri dependency is required for now-roadmap features.
 
 ### Later Hosted Layer
 
@@ -74,7 +74,7 @@ Shared TypeScript packages should define:
 
 ## Superseded Decisions
 
-- Nhost auth and sync are no longer target architecture.
+- Managed auth and hosted sync are no longer now-roadmap architecture.
 - Login/auth is not now-roadmap work.
 - Hosted sync is not now-roadmap work.
 - Cloudflare, WorkOS, Neon/Postgres, and Tauri are future or boundary concerns rather than requirements for local MVP work.
@@ -125,7 +125,7 @@ Rejected or removed from ADR corpus:
 
 ## Required Re-Baseline Work
 
-1. Update PRD requirements to remove Nhost/login/cloud-sync requirements from the now roadmap while preserving Expo/Gluestack/Tailwind/TinyBase local-first decisions.
+1. Update PRD requirements to remove login/cloud-sync requirements from the now roadmap while preserving Expo/Gluestack/Tailwind/TinyBase local-first decisions.
 2. Update UX spec so the primary journey is local and login-free; move account, auth, and hosted onboarding to later roadmap sections.
 3. Rewrite architecture.md around Expo/Gluestack/Tailwind/TinyBase now, sync-ready TypeScript ports next, and Cloudflare/Neon/WorkOS/Tauri later boundaries.
 4. Regenerate epics and stories so local TinyBase foundation, export/import, migrations, and login-free UX happen before sync/auth/server scope.

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Settings, LogOut } from 'lucide-react-native';
-import { useAuth } from '@/shared/providers/auth-provider';
+import { Settings } from 'lucide-react-native';
 import { AppSidebar, HamburgerButton } from '@/shared/ui/navigation/app-sidebar';
 import { CharacterGrid } from './character-grid';
 import { FriendsList } from '@/features/friends/ui/friends-list';
@@ -13,7 +12,6 @@ export const CharactersScreen: React.FC<{
   onSettingsPress?: () => void;
   viewportWidth?: number;
 }> = ({ onNavigate, onSettingsPress, viewportWidth }) => {
-  const { logout } = useAuth();
   const { width: measuredWidth } = useWindowDimensions();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -77,24 +75,6 @@ export const CharactersScreen: React.FC<{
                 }}
               >
                 <Settings size={20} color="#9CA3AF" />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                testID="logout-button"
-                accessibilityRole="button"
-                onPress={logout}
-                style={{
-                  height: 40,
-                  width: 40,
-                  borderRadius: 20,
-                  backgroundColor: '#1E1B4B',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: '#312E81'
-                }}
-              >
-                <LogOut size={18} color="#DC2626" />
               </TouchableOpacity>
             </View>
           </View>

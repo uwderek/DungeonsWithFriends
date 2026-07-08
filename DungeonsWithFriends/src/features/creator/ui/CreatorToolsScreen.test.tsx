@@ -4,11 +4,6 @@ import { CreatorToolsScreen } from './CreatorToolsScreen';
 import { useWindowDimensions } from 'react-native';
 import { createComponentDefinition } from '../model/component-store';
 import { useStore } from 'tinybase/ui-react';
-import { useAuth } from '@/shared/providers/auth-provider';
-
-jest.mock('@/shared/providers/auth-provider', () => ({
-    useAuth: jest.fn(),
-}));
 
 // Mock high level components to avoid deep rendering issues
 jest.mock('./ComponentListView', () => ({
@@ -90,14 +85,9 @@ jest.mock('./creator-workspace-empty-state', () => {
 });
 
 describe('CreatorToolsScreen', () => {
-    const mockLogout = jest.fn();
-
     beforeEach(() => {
         jest.clearAllMocks();
         (useStore as jest.Mock).mockReturnValue({});
-        (useAuth as jest.Mock).mockReturnValue({
-            logout: mockLogout,
-        });
         // Default mock for useWindowDimensions just in case though we mostly use props
         (useWindowDimensions as jest.Mock).mockReturnValue({ width: 1200, height: 800 });
     });
@@ -112,7 +102,7 @@ describe('CreatorToolsScreen', () => {
         expect(getByText(/Creator Tools/i)).toBeTruthy();
     });
 
-    it('handles settings and logout', () => {
+    it('handles settings', () => {
         const onSettingsPress = jest.fn();
         const { getByTestId } = render(
             <CreatorToolsScreen viewportWidth={1200} onSettingsPress={onSettingsPress} />
@@ -120,9 +110,6 @@ describe('CreatorToolsScreen', () => {
 
         fireEvent.press(getByTestId('settings-button'));
         expect(onSettingsPress).toHaveBeenCalled();
-
-        fireEvent.press(getByTestId('logout-button'));
-        expect(mockLogout).toHaveBeenCalled();
     });
 
     it('handles onSelectSystem', () => {

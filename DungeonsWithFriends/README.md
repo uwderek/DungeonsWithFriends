@@ -1,6 +1,6 @@
 # Dungeons With Friends - Foundation (React Native Web + Nativewind v4)
 
-This represents the foundational codebase for the Dungeons With Friends project. It is structured using Feature-Sliced Design to eventually build out complex offline-first capabilities using TinyBase and Nhost synchronization.
+This represents the foundational codebase for the Dungeons With Friends project. It is structured using Feature-Sliced Design to build out local-first capabilities with TinyBase-backed persistence.
 
 ## 🚀 Getting Started
 

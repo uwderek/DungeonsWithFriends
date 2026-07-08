@@ -6,7 +6,6 @@ import { DashboardScreen } from './dashboard-screen';
 // Mock Lucide icons
 jest.mock('lucide-react-native', () => ({
     Settings: () => null,
-    LogOut: () => null,
     Swords: () => null,
     PlusCircle: () => null,
     Users: () => null,
@@ -28,13 +27,6 @@ jest.mock('lucide-react-native', () => ({
     Sparkles: () => null,
 }));
 
-const mockUseAuth = jest.fn();
-
-// Mock AuthProvider
-jest.mock('@/shared/providers/auth-provider', () => ({
-    useAuth: () => mockUseAuth(),
-}));
-
 // Mock navigation components
 jest.mock('@/shared/ui/navigation/app-sidebar', () => {
     const { TouchableOpacity } = require('react-native');
@@ -50,11 +42,7 @@ jest.mock('@/shared/ui/navigation/app-sidebar', () => {
 
 describe('DashboardScreen', () => {
     beforeEach(() => {
-        mockUseAuth.mockReturnValue({
-            user: { email: 'test@example.com' },
-            logout: jest.fn(),
-            offlineMode: false,
-        });
+        jest.clearAllMocks();
     });
 
     it('renders dashboard title and sections', () => {
@@ -71,20 +59,7 @@ describe('DashboardScreen', () => {
         expect(getAllByText(/Curse of Strahd/i).length).toBeGreaterThan(0);
     });
 
-    it('shows "Local Vault" in offline mode', () => {
-        mockUseAuth.mockReturnValue({
-            user: null,
-            logout: jest.fn(),
-            offlineMode: true,
-        });
-
-        // The current implementation doesn't seem to show "Local Vault" based on offlineMode
-        // but let's keep it if it's meant to be there. 
-        // Actually, looking at dashboard-screen.tsx, it doesn't use offlineMode for the title.
-        // I'll skip this or update it to match reality.
-    });
-
-    it('shows "Dashboard" when not in offline mode', () => {
+    it('shows "Dashboard" in the local shell', () => {
         const { getAllByText } = render(<DashboardScreen />);
         expect(getAllByText(/Dashboard/).length).toBeGreaterThan(0);
     });
@@ -99,18 +74,6 @@ describe('DashboardScreen', () => {
         const { getAllByText } = render(<DashboardScreen />);
         expect(getAllByText(/Kaelith Darkbane/i).length).toBeGreaterThan(0);
         expect(getAllByText(/Brother Aldric/i).length).toBeGreaterThan(0);
-    });
-    it('calls logout when logout button is pressed', () => {
-        const logoutMock = jest.fn();
-        mockUseAuth.mockReturnValue({
-            user: { email: 'test@example.com' },
-            logout: logoutMock,
-            offlineMode: false,
-        });
-
-        const { getByTestId } = render(<DashboardScreen />);
-        fireEvent.press(getByTestId('logout-button'));
-        expect(logoutMock).toHaveBeenCalled();
     });
 
     it('calls onSettingsPress when settings button is pressed', () => {

@@ -93,7 +93,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
                         </View>
                         <View>
                             <Text className="text-xs text-typography-primary font-medium">Dungeon Master</Text>
-                            <Text className="text-[10px] text-typography-tertiary">Pro Account</Text>
+                            <Text className="text-[10px] text-typography-tertiary">Local Mode</Text>
                         </View>
                     </View>
                 </View>

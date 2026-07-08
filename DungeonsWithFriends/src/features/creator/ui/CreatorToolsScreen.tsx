@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Settings, LogOut } from 'lucide-react-native';
-import { useAuth } from '@/shared/providers/auth-provider';
+import { Settings } from 'lucide-react-native';
 import { AppSidebar, HamburgerButton } from '@/shared/ui/navigation/app-sidebar';
 import { ComponentListView } from './ComponentListView';
 import { ComponentEditor } from './ComponentEditor';
@@ -19,7 +18,6 @@ export const CreatorToolsScreen: React.FC<{
     onSelectSystem?: () => void;
     viewportWidth?: number;
 }> = ({ onNavigate, onSettingsPress, onSelectSystem, viewportWidth }) => {
-    const { logout } = useAuth();
     const { width: measuredWidth } = useWindowDimensions();
     const width = viewportWidth ?? measuredWidth;
     const isDesktop = width >= 768; // Use same breakpoint as other screens for sidebar logic
@@ -65,15 +63,6 @@ export const CreatorToolsScreen: React.FC<{
                                 className="h-10 w-10 rounded-full bg-indigo-950/50 items-center justify-center border border-indigo-900 shadow-sm"
                             >
                                 <Settings size={20} color="#9CA3AF" />
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                testID="logout-button"
-                                accessibilityRole="button"
-                                onPress={logout}
-                                className="h-10 w-10 rounded-full bg-indigo-950/50 items-center justify-center border border-indigo-900 shadow-sm"
-                            >
-                                <LogOut size={18} color="#DC2626" />
                             </TouchableOpacity>
                         </View>
                     </View>

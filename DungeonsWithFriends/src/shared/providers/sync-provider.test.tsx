@@ -71,6 +71,7 @@ describe('SyncProvider', () => {
         });
 
         expect(getByTestId('isSyncing').props.children).toBe('false');
+        expect(getByTestId('lastSyncTime').props.children).not.toBe('null');
 
         jest.useRealTimers();
     });

@@ -15,7 +15,7 @@ This file owns feature priority and sequencing. The lane files describe scope bo
 | Priority | Feature | Lane | Status | Notes |
 | --- | --- | --- | --- | --- |
 | P0 | Documentation repair and BMAD rebaseline | Now | Open | Repair PRD, architecture, UX, epics, story templates, and sprint status before the next implementation story. |
-| P1 | Login-free local app flow | Now | Open | The app must open into useful local functionality without account creation, hosted sync, WorkOS, or Nhost. |
+| P1 | Login-free local app flow | Now | Open | The app must open into useful local functionality without account creation, hosted sync, or WorkOS. |
 | P2 | TinyBase local data foundation | Now | Open | Define local stores, migrations, export/import, and test coverage for creator and playable-sheet data. |
 | P3 | Creator workspace continuation | Now | Open | Continue the Expo creator shell from Story 1.1 after doc repair confirms the local-first target. |
 | P4 | System template and custom JSON binding | Now | Open | Bind visible components to structured system/template JSON without hardcoded game-system assumptions. |
@@ -31,7 +31,7 @@ This file owns feature priority and sequencing. The lane files describe scope bo
 
 ## Lane Rules
 
-- Now work must not require login, hosted sync, Cloudflare, WorkOS, Neon/Postgres, Nhost, or Tauri.
+- Now work must not require login, hosted sync, Cloudflare, WorkOS, Neon/Postgres, or Tauri.
 - Next work may introduce sync-ready ports and envelopes, but must remain useful fully locally.
 - Later work may depend on hosted services, auth, native OS-specific capabilities, or AI infrastructure.
 - The priority ledger can change without editing the lane files unless lane boundaries themselves change.
