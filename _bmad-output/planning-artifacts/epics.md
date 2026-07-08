@@ -7,6 +7,24 @@ inputDocuments: ["prd.md", "architecture.md", "ux-design-specification.md", "1-3
 
 # DungeonsWithFriends - Epic Breakdown
 
+## Current Decision Status
+
+This epic breakdown is historical until re-baselined. The product goals remain useful, but implementation sequencing and platform-specific requirements must be updated for:
+
+- Expo/React Native as the primary UI/app framework
+- Gluestack/Tailwind as the primary component and styling framework
+- TinyBase as the local-first store for now
+- fully local, login-free now-roadmap work
+- TypeScript-first product implementation
+- Tauri/Rust only for OS-specific downloaded-app or local/server process boundaries when needed
+- Neon/Postgres server sync later
+- Cloudflare hosting later
+- WorkOS authentication later
+- no new Python product code
+- cleaned ADR files in `docs/decisions/`
+
+Use `_bmad-output/planning-artifacts/sprint-change-proposal-2026-07-07.md` before creating the next development story.
+
 ## Overview
 
 This document provides the complete epic and story breakdown for DungeonsWithFriends, decomposing the requirements from the PRD, UX Design if it exists, and Architecture requirements into implementable stories.

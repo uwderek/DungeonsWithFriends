@@ -30,6 +30,17 @@ classification:
   projectContext: brownfield
 ---
 
+# Current Decision Status
+
+This March 2026 PRD remains useful product context, but its vendor-specific platform assumptions must be re-evaluated. As of 2026-07-07, planning is governed by the platform rebaseline in:
+
+- `docs/decisions/ADR-0059-dwf-platform-baseline-typescript-tauri-cloudflare-workos.md`
+- cleaned ADR files in `docs/decisions/`
+- `_bmad-output/planning-artifacts/product-brief.md`
+- `_bmad-output/planning-artifacts/sprint-change-proposal-2026-07-07.md`
+
+Do not treat Nhost, login-required flows, hosted sync, Cloudflare, WorkOS, Neon/Postgres, or Tauri references in this file as now-roadmap implementation decisions. Expo/React Native, Gluestack/Tailwind, and TinyBase local-first are current now-roadmap decisions.
+
 # Product Requirements Document - DungeonsWithFriends
 
 **Author:** Derek

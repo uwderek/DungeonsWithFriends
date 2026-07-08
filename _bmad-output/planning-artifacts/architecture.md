@@ -13,6 +13,17 @@ lastStep: 8
 status: 'complete'
 completedAt: '2026-03-06T10:02:56-08:00'
 ---
+# Current Decision Status
+
+This March 2026 architecture is superseded for platform decisions by:
+
+- `docs/decisions/ADR-0059-dwf-platform-baseline-typescript-tauri-cloudflare-workos.md`
+- cleaned ADR files in `docs/decisions/`
+- `_bmad-output/planning-artifacts/architecture-realignment-2026-07-07.md`
+- `_bmad-output/planning-artifacts/sprint-change-proposal-2026-07-07.md`
+
+Keep this document as historical product/architecture context. Expo/React Native, Gluestack/Tailwind, and TinyBase local-first are current decisions, but Nhost, login-required flows, and hosted sync references in this file are not current now-roadmap authority.
+
 # Architecture Decision Document
 
 _This document builds collaboratively through step-by-step discovery. Sections are appended as we work through each architectural decision together._

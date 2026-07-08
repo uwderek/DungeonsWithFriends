@@ -10,6 +10,17 @@ inputDocuments: ['prd.md', 'architecture.md', 'product.md', 'productroadmap.md']
 
 ---
 
+## Current Decision Status
+
+This UX direction remains useful for product experience goals, especially asynchronous play, story cards, contextual action drawers, and desktop creator ergonomics. Platform-specific assumptions must be re-evaluated for the 2026-07-07 architecture rebaseline:
+
+- Now-roadmap UX is fully local and must not require login.
+- Expo/React Native remains the primary UI/app framework.
+- Gluestack/Tailwind remains the primary component and styling framework.
+- TinyBase remains the local-first store for now.
+- WorkOS hosted authentication, Cloudflare/Neon hosted sync, and Tauri OS-specific downloaded-app UX move to later roadmap sections.
+- Imported ADRs around headless components, shared seams, local-first behavior, and logging should be applied through the DungeonsWithFriends ADR register.
+
 <!-- UX design content will be appended sequentially through collaborative workflow steps -->
 
 ## Executive Summary

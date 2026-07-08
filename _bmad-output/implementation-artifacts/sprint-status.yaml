@@ -1,4 +1,5 @@
-# generated: 2026-03-06 15:15:00
+# generated: 2026-07-07 00:00:00
+# last_updated: 2026-07-07 00:00:00
 # project: DungeonsWithFriends
 # project_key: NOKEY
 # tracking_system: file-system
@@ -11,29 +12,30 @@
 #   - in-progress: Epic actively being worked on
 #   - done: All stories in epic completed
 #
-# Epic Status Transitions:
-#   - backlog → in-progress: Automatically when first story is created (via create-story)
-#   - in-progress → done: Manually when all stories reach 'done' status
-#
 # Story Status:
 #   - backlog: Story only exists in epic file
 #   - ready-for-dev: Story file created in stories folder
 #   - in-progress: Developer actively working on implementation
-#   - review: Ready for code review (via Dev's code-review workflow)
+#   - review: Ready for code review
 #   - done: Story completed
 #
 # Retrospective Status:
 #   - optional: Can be completed but not required
 #   - done: Retrospective has been completed
 #
+# Action Item Status:
+#   - open: Committed during planning or retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+#
 # WORKFLOW NOTES:
 # ===============
-# - Epic transitions to 'in-progress' automatically when first story is created
-# - Stories can be worked in parallel if team capacity allows
-# - SM typically creates next story after previous one is 'done' to incorporate learnings
-# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - This file was refreshed from epics.md on 2026-07-07.
+# - The epic list is currently historical pending the documentation repair plan.
+# - Do not create the next implementation story until action item repair-current-docs is done or explicitly waived.
 
-generated: "2026-03-10 13:50:00"
+generated: "2026-07-07 00:00:00"
+last_updated: "2026-07-07 00:00:00"
 project: DungeonsWithFriends
 project_key: NOKEY
 tracking_system: file-system
@@ -87,6 +89,7 @@ development_status:
   5-3-tactical-map-view-and-token-presence: backlog
   5-4-initiative-entry-and-turn-order-activation: backlog
   5-5-theater-of-the-mind-and-tactical-mode-switching: backlog
+  5-6-compatible-2d-and-3d-tactical-scene-presentation: backlog
   epic-5-retrospective: optional
 
   epic-6: backlog
@@ -94,6 +97,7 @@ development_status:
   6-2-reconnection-sync-and-chronological-resolution: backlog
   6-3-narrative-push-notifications-for-required-input: backlog
   6-4-conflict-rollback-and-authoritative-state-recovery: backlog
+  6-5-offline-re-entry-with-cached-scene-and-character-data: backlog
   epic-6-retrospective: optional
 
   epic-7: backlog
@@ -103,6 +107,7 @@ development_status:
   7-4-gm-approval-gates-for-high-stakes-outcomes: backlog
   7-5-ai-action-interception-and-override: backlog
   7-6-natural-language-rules-mapping: backlog
+  7-7-offline-single-player-ai-assistance: backlog
   epic-7-retrospective: optional
 
   epic-8: backlog
@@ -113,3 +118,19 @@ development_status:
   8-5-automated-marketplace-moderation: backlog
   8-6-administrative-audit-playback-and-abuse-restriction: backlog
   epic-8-retrospective: optional
+
+  epic-9: backlog
+  9-1-shared-display-and-party-leader-presentation-mode: backlog
+  9-2-internet-backed-room-sessions-with-future-lan-compatibility: backlog
+  9-3-native-vr-tactical-tabletop-presentation: backlog
+  epic-9-retrospective: optional
+
+action_items:
+  repair-current-docs:
+    status: open
+    source: documentation-repair-plan-2026-07-07
+    description: "Update PRD, architecture, UX, epics, and implementation stories for Expo/Gluestack/Tailwind primary UI, TinyBase local no-login now, Tauri OS/server boundaries later, Neon/Postgres sync later, Cloudflare hosting later, WorkOS auth later, no Python product code, and cleaned self-contained ADRs before creating the next dev story."
+  complete-story-1-1-review:
+    status: open
+    source: story-1-1
+    description: "Finish code review of Story 1.1 after the documentation repair plan confirms how to preserve and continue the Expo creator shell."
