@@ -1,6 +1,6 @@
 # Story 1.2: System Template Selection And Custom JSON Binding
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -27,3 +27,9 @@ so that creator components can bind to structured local metadata without hardcod
 - Add co-located tests for valid template import, malformed JSON, invalid schema, and non-mutation on failure.
 - Run `npx tsc --noEmit` from `DungeonsWithFriends/`.
 - Use Test Orchestrator MCP if available; otherwise report the gap.
+
+## Implementation Notes
+
+- Added `system-template-store.ts` with built-in Fantasy d20 selection, custom JSON import, TinyBase persistence, selected-template marking, and typed recoverable import errors.
+- Extended the creator workspace empty state with built-in selection and custom JSON import controls.
+- Covered valid import, malformed JSON, invalid schema, and non-mutation on failure in co-located tests.

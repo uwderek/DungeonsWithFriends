@@ -72,11 +72,11 @@ jest.mock('@/shared/ui/navigation/app-sidebar', () => {
     };
 });
 
-jest.mock('./creator-workspace-empty-state', () => {
+jest.mock('./creator-template-panel', () => {
     const React = require('react');
     const { TouchableOpacity, Text } = require('react-native');
     return {
-        CreatorWorkspaceEmptyState: ({ onSelectSystem }: any) => (
+        CreatorTemplatePanel: ({ onSelectSystem }: any) => (
             <TouchableOpacity onPress={onSelectSystem} testID="select-system-button">
                 <Text>Select System</Text>
             </TouchableOpacity>
@@ -128,9 +128,6 @@ describe('CreatorToolsScreen', () => {
 
         fireEvent.press(getByTestId('settings-button'));
         expect(consoleSpy).toHaveBeenCalledWith('Settings clicked');
-
-        fireEvent.press(getByTestId('select-system-button'));
-        expect(consoleSpy).toHaveBeenCalledWith('Select System clicked');
 
         consoleSpy.mockRestore();
     });

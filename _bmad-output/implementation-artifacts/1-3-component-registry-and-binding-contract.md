@@ -1,6 +1,6 @@
 # Story 1.3: Component Registry And Binding Contract
 
-Status: backlog
+Status: review
 
 ## Story
 
@@ -24,3 +24,9 @@ so that local templates can become playable sheets in later stories.
 
 - Add co-located schema and model tests for valid bindings and stale binding detection.
 - Run `npx tsc --noEmit` from `DungeonsWithFriends/`.
+
+## Implementation Notes
+
+- Added `template-binding-store.ts` to validate component, system template, and field existence before writing bindings.
+- Added stale binding reporting that leaves user work intact.
+- Added creator panel binding controls and export-envelope coverage for `template_bindings`.

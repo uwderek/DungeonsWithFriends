@@ -1,6 +1,6 @@
 # Story 1.4: Local Save Load Preview Export Import
 
-Status: backlog
+Status: review
 
 ## Story
 
@@ -25,3 +25,9 @@ so that my work survives reloads and can be moved manually before hosted sync ex
 
 - Add co-located tests for export envelope shape, import success, malformed import, unsupported version, and non-mutation on failure.
 - Run `npx tsc --noEmit` from `DungeonsWithFriends/`.
+
+## Implementation Notes
+
+- Added creator workspace checkpoint, export, and import controls backed by the shared local store helpers.
+- Added schema-driven local preview of selected template fields, binding summaries, and stale binding warnings.
+- Failed snapshot imports surface recoverable local errors and preserve current TinyBase rows.

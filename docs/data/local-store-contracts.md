@@ -34,7 +34,7 @@ Local snapshots use this shape:
 ## Current Tables
 
 - `component_definitions`: creator component definitions.
-- `system_templates`: local game-system metadata.
+- `system_templates`: local game-system metadata. Rows store `field_definitions` as JSON text and may mark the active creator system with `is_selected`.
 - `template_bindings`: mapping between creator components and system fields.
 - `character_sheets`: local playable sheet records.
 

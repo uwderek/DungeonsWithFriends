@@ -9,7 +9,7 @@ import { createComponentDefinition } from '../model/component-store';
 import { useStore } from 'tinybase/ui-react';
 import { Database } from 'lucide-react-native';
 import { CreatorWorkspaceShell } from './creator-workspace-shell';
-import { CreatorWorkspaceEmptyState } from './creator-workspace-empty-state';
+import { CreatorTemplatePanel } from './creator-template-panel';
 import { useCreatorWorkspaceState } from '../model/use-creator-workspace-state';
 
 export const CreatorToolsScreen: React.FC<{ 
@@ -115,14 +115,12 @@ export const CreatorToolsScreen: React.FC<{
                     />
                 }
                 centerContent={
-                    <CreatorWorkspaceEmptyState 
+                    <CreatorTemplatePanel
                         onSelectSystem={() => {
                             if (onSelectSystem) {
                                 onSelectSystem();
-                            } else {
-                                console.log('Select System clicked');
                             }
-                        }} 
+                        }}
                     />
                 }
                 rightContent={

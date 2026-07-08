@@ -43,6 +43,7 @@ A template binding maps a creator component to a system field:
 - Bindings must validate that the referenced component and system field exist.
 - Removing a system field reports stale bindings instead of deleting user work.
 - Binding transforms are metadata only until a later story implements runtime evaluation.
+- The selected creator system is stored locally on the `system_templates` row with `is_selected`; this is local workspace state, not account or hosted sync state.
 
 ## Future Consumers
 
