@@ -37,7 +37,7 @@ Local snapshots use this shape:
 - `system_templates`: local game-system metadata. Rows store `field_definitions` as JSON text and may mark the active creator system with `is_selected`.
 - `template_bindings`: mapping between creator components and system fields.
 - `character_sheets`: local playable sheet records.
-- `dice_rolls`: local roll records for character sheets. Rows store roll detail as JSON text.
+- `dice_rolls`: local roll records for character sheets. Rows store roll detail as JSON text and carry `resolution_source` (`local_rng` or `manual_entry`, defaulting to `local_rng` for older rows) per ADR-0063. Manual results validate against notation exactly like digital rolls.
 
 TinyBase omits empty tables from `getTables()`. An empty store or export therefore uses `"tables": {}` until rows are written; the table names above are the allowed contract, not required empty keys.
 
@@ -52,4 +52,4 @@ TinyBase omits empty tables from `getTables()`. An empty store or export therefo
 
 ## Later Sync Boundary
 
-Later Neon/Postgres sync must consume this versioned local envelope or explicit derivatives from it. Hosted sync must not bypass local migrations or validation.
+Later sync must consume this versioned local envelope or explicit derivatives from it, over any transport adapter (hosted Neon/Postgres, LAN host, or manual file exchange) per ADR-0061. No sync adapter may bypass local migrations or validation.

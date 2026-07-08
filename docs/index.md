@@ -1,10 +1,11 @@
 # Project Documentation Index
 
-Last updated: 2026-07-07
+Last updated: 2026-07-08
 
 ## Current Authority
 
 - [Project Context](./project-context.md)
+- [Long-Term Product Vision](./product-vision.md)
 - [Product Requirements](../_bmad-output/planning-artifacts/prd.md)
 - [Current Codebase Architecture](./architecture.md)
 - [Technical Architecture](../_bmad-output/planning-artifacts/architecture.md)
@@ -20,6 +21,7 @@ Last updated: 2026-07-07
 - [Template Binding Contracts](./data/template-binding-contracts.md)
 - [Export and Import Format](./data/export-import-format.md)
 - [DWF Platform Baseline ADR](./decisions/ADR-0059-dwf-platform-baseline-typescript-tauri-cloudflare-workos.md)
+- [Vision Capability Map ADR](./decisions/ADR-0060-long-term-vision-capability-map.md), [Transport-Agnostic Sync ADR](./decisions/ADR-0061-transport-agnostic-sync-and-session-authority.md), [Event Ledger Spine ADR](./decisions/ADR-0062-campaign-event-ledger-replayable-spine.md), [Dice Provenance ADR](./decisions/ADR-0063-dice-roll-resolution-provenance.md), [Rules-As-Data ADR](./decisions/ADR-0064-rules-as-data-compendium-layer.md)
 - Cleaned ADR corpus: individual files in `docs/decisions/` carry DWF disposition and roadmap lane metadata.
 - [Sprint Change Proposal](../_bmad-output/planning-artifacts/sprint-change-proposal-2026-07-07.md)
 - [Architecture Realignment](../_bmad-output/planning-artifacts/architecture-realignment-2026-07-07.md)

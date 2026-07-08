@@ -22,12 +22,18 @@ export const diceRollDetailSchema = z.object({
     modifier: z.number().int(),
 });
 
+// ADR-0063: rows persisted before this field existed default to local_rng.
+export const diceRollResolutionSourceSchema = z.enum(['local_rng', 'manual_entry']);
+
+export type DiceRollResolutionSource = z.infer<typeof diceRollResolutionSourceSchema>;
+
 export const diceRollSchema = z.object({
     roll_id: z.uuid(),
     character_sheet_id: z.uuid(),
     notation: z.string().min(2).max(32),
     total: z.number().int(),
     detail: diceRollDetailSchema,
+    resolution_source: diceRollResolutionSourceSchema.default('local_rng'),
     rolled_at: z.iso.datetime(),
 }).superRefine((roll, context) => {
     try {
@@ -81,6 +87,7 @@ type DiceRollRow = {
     notation?: string;
     total?: number;
     detail?: string;
+    resolution_source?: string;
     rolled_at?: string;
 };
 
@@ -92,6 +99,7 @@ const parseDiceRollRow = (rollId: string, row: DiceRollRow): DiceRoll | null => 
             notation: row.notation,
             total: row.total,
             detail: typeof row.detail === 'string' ? JSON.parse(row.detail) : row.detail,
+            resolution_source: row.resolution_source,
             rolled_at: row.rolled_at,
         });
     } catch {
@@ -104,6 +112,7 @@ const serializeDiceRoll = (roll: DiceRoll) => ({
     notation: roll.notation,
     total: roll.total,
     detail: JSON.stringify(roll.detail),
+    resolution_source: roll.resolution_source,
     rolled_at: roll.rolled_at,
 });
 
@@ -138,8 +147,54 @@ export const createDiceRoll = (
             rolls: result.rolls,
             modifier: result.modifier,
         },
+        resolution_source: 'local_rng',
         rolled_at: input.rolled_at ?? new Date().toISOString(),
     });
+
+    store.setRow(TABLES.diceRolls, roll.roll_id, serializeDiceRoll(roll));
+
+    return roll;
+};
+
+export const createManualDiceRoll = (
+    store: Store,
+    input: {
+        character_sheet_id: string;
+        notation: string;
+        rolls: number[];
+        roll_id?: string;
+        rolled_at?: string;
+    }
+): DiceRoll => {
+    if (!getCharacterSheet(store, input.character_sheet_id)) {
+        throw new DiceRollStoreError('missing_sheet', `Character sheet ${input.character_sheet_id} was not found.`);
+    }
+
+    let parsed;
+    try {
+        parsed = parseDiceNotation(input.notation);
+    } catch (error) {
+        const message = error instanceof DiceNotationError ? error.message : 'Dice notation is invalid.';
+        throw new DiceRollStoreError('invalid_notation', message, error);
+    }
+
+    let roll;
+    try {
+        roll = diceRollSchema.parse({
+            roll_id: input.roll_id ?? crypto.randomUUID(),
+            character_sheet_id: input.character_sheet_id,
+            notation: parsed.normalized,
+            total: input.rolls.reduce((sum, value) => sum + value, parsed.modifier),
+            detail: {
+                rolls: input.rolls,
+                modifier: parsed.modifier,
+            },
+            resolution_source: 'manual_entry',
+            rolled_at: input.rolled_at ?? new Date().toISOString(),
+        });
+    } catch (error) {
+        throw new DiceRollStoreError('invalid_roll', 'Manual roll results do not match the notation.', error);
+    }
 
     store.setRow(TABLES.diceRolls, roll.roll_id, serializeDiceRoll(roll));
 

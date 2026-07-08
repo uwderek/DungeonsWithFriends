@@ -6,6 +6,7 @@ import { createCharacterSheet } from './character-sheet-store';
 import {
     DiceRollStoreError,
     createDiceRoll,
+    createManualDiceRoll,
     getDiceRollsForCharacter,
     getLatestDiceRollForCharacter,
 } from './dice-roll-store';
@@ -45,9 +46,65 @@ describe('dice-roll-store', () => {
             rolled_at: now,
         });
         expect(roll.detail.rolls).toEqual([1, 1]);
+        expect(roll.resolution_source).toBe('local_rng');
         expect(getDiceRollsForCharacter(store, sheetId)).toHaveLength(1);
         expect(getLatestDiceRollForCharacter(store, sheetId)?.roll_id).toBe(rollId);
         expect(store.getCell(TABLES.diceRolls, rollId, 'detail')).toContain('"rolls":[1,1]');
+        expect(store.getCell(TABLES.diceRolls, rollId, 'resolution_source')).toBe('local_rng');
+    });
+
+    it('creates a validated manual roll with manual_entry provenance', () => {
+        const store = setupSheet();
+
+        const roll = createManualDiceRoll(store, {
+            roll_id: rollId,
+            character_sheet_id: sheetId,
+            notation: '2d6+3',
+            rolls: [4, 6],
+            rolled_at: now,
+        });
+
+        expect(roll).toMatchObject({
+            notation: '2d6+3',
+            total: 13,
+            resolution_source: 'manual_entry',
+        });
+        expect(store.getCell(TABLES.diceRolls, rollId, 'resolution_source')).toBe('manual_entry');
+    });
+
+    it('rejects manual rolls that do not match the notation', () => {
+        const store = setupSheet();
+
+        expect(() => createManualDiceRoll(store, {
+            character_sheet_id: sheetId,
+            notation: '2d6+3',
+            rolls: [4],
+        })).toThrow(DiceRollStoreError);
+
+        expect(() => createManualDiceRoll(store, {
+            character_sheet_id: sheetId,
+            notation: '2d6+3',
+            rolls: [4, 7],
+        })).toThrow(DiceRollStoreError);
+
+        expect(store.getRowIds(TABLES.diceRolls)).toEqual([]);
+    });
+
+    it('defaults resolution_source to local_rng for rows persisted before ADR-0063', () => {
+        const store = setupSheet();
+        createDiceRoll(store, {
+            roll_id: rollId,
+            character_sheet_id: sheetId,
+            notation: '2d6+3',
+            rolled_at: now,
+            random: () => 0,
+        });
+        store.delCell(TABLES.diceRolls, rollId, 'resolution_source');
+
+        const rolls = getDiceRollsForCharacter(store, sheetId);
+
+        expect(rolls).toHaveLength(1);
+        expect(rolls[0].resolution_source).toBe('local_rng');
     });
 
     it('does not create a row for invalid notation', () => {
