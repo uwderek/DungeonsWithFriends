@@ -77,7 +77,7 @@ context:
 - Legacy provider/auth-screen `rg` scan across active code/story docs -- passed with no matches.
 - `git diff --check` -- passed; Git printed Windows CRLF normalization warnings only.
 - Sprint status duplicate-key check -- passed with 26 unique status keys.
-- Test Orchestrator MCP lookup -- unavailable in this session; direct Jest/Playwright commands were not run because package scripts intentionally block them.
+- Direct Jest/Playwright commands were not run during the original Epic 1 closeout; current repo guidance now supports direct verification commands.
 
 ## Review Notes
 
@@ -92,7 +92,7 @@ context:
 - Stories 1.1, 1.2, 1.3, and 1.4 were accepted on 2026-07-08 after the final review patch.
 - Epic 1 was marked done in `sprint-status.yaml`.
 - Epic 1 retrospective was completed and saved as `epic-1-retro-2026-07-08.md`.
-- Remaining risk is verification tooling, not accepted behavior: Test Orchestrator MCP was unavailable, so direct Jest/Playwright verification remains deferred until that tool path is restored.
+- Remaining historical note: direct Jest/Playwright verification was enabled in a follow-up cleanup after the Epic 1 closeout.
 
 ## Suggested Review Order
 

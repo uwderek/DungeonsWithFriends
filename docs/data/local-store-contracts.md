@@ -45,7 +45,8 @@ TinyBase omits empty tables from `getTables()`. An empty store or export therefo
 - Persisted field names use `snake_case`.
 - Hooks, functions, variables, and React props use `camelCase`.
 - Local actions must not require network or login.
-- Import must validate before replacing current local data.
+- Import must validate the envelope, known domain table rows, and creator binding references before replacing current local data.
+- Manual creator portability stays JSON text-area based for now; file picker or native filesystem support needs explicit future story coverage.
 - Corrupt local persistence must fall back to an empty valid snapshot.
 
 ## Later Sync Boundary

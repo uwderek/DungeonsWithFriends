@@ -61,7 +61,7 @@ Every ADR that is *motivated by* a best-practice pack and every pack that is
 - **No-linkage is valid.** A pack without an `adr:` field and an ADR
   without a pack reference is fine — the contract is symmetry, not
   presence. Standalone packs (e.g. a future pack with no ADR yet) and
-  standalone ADRs (e.g. ADR-0012 MCP-first, motivated by the
+  standalone ADRs (e.g. ADR-0012 direct repository verification, motivated by the
   authoritative override block, not a pack) both pass.
 
 ## Consequences
@@ -91,12 +91,8 @@ authority.
 
 ## Confirmation
 
-This ADR is enforced by the quality script
-`ActionPlan/quality/check-adr-pack-linkage.js` (MCP-wrapped via the
-existing `mcp__actionplan-verification__check_governance_audit` aggregate
-gate). The validator runs on every `run_quality_gates` invocation and is
-allow-listed in `.claude/settings.json` (added by Story 250.10). The
-script:
+This ADR can be enforced by a future DWF repo-owned quality script that runs
+through direct repository commands. The validator should:
 
 1. Parses every file under `docs/decisions/*.md` and extracts each ADR's
    Confirmation references that point at a best-practice pack.

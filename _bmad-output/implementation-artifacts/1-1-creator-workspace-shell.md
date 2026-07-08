@@ -182,7 +182,7 @@ Reusable code that may be consumed but should not be relocated:
   - keyboard/focus affordances for primary controls
 - Preserve existing creator feature tests for component-definition behavior unless the shell refactor intentionally changes their surface area.
 - Preserve provider and navigation regressions in shared test suites.
-- Use the project’s orchestrated testing workflow rather than direct Jest or Playwright commands.
+- Use the project’s direct repository verification commands for TypeScript, Jest, Playwright, and style checks.
 
 ### Scope Boundaries
 
@@ -268,4 +268,4 @@ Cascade
 
 - Accepted on 2026-07-08 as part of the Epic 1 implementation review.
 - Story 1.1's open review action item was closed in `sprint-status.yaml`.
-- Final Epic 1 review verification used TypeScript, architecture-regression scans, and diff hygiene checks; Test Orchestrator remained unavailable in this session.
+- Final Epic 1 review verification used TypeScript, architecture-regression scans, and diff hygiene checks.

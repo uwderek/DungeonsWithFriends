@@ -10,20 +10,21 @@ Testing protects the local-first baseline while the project moves from creator t
 
 - **TypeScript:** `npx tsc --noEmit` from `DungeonsWithFriends/` verifies strict TypeScript.
 - **Unit tests:** Co-located Jest tests validate schemas, model helpers, UI behavior, and local persistence.
-- **E2E tests:** Playwright validates high-value app flows through the sanctioned orchestrator.
+- **E2E tests:** Playwright validates high-value app flows directly through the repo script.
 - **Static ADR scans:** Repository scans ensure current code does not reintroduce removed auth/provider assumptions.
 - **Markdown checks:** Documentation links and sprint status consistency must be checked when planning artifacts change.
 
-## Orchestrator Rule
+## Direct Tool Rule
 
-The preferred path is the Test Orchestrator MCP documented in `DungeonsWithFriends/README.md`. When it is available, use it for unit, E2E, style, and coverage checks.
+Use the repo's direct commands for verification:
 
-When the orchestrator is not available in a session:
+- `npm run typecheck` from `DungeonsWithFriends/`
+- `npm test -- --runInBand` from `DungeonsWithFriends/`
+- `npm test -- --runInBand <test-path>` for focused Jest runs
+- `npm run test:e2e` when browser-level flows are affected
+- `npm run lint:css` when CSS or Tailwind/style files are touched
 
-- Do not run direct `npm test`, `jest`, or `playwright` commands because package scripts intentionally block them.
-- Run `npx tsc --noEmit` as the nearest local code check.
-- Run targeted `rg` scans for forbidden current-scope dependencies or docs drift.
-- Report the orchestrator gap explicitly in the closeout.
+Run targeted `rg` scans for forbidden current-scope dependencies or docs drift when architecture-sensitive areas change.
 
 ## Coverage Expectations
 
@@ -43,6 +44,6 @@ Expected current-scope result: no product-code matches and no active planning ar
 A story is not done until:
 
 - TypeScript passes or the exact blocker is documented.
-- Test Orchestrator checks pass, or the orchestrator is unavailable and the degraded verification is reported.
+- Relevant direct unit, E2E, style, or scan checks pass, or the exact blocker is documented.
 - Story file and `sprint-status.yaml` agree.
 - Any new ADR/doc links resolve.

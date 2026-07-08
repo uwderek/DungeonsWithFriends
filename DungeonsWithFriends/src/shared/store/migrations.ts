@@ -22,6 +22,7 @@ const snapshotEnvelopeSchema = z.object({
 export type LocalStoreErrorCode =
     | 'invalid_json'
     | 'invalid_envelope'
+    | 'invalid_domain_data'
     | 'storage_unavailable'
     | 'unsupported_version'
     | 'migration_failed';

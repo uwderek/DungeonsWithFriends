@@ -30,12 +30,14 @@ Manual export/import is the current portability and backup path. It must work be
 - Validate envelope fields.
 - Reject unsupported future versions.
 - Run migrations for supported older versions.
+- Validate known domain tables and cross-table references.
 - Replace store tables only after validation and migration succeeds.
 
 ## Error Types
 
 - `invalid_json`
 - `invalid_envelope`
+- `invalid_domain_data`
 - `storage_unavailable`
 - `unsupported_version`
 - `migration_failed`

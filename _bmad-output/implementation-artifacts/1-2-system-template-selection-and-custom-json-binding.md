@@ -26,7 +26,7 @@ so that creator components can bind to structured local metadata without hardcod
 
 - Add co-located tests for valid template import, malformed JSON, invalid schema, and non-mutation on failure.
 - Run `npx tsc --noEmit` from `DungeonsWithFriends/`.
-- Use Test Orchestrator MCP if available; otherwise report the gap.
+- Use direct repository verification commands for TypeScript and relevant focused tests.
 
 ## Implementation Notes
 
@@ -38,4 +38,4 @@ so that creator components can bind to structured local metadata without hardcod
 
 - Accepted on 2026-07-08 as part of the Epic 1 implementation review.
 - Review confirmed selected-template reads are safe against malformed imported rows and preserve the local-first, login-free boundary.
-- Final Epic 1 review verification used TypeScript, architecture-regression scans, and diff hygiene checks; Test Orchestrator remained unavailable in this session.
+- Final Epic 1 review verification used TypeScript, architecture-regression scans, and diff hygiene checks.

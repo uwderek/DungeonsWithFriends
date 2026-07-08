@@ -186,7 +186,6 @@ This ADR is confirmed by:
   import on that path fails the gate).
 - The CLI core daemon's warm-reuse performance budget test and the
   `clear-all-local-state` reset test (fresh state without file surgery).
-- Manual review against ADR-0027 (single authority),
-  using the change-management discipline pack. All verification runs through the
-  `actionplan-verification` MCP, degrading via `node ActionPlan/scripts/verify.cjs
-  <verb>`, never raw `jest` / `pnpm` / `tsc`.
+- Manual review against ADR-0027 (single authority), using the change-management
+  discipline pack. DWF verification should run through direct repository
+  commands and CI jobs.

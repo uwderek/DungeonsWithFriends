@@ -66,7 +66,7 @@ WorkOS, Cloudflare, Neon/Postgres, and Tauri/Rust are later boundaries. They att
 
 ## Verification Architecture
 
-The preferred path is the Test Orchestrator MCP. When unavailable, direct Jest/Playwright scripts remain blocked by package scripts; use TypeScript and static scans as degraded checks and report the gap.
+Verification runs through direct repo commands: TypeScript typecheck, co-located Jest tests, Playwright E2E where relevant, Stylelint for CSS, and targeted architecture scans. Package scripts expose those commands directly.
 
 ## Later Attach Points
 

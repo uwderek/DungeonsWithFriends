@@ -13,7 +13,7 @@ source: imported-and-cleaned
 
 - **DWF disposition:** adapted.
 - **Roadmap lane:** now.
-- **Project application:** Preserve the per-file coverage intent, but define actual DWF thresholds after the test orchestrator and Expo/TinyBase baseline are repaired.
+- **Project application:** Preserve the per-file coverage intent, with thresholds and reports gathered through direct Jest coverage output or repo-owned scripts.
 - **Source cleanup:** Source-specific epics, story IDs, paths, scripts, MCP names, and product nouns in the historical text below are non-governing for DungeonsWithFriends. Use current DWF paths, the ADR-0059 platform baseline, and any future DWF ADRs instead.
 
 ## Source Status

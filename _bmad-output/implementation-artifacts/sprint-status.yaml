@@ -82,18 +82,13 @@ action_items:
     status: done
     source: story-1-1
     description: "Finish code review of Story 1.1 creator workspace shell before marking it done."
-  restore-test-orchestrator-verification:
-    status: open
-    source: epic-1-retrospective
-    owner: "Dev/Tooling"
-    description: "Restore or expose the Test Orchestrator MCP path so Epic 2 can run the intended unit and UI verification flow instead of relying only on TypeScript/static checks."
   validate-imported-domain-rows-before-epic-2:
-    status: open
+    status: done
     source: epic-1-retrospective
     owner: "Architect/Developer"
     description: "Add or confirm domain-level validation for imported TinyBase rows before Epic 2 relies on creator template, binding, and component rows at runtime."
   decide-creator-import-file-picker-scope:
-    status: open
+    status: done
     source: epic-1-retrospective
     owner: "Product/UX"
-    description: "Decide whether the current JSON text-area import/export flow is enough for the next local playable-sheet workflow or whether file picker support should be planned."
+    description: "Decision recorded: keep the current JSON text-area import/export flow for now; file picker support is not planned for the current local playable-sheet baseline."

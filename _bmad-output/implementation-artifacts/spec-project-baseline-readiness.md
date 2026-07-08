@@ -47,7 +47,7 @@ context:
 - `_bmad-output/planning-artifacts/epics.md` -- repaired Now/Next/Later epic and story backlog.
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` -- implementation gate and backlog status.
 - `_bmad-output/implementation-artifacts/1-1-creator-workspace-shell.md` -- Story 1.1 review handoff.
-- `docs/testing/strategy.md` -- verification and orchestrator expectations.
+- `docs/testing/strategy.md` -- direct repository verification expectations.
 - `docs/data/local-store-contracts.md` -- TinyBase table/version/migration contracts.
 - `docs/data/template-binding-contracts.md` -- creator template and binding contracts.
 - `docs/data/export-import-format.md` -- local backup/import envelope.
@@ -82,11 +82,11 @@ context:
 - `git diff --check` -- passed; Git printed Windows CRLF normalization warnings only.
 - Sprint status duplicate-key PowerShell check -- passed with 28 unique status keys.
 - TinyBase runtime probe for empty tables and first row write -- passed.
-- Test Orchestrator MCP lookup -- unavailable in this session; direct Jest/Playwright commands were not run because package scripts intentionally block them.
+- Direct Jest/Playwright commands were not run during that session; current repo guidance now supports direct verification commands.
 
 ## Review Notes
 
-- Blind review and edge-case review were run in-process against the diff because no separate Test Orchestrator or review-agent handoff tool was exposed.
+- Blind review and edge-case review were run in-process against the diff because no separate review-agent handoff tool was exposed.
 - Patch finding fixed: TinyBase does not retain empty table keys, so empty snapshots/stores now treat `tables: {}` as valid and docs clarify that table names are the write contract.
 - Patch finding fixed: local persistence read failures now recover to an empty snapshot with a typed `storage_unavailable` error.
 
@@ -139,7 +139,7 @@ context:
 - Review TinyBase table rules and empty export note.
   [`local-store-contracts.md:34`](../../docs/data/local-store-contracts.md#L34)
 
-- Confirm the current release gate and orchestrator posture.
+- Confirm the current release gate and direct repository verification posture.
   [`strategy.md:41`](../../docs/testing/strategy.md#L41)
 
 **Tests**

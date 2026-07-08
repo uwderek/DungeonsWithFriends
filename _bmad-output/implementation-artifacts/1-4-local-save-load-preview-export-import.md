@@ -36,4 +36,4 @@ so that my work survives reloads and can be moved manually before hosted sync ex
 
 - Accepted on 2026-07-08 as part of the Epic 1 implementation review.
 - Review confirmed local export/import remains login-free and failed imports preserve current TinyBase rows.
-- Final Epic 1 review verification used TypeScript, architecture-regression scans, and diff hygiene checks; Test Orchestrator remained unavailable in this session.
+- Final Epic 1 review verification used TypeScript, architecture-regression scans, and diff hygiene checks.

@@ -50,9 +50,8 @@ Specific-only components without that justification are rejected at review.
   rather than fork.
 - Adding a new variant touches the shared component, not a parallel local
   copy, so visual regressions are caught in one place.
-- The `audit-shared-reuse.js` gate (MCP-wrapped as
-  `mcp__actionplan-verification__audit_shared_reuse`) keeps an empirical eye
-  on the reuse surface and surfaces drift.
+- A future DWF repo-owned shared-reuse audit can keep an empirical eye on
+  the reuse surface and surface drift.
 
 If reversed, the codebase fragments into a graveyard of one-off components,
 each one-line-different from a sibling, and the design system stops being a
@@ -69,10 +68,8 @@ work that gets scheduled but not done.
 
 This ADR is enforced through:
 
-- The quality script `ActionPlan/quality/audit-shared-reuse.js` (MCP-wrapped
-  as `mcp__actionplan-verification__audit_shared_reuse`) audits the
-  shared-component reuse surface and is part of the aggregate
-  `run_quality_gates` set.
+- A future DWF quality script can audit the shared-component reuse surface
+  through direct repository commands.
 - The pack `Agents/_shared/best-practice-packs/extensibility-and-reuse.yaml`
   defines the proactive review checklist; the pack carries `adr: ADR-0010`
   (and `ADR-0016`) so the linkage validator (see ADR-0018) keeps the two

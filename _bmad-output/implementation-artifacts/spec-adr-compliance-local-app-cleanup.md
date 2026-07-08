@@ -68,7 +68,7 @@ context:
 **Commands:**
 - `rg -n -i "nhost|auth-provider|login-screen|register-screen|welcome-screen|@nhost" DungeonsWithFriends/src DungeonsWithFriends/App.tsx DungeonsWithFriends/package.json` -- expected: no matches.
 - `npm run lint -- --noEmit` or nearest available typecheck command from the app -- expected: TypeScript success if available.
-- Targeted Jest via sanctioned orchestrator if available; otherwise report the orchestrator gap and run no direct Jest command.
+- Targeted Jest through direct repository commands where relevant.
 
 **Results:**
 - `rg -n -i "nhost|@nhost|auth-provider|login-screen|register-screen|welcome-screen|debug-nhost" DungeonsWithFriends/src DungeonsWithFriends/App.tsx DungeonsWithFriends/App.test.tsx DungeonsWithFriends/package.json DungeonsWithFriends/package-lock.json DungeonsWithFriends/README.md docs/architecture.md docs/project-context.md docs/roadmap _bmad-output/planning-artifacts/architecture-realignment-2026-07-07.md _bmad-output/planning-artifacts/documentation-repair-plan-2026-07-07.md _bmad-output/planning-artifacts/sprint-change-proposal-2026-07-07.md _bmad-output/implementation-artifacts/1-1-creator-workspace-shell.md` -- no matches.
@@ -76,7 +76,7 @@ context:
 - `npx tsc --noEmit` from `DungeonsWithFriends/` -- passed.
 - `npm ls @nhost/nhost-js @nhost/react expo-auth-session expo-crypto graphql --depth=0` from `DungeonsWithFriends/` -- returned an empty dependency tree.
 - `git diff --check` -- passed with Git CRLF normalization warnings only.
-- Test-orchestrator MCP was not available in this Codex session; direct Jest/Playwright was not run because `package.json` routes those through the orchestrator.
+- Direct Jest/Playwright was not run during that session because package scripts previously blocked them; this has since been superseded by direct repository verification commands.
 
 ## Suggested Review Order
 

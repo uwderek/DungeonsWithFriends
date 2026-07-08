@@ -55,7 +55,7 @@ Repair the current BMAD documentation so development can continue from one coher
 8. Verification
    - Run Markdown link checks over `docs/index.md`, `docs/roadmap/*`, `docs/project-context.md`, `docs/architecture.md`, and repaired planning artifacts.
    - Validate sprint status for duplicate keys and story alignment.
-   - Use the sanctioned test orchestrator when code changes are introduced.
+   - Use direct repository verification commands when code changes are introduced.
 
 ## Deliverables
 

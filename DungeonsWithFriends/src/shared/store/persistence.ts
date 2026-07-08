@@ -6,6 +6,7 @@ import {
     snapshotStore,
 } from './local-store';
 import { LocalStoreError, migrateSnapshot, parseSnapshotJson } from './migrations';
+import { validateSnapshotDomainData } from './domain-validation';
 
 export type LocalStoreStorage = {
     getItem: (key: string) => string | null;
@@ -63,7 +64,9 @@ export const loadPersistedSnapshot = (
     }
 
     try {
-        return { snapshot: migrateSnapshot(parseSnapshotJson(raw)), recovered: false, error: null };
+        const snapshot = migrateSnapshot(parseSnapshotJson(raw));
+        validateSnapshotDomainData(snapshot);
+        return { snapshot, recovered: false, error: null };
     } catch (error) {
         const localError = error instanceof LocalStoreError
             ? error

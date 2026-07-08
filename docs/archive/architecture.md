@@ -32,7 +32,7 @@ Rendering: The Three.js rendering engine is a component within the client applic
 Voice/Video Chat: WebRTC connections are established peer-to-peer between clients. The Nhost backend acts as a secure signaling server to facilitate the initial handshake.
 
 2. Testing Strategy \& Libraries
-   The testing strategy has moved towards a structured setup orchestrated by a custom MCP (Model Context Protocol) server (test-orchestrator), dividing tests into Unit and End-to-End (E2E) layers.
+   The testing strategy uses direct repository commands for TypeScript, Unit, style, and End-to-End (E2E) layers.
 
 Unit Testing Strategy
 
@@ -43,7 +43,7 @@ E2E Testing Strategy
 
 Playwright (@playwright/test): Replaced Maestro/Detox (indicated by some legacy docs) as the primary End-to-End browser/web testing framework. Playwright simulates detailed user flows like authentication, task management, and project tracking in a real browser environment.
 
-est Orchestration
+Verification Commands
 
-MCP Test Orchestrator (mcp/test-orchestrator/dist/cli.js): A custom system designed for AI agents to precisely run tests, type-checks, and coverage reports. It replaces the traditional manual npm test scripts to provide structured, machine-readable output for continuous validation during development.
+Repository scripts run the local verification tools directly: TypeScript, Jest, Playwright, and Stylelint.
 

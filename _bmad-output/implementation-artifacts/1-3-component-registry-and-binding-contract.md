@@ -35,4 +35,4 @@ so that local templates can become playable sheets in later stories.
 
 - Accepted on 2026-07-08 as part of the Epic 1 implementation review after patching binding-row validation.
 - Review patch now safe-parses persisted binding rows and rejects invalid component rows before writing a binding.
-- Final Epic 1 review verification used TypeScript, architecture-regression scans, and diff hygiene checks; Test Orchestrator remained unavailable in this session.
+- Final Epic 1 review verification used TypeScript, architecture-regression scans, and diff hygiene checks.

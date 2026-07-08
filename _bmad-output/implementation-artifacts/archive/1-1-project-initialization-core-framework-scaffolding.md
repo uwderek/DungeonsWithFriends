@@ -121,4 +121,4 @@ Antigravity
 - [DELETE] `DungeonsWithFriends/src/components/ui/gluestack-ui-provider/config.ts`
 - [DELETE] `DungeonsWithFriends/src/components/ui/gluestack-ui-provider/index.tsx`
 - [DELETE] `DungeonsWithFriends/src/components/ui/gluestack-ui-provider/index.web.tsx`
-- [OUT-OF-SCOPE] `mcp/test-orchestrator/src/handlers/UnitTestHandler.ts` (Modified during infra testing)
+- [OUT-OF-SCOPE] Legacy external test infrastructure files modified during infra testing.

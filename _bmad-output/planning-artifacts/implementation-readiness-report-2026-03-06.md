@@ -49,7 +49,7 @@ The local-first baseline now has explicit supporting contracts for testing, loca
 ## Remaining Readiness Risks
 
 - Story 1.1 still needs a formal review closeout before it should be marked done.
-- Test Orchestrator access must be restored or explicitly reported as unavailable for every story closeout.
+- Direct repository verification commands must be run, or the exact local blocker must be reported, for every story closeout.
 - Future hosted, account, and native decisions must enter through roadmap or ADR updates before implementation.
 - Import/export and migration logic must stay versioned so future server sync can be added without rewriting local payloads.
 

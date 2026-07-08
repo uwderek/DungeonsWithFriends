@@ -1,17 +1,21 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 
+const createMockStore = () => ({
+    getCell: jest.fn(),
+    setCell: jest.fn(),
+    getTables: jest.fn(() => ({})),
+    setTables: jest.fn(),
+});
+
 jest.mock('tinybase/ui-react', () => ({
     Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-    useCreateStore: jest.fn(() => ({})),
-    useStore: jest.fn(() => ({
-        getCell: jest.fn(),
-        setCell: jest.fn(),
-    })),
+    useCreateStore: jest.fn((factory?: () => unknown) => factory?.() ?? createMockStore()),
+    useStore: jest.fn(() => createMockStore()),
 }));
 
 jest.mock('tinybase', () => ({
-    createStore: jest.fn(() => ({})),
+    createStore: jest.fn(() => createMockStore()),
 }));
 
 jest.mock('@gluestack-ui/overlay', () => ({

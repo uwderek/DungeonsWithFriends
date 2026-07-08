@@ -23,15 +23,11 @@ accepted
 ## Promotion Notes
 
 Promoted to accepted on 2026-05-26 as part of the multi-ADR activation
-batch. The existing `ActionPlan/scripts/audit-colocated-tests.js` script
-(with its own colocated test) provides the mechanical confirmation
-surface; the `test-colocation.yaml` pack carries the proactive
-checklist (ADR-0018 linkage). MCP wrapping as
-`mcp__actionplan-verification__audit_colocated_tests` is deferred to a
-follow-up PR — it requires rebuilding `ActionPlan/mcp/test-orchestrator/dist/`
-which is out of scope of an ADR-only activation. Until then the gate
-runs by invoking the script directly via `node` or by the
-co-located-test pattern that the repository already practices.
+batch. For DungeonsWithFriends, the mechanical confirmation surface is
+the co-located Jest test pattern and any future repo-owned audit script
+that can be run directly from the checkout. Until a DWF-specific audit
+exists, review enforces the policy by checking that new and modified
+unit tests live next to the implementation files they verify.
 
 ## Context
 

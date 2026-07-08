@@ -187,7 +187,7 @@ Cells: component_name, display_label, description, data_type, default_value,
 
 - **Co-located Tests:** Every new `.tsx`/`.ts` file gets a sibling `.test.tsx`/`.test.ts` file in the same directory.
 - **Test Runner:** Jest (configured in `jest.config.js` with CSS mocking via `jest-style-mock.js`).
-- **Test Orchestrator:** Run tests via the `test-orchestrator` MCP server, NOT directly via `jest` command.
+- **Testing:** Run direct repository verification commands, including focused Jest tests where relevant.
 - **Regression Guard:** All existing Story 1-1 and 1-2 tests MUST continue to pass.
 - **Coverage:** Creator feature should have tests for:
   - Zod schema validation (valid/invalid component definitions)

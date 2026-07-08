@@ -85,10 +85,9 @@ string-literal contracts (workflow ids, persona-pack ids, audit logs).
 Two mechanisms confirm this ADR:
 
 - **`mechanism: quality-script`** —
-  `ActionPlan/quality/check-persona-role-decoupling.js` (MCP-wrapped as
-  `mcp__actionplan-verification__check_persona_role_decoupling`) mechanically
-  enforces persona-name decoupling against the
-  `persona-decoupling-allowlist.txt` file. This is the runtime gate.
+  A future DWF repo-owned audit can mechanically enforce persona-name
+  decoupling against an allowlist file. Until that exists, review owns the
+  check.
 - **`mechanism: manual`** —
   `Agents/_shared/best-practice-packs/business-first-code-design.yaml` carries
   the proactive naming checklist used at code review; the pack declares

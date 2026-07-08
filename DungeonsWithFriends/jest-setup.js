@@ -5,7 +5,6 @@ jest.useFakeTimers();
 beforeEach(() => {
     const testName = expect.getState().currentTestName;
     if (testName) {
-        // Output formatting exactly as Test Orchestrator utils.ts capture logic requires
         console.log(`[TEST START] ${testName}`);
     }
 });
@@ -79,11 +78,15 @@ jest.mock('lucide-react-native', () => {
         Plus: icon,
         Database: icon,
         FileCode: icon,
+        FileJson: icon,
         Trash2: icon,
         X: icon,
         Save: icon,
+        Download: icon,
+        Upload: icon,
         AlertCircle: icon,
         Info: icon,
+        Link: icon,
         Clock: icon,
         LayoutDashboard: icon,
         User: icon,
@@ -95,6 +98,7 @@ jest.mock('lucide-react-native', () => {
         HelpCircle: icon,
         Menu: icon,
         Database: icon,
+        Wand2: icon,
         Sparkles: icon,
     };
 });
