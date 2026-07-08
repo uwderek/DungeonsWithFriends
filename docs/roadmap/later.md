@@ -1,6 +1,6 @@
 # Roadmap Later
 
-Last updated: 2026-07-07
+Last updated: 2026-07-08
 
 ## Goal
 
@@ -16,6 +16,10 @@ Add hosted, authenticated, native OS-specific, marketplace, and AI capabilities 
 - Friends, profiles, organization/session mapping, and account management.
 - Marketplace publishing, licensing, moderation, entitlement, and administrative audit views.
 - AI assistance, narrative summaries, encounter balancing, rules mapping, automation, and cost controls.
+- Voice assistant and voiced DM: a rules-aware assistant that answers rules questions, teaches new players, and acts as a fully voiced DM (theater-of-the-mind voice-only, TV screen, or phones), consuming the rules/compendium layer (ADR-0064) and acting only through governed typed actions (ADR-0038).
+- TV casting and shared-display surfaces: cast the battle map or narrative view to a TV as a renderer-independent consumer of scene contracts (Epic 4).
+- LAN-hosted sessions: a local device acts as session authority over the transport-agnostic sync port (ADR-0061) with no internet required.
+- External VTT integration adapters: embed or interoperate standalone tools (battle map, character sheet) with platforms such as Roll20, building on the Epic 7 packaging foundation.
 - Immersive/VR or specialized display clients.
 
 ## Entry Criteria
@@ -30,3 +34,6 @@ Add hosted, authenticated, native OS-specific, marketplace, and AI capabilities 
 - Neon/Postgres sync must not bypass local data contracts.
 - Cloudflare services must be selected per responsibility instead of becoming a catch-all platform abstraction.
 - Tauri/Rust must not replace Expo as the primary UI framework.
+- Voice assistants and AI DM behavior must mutate game state only through governed typed actions (ADR-0038); no second ungoverned path.
+- AI capabilities must attach through a provider port that permits local model execution; offline convention play must remain possible (ADR-0060).
+- TV casting, LAN hosting, and external VTT adapters must consume existing scene, ledger, and sync contracts rather than introducing surface-specific state.

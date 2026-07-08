@@ -1,11 +1,13 @@
 # DungeonsWithFriends Project Context
 
 Status: active context
-Last updated: 2026-07-07
+Last updated: 2026-07-08
 
 ## Purpose
 
 DungeonsWithFriends is a local-first, asynchronous tabletop role-playing platform. The product goal remains to make campaign play viable for groups that cannot coordinate long synchronous sessions, while still preserving rich character sheets, tactical scenes, campaign history, creator tooling, and future AI assistance.
+
+The full long-term end-state (automated DM, voice assistant, standalone/embeddable tools, live-play transition, game-system import with AI content generation) is recorded in `docs/product-vision.md` and bound to planning by ADR-0060. Deferred pillars are protected by ADR-0061 (transport-agnostic sync), ADR-0062 (event ledger spine), ADR-0063 (dice provenance), and ADR-0064 (rules-as-data layer).
 
 ## Current Direction
 

@@ -31,8 +31,10 @@
 # WORKFLOW NOTES:
 # ===============
 # - Refreshed from repaired epics.md on 2026-07-08.
+# - Vision-alignment update 2026-07-08: added story 2-4 (done) and epics 6-9 per ADR-0060.
 # - Now-roadmap stories are local-first, login-free, and TinyBase-backed.
-# - Hosted sync, auth, marketplace, AI, and broad Tauri work are later-roadmap only.
+# - Hosted sync, auth, marketplace, and broad Tauri work are later-roadmap only.
+# - Exception per ADR-0060: epic-9 AI content ingestion/generation is next-lane, gated on epic-8 contracts.
 
 generated: "2026-07-08 00:00:00"
 last_updated: "2026-07-08 00:00:00"
@@ -53,6 +55,7 @@ development_status:
   2-1-local-character-library-and-manual-export: done
   2-2-playable-sheet-data-binding: done
   2-3-native-dice-notation-and-local-roll-resolution: done
+  2-4-dice-roll-resolution-provenance: done
   epic-2-retrospective: optional
 
   epic-3: backlog
@@ -71,7 +74,35 @@ development_status:
   5-4-tauri-os-specific-downloaded-app-capabilities: backlog
   5-5-marketplace-governance-and-entitlements: backlog
   5-6-ai-assistance-with-governance: backlog
+  5-7-lan-hosted-session-authority-adapter: backlog
+  5-8-voice-assistant-and-voiced-dm: backlog
+  5-9-tv-casting-and-shared-display-surfaces: backlog
+  5-10-external-vtt-integration-adapters: backlog
   epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-local-play-by-post-thread: backlog
+  6-2-turn-submission-and-pending-action-resolution: backlog
+  6-3-async-pacing-metadata: backlog
+  epic-6-retrospective: optional
+
+  epic-7: backlog
+  7-1-headless-module-boundary-enforcement: backlog
+  7-2-standalone-sheet-and-dice-packaging-spike: backlog
+  7-3-embed-contract-definition: backlog
+  epic-7-retrospective: optional
+
+  epic-8: backlog
+  8-1-rules-and-compendium-schema-contracts: backlog
+  8-2-licensing-and-source-metadata-contract: backlog
+  epic-8-retrospective: optional
+
+  epic-9: backlog
+  9-1-documented-system-ingestion-pipeline: backlog
+  9-2-governed-ai-compendium-generation: backlog
+  9-3-governed-ai-adventure-and-story-generation: backlog
+  9-4-ai-provider-port-local-and-hosted-adapters: backlog
+  epic-9-retrospective: optional
 
 action_items:
   repair-current-docs:

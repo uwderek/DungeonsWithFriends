@@ -1,6 +1,6 @@
 # Roadmap Priority Index
 
-Last updated: 2026-07-07
+Last updated: 2026-07-08
 
 This file owns feature priority and sequencing. The lane files describe scope boundaries and should stay stable as features are added.
 
@@ -27,7 +27,16 @@ This file owns feature priority and sequencing. The lane files describe scope bo
 | P10 | Cloudflare hosted platform | Later | Candidate | Add Workers, Pages, R2, Queues, and coordination services when hosted surfaces are required. |
 | P11 | WorkOS auth/login | Later | Candidate | Auth and login are explicitly later-roadmap work. |
 | P12 | Marketplace and governance | Later | Candidate | Requires account, entitlement, moderation, audit, and hosted storage decisions. |
-| P13 | AI assistance and automation | Later | Candidate | Requires cost controls, governance, safety boundaries, and hosted execution. |
+| P13 | AI assistance and automation | Later | Candidate | Requires cost controls, governance, and safety boundaries; must not be architecturally hosted-only (ADR-0060). |
+| P14 | Dice roll resolution provenance | Now | Done | `resolution_source` on dice rolls with validated manual entry (ADR-0063). |
+| P15 | Local async play loop | Now | Open | Epic 6: play-by-post threads, turn submission, and pending-action resolution on the event ledger spine (ADR-0062). |
+| P16 | Standalone tool packaging foundation | Now | Open | Epic 7: enforced headless module boundaries and packageable tool surfaces for standalone/embedded use. |
+| P17 | Rules and compendium content contracts | Now | Open | Epic 8: schemas for structured rules, compendium entries, source corpus, and licensing metadata (ADR-0064). |
+| P18 | AI content generation and ingestion | Next | Open | Epic 9: ingest documented game systems and generate content into rules/compendium contracts behind governed actions. |
+| P19 | Voice assistant and voiced DM | Later | Candidate | Rules-aware voice/chat assistant, teaching, and fully voiced DM as clients of the governed action registry. |
+| P20 | TV casting and shared displays | Later | Candidate | Scene-contract consumers for casting the battle map or narrative view to a TV. |
+| P21 | LAN-hosted sessions | Later | Candidate | Local device session authority through the transport-agnostic sync port (ADR-0061). |
+| P22 | External VTT integration adapters | Later | Candidate | Embed/interop adapters (for example Roll20) built on the Epic 7 packaging foundation. |
 
 ## Lane Rules
 
@@ -38,6 +47,7 @@ This file owns feature priority and sequencing. The lane files describe scope bo
 
 ## Related Authority
 
+- [Long-Term Product Vision](../product-vision.md) and [Vision Capability Map ADR](../decisions/ADR-0060-long-term-vision-capability-map.md)
 - [DWF Platform Baseline ADR](../decisions/ADR-0059-dwf-platform-baseline-typescript-tauri-cloudflare-workos.md)
 - Cleaned ADR corpus: individual files in `../decisions/` carry DWF disposition and roadmap lane metadata.
 - [Documentation Repair Plan](../../_bmad-output/planning-artifacts/documentation-repair-plan-2026-07-07.md)
